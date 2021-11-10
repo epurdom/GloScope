@@ -1,6 +1,6 @@
 
 
-#' calculat  KL for a pair of samples
+#' calculate  KL for a pair of samples
 #'
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.

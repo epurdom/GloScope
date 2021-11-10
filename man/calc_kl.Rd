@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_dist.R
 \name{calc_kl}
 \alias{calc_kl}
-\title{calculat  KL for a pair of samples}
+\title{calculate  KL for a pair of samples}
 \usage{
 calc_kl(mclust_mod1, mclust_mod2, n = 10000, ep = 1e-64)
 }
