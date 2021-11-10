@@ -4,8 +4,20 @@ Title: Population-level Representation on scRNA-Seq data
 Version: 0.1.0
 Author: Hao Wang, Elizabeth Purdom, Boying Gong
 Maintainer: Hao Wang <hao_wang@berkeley.edu>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Estimate patient distribution to summarizing patient level representation on scRNA-Seq data.
 License: What license is it under?
 Encoding: UTF-8
+Imports: 
+    methods, 
+    utils, 
+    stats, 
+    MASS,
+    Seurat,
+    mclust, 
+    stringr, 
+    dplyr, 
+    ggplot2, 
+    BiocParallel
 LazyData: true
+Depends: R (>= 4.1)
+RoxygenNote: 7.1.1
