@@ -2,10 +2,14 @@ Package: popPackage
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
 Version: 0.1.0
-Author: Hao Wang, Elizabeth Purdom, Boying Gong
+Author: c(person("Hao", "Wang", email = "hao_wang@berkeley.edu",
+            role = c("aut")),
+	     person("Elizabeth", "Purdom", email = "epurdom@stat.berkeley.edu", role = c("aut"),
+	     person("Boying", "Gong", email = "boyinggong@berkeley.edu", role = "aut"))
 Maintainer: Hao Wang <hao_wang@berkeley.edu>
 Description: Estimate patient distribution to summarizing patient level representation on scRNA-Seq data.
-License: What license is it under?
+BugReports: https://github.com/epurdom/popPackage/issues
+License: 
 Encoding: UTF-8
 Imports: 
     methods, 
@@ -20,4 +24,10 @@ Imports:
     BiocParallel
 LazyData: true
 Depends: R (>= 4.1)
+        SingleCellExperiment,
+	      SummarizedExperiment (>= 1.15.4)
+Suggests:
+	knitr,
+  rmarkdown
+biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
 RoxygenNote: 7.1.1

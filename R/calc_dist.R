@@ -20,7 +20,7 @@
 
 # KL divergence
 calc_kl <- function(mclust_mod1, mclust_mod2, n = 10000, ep = 1e-64){
-  s <- sample_mclust(mclust_mod1, n)
+  s <- .sample_mclust(mclust_mod1, n)
   dens1 <- predict(mclust_mod1, s, what = "dens")
   dens2 <- predict(mclust_mod2, s, what = "dens")
   kl <- sum(log(dens1/(dens2 + ep))) / n

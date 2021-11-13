@@ -11,7 +11,8 @@
 #'
 #' @examples
 #' data(example_data)
-#' dist_mat <- SKL(example_data, "donor_label", "PC", 1:10)
+#' set.seed(1)
+#' dist_mat <- distMat(example_data, "donor_label", "PC", 1:10)
 #'
 #' #print out the distance matrix using PCA embedding.
 #' dist_mat
@@ -29,7 +30,7 @@
 
 
 distMat = function(x, sample_id, dim_redu, ndim){
-  sample_names = as.cahracter(unique(x[, sample_id]))
+  sample_names = as.character(unique(x[, sample_id]))
   dim_redu_data = x[,str_detect(colnames(x), dim_redu)]
 
   mod_list = list()

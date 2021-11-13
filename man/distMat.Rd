@@ -23,7 +23,8 @@ in the form "dim_i". Dimension reduction embedding is used to calculate the dens
 }
 \examples{
 data(example_data)
-dist_mat <- SKL(example_data, "donor_label", "PC", 1:10)
+set.seed(1)
+dist_mat <- distMat(example_data, "donor_label", "PC", 1:10)
 
 #print out the distance matrix using PCA embedding.
 dist_mat
