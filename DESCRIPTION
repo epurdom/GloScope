@@ -21,6 +21,7 @@ Imports:
     stringr, 
     dplyr, 
     ggplot2, 
+    RANN,
     BiocParallel
 LazyData: true
 Depends: R (>= 4.1)

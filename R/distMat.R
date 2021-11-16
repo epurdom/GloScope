@@ -21,6 +21,8 @@
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @importFrom stringr str_detect
+#' @importFrom RANN nn2
+
 #' @export
 
 
