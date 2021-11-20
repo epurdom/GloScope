@@ -4,28 +4,21 @@
 \alias{calc_dens}
 \title{calculate density for each samples based on dimension reduction embedding}
 \usage{
-calc_dens(
-  sample_name,
-  sample_id,
-  x,
-  dim_redu_data,
-  dens = c("GMM", "KNN"),
-  k = NULL
-)
+calc_dens(df_list, dens, k, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
-\item{sample_id}{column names in x that contains the sample ID}
-
-\item{x}{a data frame with row corresponding to single cell, contains the info of
-each cell}
-
-\item{dim_redu_data}{a data matrix or frame contains the dimension reduction embedding
-for each cell}
-
 \item{dens}{method used to estimate density, options are GMM (Gaussian mixture model)
 and KNN (K-nearest Neighbor)}
 
 \item{k}{number of nearest neighbor, used when dens = "KNN".}
+
+\item{x}{a data frame with row corresponding to single cell, contains the info of
+each cell}
+
+\item{sample_id}{column names in x that contains the sample ID}
+
+\item{dim_redu_data}{a data matrix or frame contains the dimension reduction embedding
+for each cell}
 }
 \value{
 A list of length number of samples, contains the estimated density for each
@@ -41,10 +34,13 @@ This function loads a vector of the sample names, with length of the
 \examples{
 data(example_data)
 set.seed(1)
+BiocParallel::register(BiocParallel::SerialParam())
 sample_name = as.character(unique(example_data[, "donor_label"]))
-dim_redu_data = example_data[,str_detect(colnames(example_data), "PC")]
-mod_list = calc_dens(sample_name, sample_id = "donor_label",
-                     x = example_data, dim_redu_data, dens = "GMM")
+
+#working with large data set, use BiocParallel
+mod_list = calc_dens(sample_id = "donor_label",
+                     x = example_data, dim_redu = "PC", dens = "GMM",
+                     BPPARAM=BiocParallel::SerialParam())
 
 
 }

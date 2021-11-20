@@ -21,33 +21,37 @@
 #' @examples
 #' data(example_data)
 #' set.seed(1)
+#' BiocParallel::register(BiocParallel::SerialParam())
 #' sample_name = as.character(unique(example_data[, "donor_label"]))
-#' dim_redu_data = example_data[,str_detect(colnames(example_data), "PC")]
-#' mod_list = calc_dens(sample_name, sample_id = "donor_label",
-#'                      x = example_data, dim_redu_data, dens = "GMM")
+#'
+#' #working with large data set, use BiocParallel
+#' mod_list = calc_dens(sample_id = "donor_label",
+#'                      x = example_data, dim_redu = "PC", dens = "GMM",
+#'                      BPPARAM=BiocParallel::SerialParam())
 #'
 #'
 #' @importFrom mclust densityMclust
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
+#' @import BiocParallel
 #' @export
 
 
 
-calc_dens = function(sample_name, sample_id, x, dim_redu_data, dens = c("GMM", "KNN"),k = NULL){
-  mod_list = list()
-  for (s in sample_name){
-    subset_idx <- x[, sample_id] == s
-    subset_dt <- as.matrix(dim_redu[subset_idx, 1:ndim])
+calc_dens = function(df_list, dens, k,
+                     BPPARAM=BiocParallel::bpparam()){
 
-    if(den == "GMM"){
-      mod_list[[s]] <- densityMclust(subset_dt, G=1:9)
-    }else if(den == "KNN"){
-      if(is.null(k)){
-        stop(paste("Did not specify k for KNN density estimation."))
-      }
-      mod_list[[s]] <- nn2(dim_redu[subset_idx, ], query = dim_redu, k = k)
+
+  if(dens == "GMM"){
+    mod_list <- bplapply(df_list, function(z) densityMclust(z, G = 1:9),
+                              BPPARAM=BPPARAM)
+  }else if(dens == "KNN"){
+    if(is.null(k)){
+      stop(paste("Did not specify k for KNN density estimation."))
     }
+    mod_list <- bplapply(df_list, function(z) nn2(z, query = z, k = k)$nn.dists[,k],
+                         BPPARAM=BPPARAM)
   }
+
   return(mod_list)
 }

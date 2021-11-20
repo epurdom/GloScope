@@ -9,7 +9,7 @@ Author: c(person("Hao", "Wang", email = "hao_wang@berkeley.edu",
 Maintainer: Hao Wang <hao_wang@berkeley.edu>
 Description: Estimate patient distribution to summarizing patient level representation on scRNA-Seq data.
 BugReports: https://github.com/epurdom/popPackage/issues
-License: 
+License: Artistic-2.0
 Encoding: UTF-8
 Imports: 
     methods, 
@@ -24,11 +24,13 @@ Imports:
     RANN,
     BiocParallel
 LazyData: true
-Depends: R (>= 4.1)
+Depends: R (>= 4.1),
         SingleCellExperiment,
 	      SummarizedExperiment (>= 1.15.4)
 Suggests:
-	knitr,
-  rmarkdown
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
 biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
 RoxygenNote: 7.1.1
+Config/testthat/edition: 3

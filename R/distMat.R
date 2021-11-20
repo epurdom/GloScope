@@ -7,12 +7,17 @@
 #' reduction embedding
 #' @param sample_id column names in x that contains the sample ID
 #' @param dim_reduc dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").
+#' @param n number of monte-carlo simulations to generate for \hat{p}
+#' @param ep error term added to the KL divergence calculation
+#' @param dens type of density to estimate for.
+#' @param ndim number of dimension reduction to keep
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
 #' data(example_data)
 #' set.seed(1)
-#' dist_mat <- distMat(example_data, "donor_label", "PC", 1:10)
+#' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
+#'                     ndim = 10, dens = "GMM")
 #'
 #' #print out the distance matrix using PCA embedding.
 #' dist_mat
@@ -22,7 +27,8 @@
 #' @importFrom MASS mvrnorm
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
-
+#' @import BiocParallel
+#' @rdname CalcDist
 #' @export
 
 
@@ -31,19 +37,17 @@
 
 
 
-distMat = function(x, sample_id, dim_redu, ndim){
+distMat = function(x, sample_id, dim_redu, ndim, k , dens = c("GMM", "KNN"),
+                   n = 10000,ep = 1e-64){
   sample_names = as.character(unique(x[, sample_id]))
-  dim_redu_data = x[,str_detect(colnames(x), dim_redu)]
-
-  mod_list = list()
-
-  for (s in sample_names){
-    subset_idx <- x[, sample_id] == s
-    subset_dt <- as.matrix(dim_redu_data[subset_idx, 1:ndim])
+  x[,sample_id] = as.character(x[,sample_id])
 
 
-    mod_list[[s]] <- densityMclust(subset_dt, G=1:9)
-  }
+  df_list = split(x, x[,sample_id])
+  df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
+  df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
+
+  mod_list = calc_dens(df_list, dens = dens, k = k)
 
 
   all_combn <- t(combn(sample_names, 2))
@@ -53,7 +57,8 @@ distMat = function(x, sample_id, dim_redu, ndim){
   for (i in 1:nrow(all_combn)){
     s1 <- all_combn[i, 1]
     s2 <- all_combn[i, 2]
-    dist_vec <- c(dist_vec, calc_dist(mod_list[[s1]], mod_list[[s2]]))
+    dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
+                                      s1 = s1, s2 = s2, dens = dens, ndim = ndim))
   }
 
   dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))

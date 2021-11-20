@@ -10,7 +10,7 @@
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
-#'
+#' @noRd
 
 # ==============================================================================
 # generate monte-carlo simulation from GMM estimated density \hat{p} for integrating
@@ -30,6 +30,13 @@
   samples <- do.call("rbind", samples)
   return(samples)
 }
+
+.knn_query = function(df_list, sample1, sample2, k = k){
+  knnq_dist = nn2(df_list[[sample2]], df_list[[sample1]], k = k)$nn.dists[,k]
+  return(knnq_dist)
+}
+
+#' prepare for plotting colors
 
 #' @rdname plottingColors
 #' @export

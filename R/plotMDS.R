@@ -25,7 +25,6 @@
 #'
 #' @import ggplot2
 #' @importFrom MASS isoMDS
-#' @importFrom clusterExperiment bigPalette
 #' @export
 #'
 plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
@@ -44,7 +43,8 @@ plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
     fit_df <- isoMDS(dist_mat, k = n, trace = FALSE)
     colnames(fit_df$points) <- paste0("Coordinate",1:n)
     mds_df <- cbind(x, fit_df$points)
-
+# add the mds coordinates
+    # invisible() for the plot
   mds_plot = ggplot(mds_df, aes_string(x = "Coordinate1", y = "Coordinate2",
                                     color = group_id)) + geom_point() +
     scale_color_manual(values=bigPalette) +
