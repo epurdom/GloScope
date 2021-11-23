@@ -11,24 +11,27 @@
 #' @param x a data frame contains each patients' info
 #' @param sample_id column name in x that contains the sample ID
 #' @param group_id column name in x that contains the patient condition
-#' @return MDS plot of the distance matrix, color-coded by patient conditions
+#' @param n number of MDS dimension to generate
+#' @return a list contains the MDS embedding and plot of the distance matrix, color-coded by patient conditions
 #'
 #' @examples
-#' data(example_data)
+#' data("example_data")
 #' set.seed(1)
-#' dist_mat <- distMat(example_data, "donor_label", "PC", 1:10)
-#' pat_info <- unique(example_data[, c("donor_label", "joint_region_label"])])
+#' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
+#'                     ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
+#' pat_info <- unique(example_data[, c("donor_label", "joint_region_label")])
 #'
-#' plotMDS(dist_mat = dist_mat, n = 10,
+#' mds_result = plotMDS(dist_mat = dist_mat, n = 2,
 #'  x =  pat_info, "donor_label", "joint_region_label")
 #'
-#'
+#' mds_result$plot
+#' mds_result$mds
 #' @import ggplot2
 #' @importFrom MASS isoMDS
 #' @export
 #'
 plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
-  if(nrow(dist_mat)!= nrow(meta)){
+  if(nrow(dist_mat)!= nrow(x)){
     stop(paste("Not consistent patient number. Make sure your
                distance matrix and meta info have the same patient
                number."))
@@ -50,5 +53,6 @@ plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
     scale_color_manual(values=bigPalette) +
     theme_bw()
 
-  return(mds_plot)
+  return(list(mds = mds_df,
+              plot = mds_plot))
 }

@@ -15,20 +15,27 @@ distMat(
   sample_id,
   dim_redu,
   ndim,
-  k,
+  k = 50,
   dens = c("GMM", "KNN"),
   n = 10000,
-  ep = 1e-64
+  ep = 1e-64,
+  BPPARAM = BiocParallel::bpparam()
 )
 }
 \arguments{
 \item{mod_list}{a list contains each samples' estimated density}
 
+\item{sample1}{sample 1 index}
+
+\item{sample2}{sample 2 index}
+
 \item{df_list}{a list contain each samples' dimension reduction embedding}
 
-\item{n}{number of monte-carlo simulations to generate for \hat{p}}
+\item{n}{number of monte-carlo simulations to generate}
 
 \item{dens}{type of density to estimate for.}
+
+\item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
 
 \item{ep}{error term added to the KL divergence calculation}
 
@@ -43,7 +50,9 @@ reduction embedding}
 
 \item{sample_id}{column names in x that contains the sample ID}
 
-\item{dim_reduc}{dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").}
+\item{dim_redu}{dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").}
+
+\item{BPPARAM}{BiocParallel parameters}
 }
 \value{
 a numeric value of distance between sample1 and sample2's distribution.
@@ -64,10 +73,10 @@ This function loads the metadata, which contains the sample id, disease group, d
 in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 }
 \examples{
-data(example_data)
+data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-                    ndim = 10, dens = "GMM")
+                    ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
 
 #print out the distance matrix using PCA embedding.
 dist_mat

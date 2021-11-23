@@ -5,12 +5,12 @@
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param n number of monte-carlo simulations to generate for \hat{p}
+#' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
-#' @param s1 sample 1 name
-#' @param s2 sample 2 name
+#' @param sample1 sample 1 index
+#' @param sample2 sample 2 index
 #' @param df_list a list contain each samples' dimension reduction embedding
 #' @param ndim number of dimension reduction to keep
 #' @return a numeric value of distance between sample1 and sample2's distribution.
@@ -52,7 +52,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param n number of monte-carlo simulations to generate for \hat{p}
+#' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.

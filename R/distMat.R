@@ -6,24 +6,27 @@
 #' @param x a data frame with row corresponding to single cell, contains a column of sample ID, and columns of dimension
 #' reduction embedding
 #' @param sample_id column names in x that contains the sample ID
-#' @param dim_reduc dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").
-#' @param n number of monte-carlo simulations to generate for \hat{p}
+#' @param dim_redu dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").
+#' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param dens type of density to estimate for.
 #' @param ndim number of dimension reduction to keep
+#' @param BPPARAM BiocParallel parameters
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
-#' data(example_data)
+#' data("example_data")
 #' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-#'                     ndim = 10, dens = "GMM")
+#'                     ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
 #'
 #' #print out the distance matrix using PCA embedding.
 #' dist_mat
 #'
 #' @importFrom mclust densityMclust
-#' @importFrom stats rmultinom
+#' @importFrom stats rmultinom predict
+#' @importFrom utils combn
 #' @importFrom MASS mvrnorm
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
@@ -37,8 +40,9 @@
 
 
 
-distMat = function(x, sample_id, dim_redu, ndim, k , dens = c("GMM", "KNN"),
-                   n = 10000,ep = 1e-64){
+distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
+                   n = 10000,ep = 1e-64,
+                   BPPARAM=BiocParallel::bpparam()){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
 
@@ -47,7 +51,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k , dens = c("GMM", "KNN"),
   df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
   df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
-  mod_list = calc_dens(df_list, dens = dens, k = k)
+  mod_list = calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
 
 
   all_combn <- t(combn(sample_names, 2))

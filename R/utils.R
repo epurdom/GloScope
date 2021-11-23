@@ -1,9 +1,9 @@
 #' generate monte-carlo simulation from GMM estimated density for integrating expectation for KL divergence
 #'
 #' This function uses a object from mclust package as input, which contains the estimated density \hat{p} and
-#' performs monte-carlo simulation based on \hat{p}
+#' performs monte-carlo simulation based on p hat.
 #'
-#' @param mclust_mod mclust object which contains the estimated density \hat{p}
+#' @param mclust_mod mclust object which contains the estimated density p hat.
 #' @param n number of simulations to generate. Default = 10,000.
 #' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'

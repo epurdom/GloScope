@@ -5,12 +5,7 @@
 \alias{example_data}
 \title{example of data frame as the input for distMat}
 \format{
-A data frame with 5000 rows and 52 variables:
-\describe{
-  \item{donor_label}{mouse's ID}
-  \item{joint_region_label}{Brain region where the cells were sampled}
-  \item{PC_1 to PC_50}{PCA dimension reduction embedding}
-}
+A data frame with 5000 rows and 52 variables
 }
 \usage{
 example_data

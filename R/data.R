@@ -7,12 +7,7 @@
 #' sampled, and PCA dimenstion reduction (PC_1 to PC_50)
 #'
 #'
-#' @format A data frame with 5000 rows and 52 variables:
-#' \describe{
-#'   \item{donor_label}{mouse's ID}
-#'   \item{joint_region_label}{Brain region where the cells were sampled}
-#'   \item{PC_1 to PC_50}{PCA dimension reduction embedding}
-#' }
+#' @format A data frame with 5000 rows and 52 variables
 #'
 "example_data"
 

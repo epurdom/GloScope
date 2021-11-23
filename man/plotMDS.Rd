@@ -10,6 +10,8 @@ plotMDS(dist_mat, n = 10, x, sample_id, group_id)
 \item{dist_mat}{the distance matrix of comparing each pairs
 of patients' distributions}
 
+\item{n}{number of MDS dimension to generate}
+
 \item{x}{a data frame contains each patients' info}
 
 \item{sample_id}{column name in x that contains the sample ID}
@@ -17,7 +19,7 @@ of patients' distributions}
 \item{group_id}{column name in x that contains the patient condition}
 }
 \value{
-MDS plot of the distance matrix, color-coded by patient conditions
+a list contains the MDS embedding and plot of the distance matrix, color-coded by patient conditions
 }
 \description{
 This function loads the distance matrix,
@@ -27,13 +29,15 @@ for the distance matrix and color-coded each patient's dot
 based on the condition.
 }
 \examples{
-data(example_data)
+data("example_data")
 set.seed(1)
-dist_mat <- distMat(example_data, "donor_label", "PC", 1:10)
-pat_info <- unique(example_data[, c("donor_label", "joint_region_label"])])
+dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
+                    ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
+pat_info <- unique(example_data[, c("donor_label", "joint_region_label")])
 
-plotMDS(dist_mat = dist_mat, n = 10,
+mds_result = plotMDS(dist_mat = dist_mat, n = 2,
  x =  pat_info, "donor_label", "joint_region_label")
 
-
+mds_result$plot
+mds_result$mds
 }

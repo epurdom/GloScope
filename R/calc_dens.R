@@ -6,28 +6,26 @@
 #'  contains dimension reduction embedding for each cell, which is used to calculate the
 #'  density for each sample.
 #'
-#' @param x a data frame with row corresponding to single cell, contains the info of
-#' each cell
-#' @param sample_id column names in x that contains the sample ID
-#' @param dim_redu_data a data matrix or frame contains the dimension reduction embedding
-#' for each cell
+#' @param df_list the list contains each samples' dimension reduction embedding
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param dens method used to estimate density, options are GMM (Gaussian mixture model)
 #' and KNN (K-nearest Neighbor)
-#' @param k number of nearest neighbor, used when dens = "KNN".
+#' @param BPPARAM BiocParallel parameters
 #' @return A list of length number of samples, contains the estimated density for each
 #' sample
 #'
 #'
 #' @examples
-#' data(example_data)
+#' data("example_data")
+#' library(stringr)
 #' set.seed(1)
-#' BiocParallel::register(BiocParallel::SerialParam())
-#' sample_name = as.character(unique(example_data[, "donor_label"]))
-#'
+#' sample_name <- as.character(unique(example_data[, "donor_label"]))
+#' example_data[,"donor_label"] <- as.character(example_data[,"donor_label"])
+#' df_list <- split(example_data, example_data[,"donor_label"])
+#' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
+#' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
 #' #working with large data set, use BiocParallel
-#' mod_list = calc_dens(sample_id = "donor_label",
-#'                      x = example_data, dim_redu = "PC", dens = "GMM",
-#'                      BPPARAM=BiocParallel::SerialParam())
+#' mod_list <- calc_dens(df_list, dens = "GMM", k = k, BPPARAM = BiocParallel::SerialParam())
 #'
 #'
 #' @importFrom mclust densityMclust
@@ -38,17 +36,15 @@
 
 
 
-calc_dens = function(df_list, dens, k,
-                     BPPARAM=BiocParallel::bpparam()){
+calc_dens = function(df_list, dens = c("GMM", "KNN"), k = 50,
+                     BPPARAM){
 
 
   if(dens == "GMM"){
-    mod_list <- bplapply(df_list, function(z) densityMclust(z, G = 1:9),
+    mod_list <- bplapply(df_list, function(z) densityMclust(z, G = 1:9, verbose = F),
                               BPPARAM=BPPARAM)
   }else if(dens == "KNN"){
-    if(is.null(k)){
-      stop(paste("Did not specify k for KNN density estimation."))
-    }
+
     mod_list <- bplapply(df_list, function(z) nn2(z, query = z, k = k)$nn.dists[,k],
                          BPPARAM=BPPARAM)
   }
