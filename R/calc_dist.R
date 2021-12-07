@@ -32,7 +32,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
   if(dens == "GMM"){
     mclust_mod1 <- mod_list[[sample1]]
     mclust_mod2 <- mod_list[[sample2]]
-    s <- .sample_mclust(mclust_mod1, n)
+    s <- .sample_mclust(mclust_mod1, n=n)
     dens1 <- predict(mclust_mod1, s, what = "dens")
     dens2 <- predict(mclust_mod2, s, what = "dens")
     kl <- sum(log(dens1/(dens2 + ep))) / n
@@ -72,8 +72,8 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 #' @export
 #'
 # make symmatrised KL
-calc_dist <- function(mod_list, s1, s2, df_list, n = 10000,
-                      dens,k, ep = 1e-64, ndim ){
+calc_dist <- function(mod_list, s1, s2, df_list, n,
+                      dens,k, ep, ndim ){
 
   sym_kl = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                    dens = dens, k = k, ndim = ndim, n = n, ep = ep) +

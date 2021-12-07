@@ -32,7 +32,7 @@ based on the condition.
 data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-                    ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
+                    ndim = 10, dens = "GMM", n=10000, ep = 1e-64, BPPARAM = BiocParallel::SerialParam())
 pat_info <- unique(example_data[, c("donor_label", "joint_region_label")])
 
 mds_result = plotMDS(dist_mat = dist_mat, n = 2,

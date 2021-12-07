@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------
 
 
-.sample_mclust <- function(mclust_mod, n = 10000){
+.sample_mclust <- function(mclust_mod, n){
   p <- table(mclust_mod$classification)/mclust_mod$n
   z <- rmultinom(1, size = n, prob = p)[,1]
   samples <- list()

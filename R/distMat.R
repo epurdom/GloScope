@@ -19,7 +19,8 @@
 #' data("example_data")
 #' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-#'                     ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
+#'                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64,
+#'                     BPPARAM = BiocParallel::SerialParam())
 #'
 #' #print out the distance matrix using PCA embedding.
 #' dist_mat
@@ -62,7 +63,8 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
     s1 <- all_combn[i, 1]
     s2 <- all_combn[i, 2]
     dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
-                                      s1 = s1, s2 = s2, dens = dens, ndim = ndim))
+                                      s1 = s1, s2 = s2, dens = dens, ndim = ndim,
+                                      n=n, ep = ep))
   }
 
   dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))

@@ -8,7 +8,7 @@
 \usage{
 calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
 
-calc_dist(mod_list, s1, s2, df_list, n = 10000, dens, k, ep = 1e-64, ndim)
+calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim)
 
 distMat(
   x,
@@ -76,7 +76,8 @@ in the form "dim_i". Dimension reduction embedding is used to calculate the dens
 data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-                    ndim = 10, dens = "GMM", n, ep, BPPARAM = BiocParallel::SerialParam())
+                    ndim = 10, dens = "GMM", n=10000, ep = 1e-64,
+                    BPPARAM = BiocParallel::SerialParam())
 
 #print out the distance matrix using PCA embedding.
 dist_mat
