@@ -31,8 +31,8 @@
   return(samples)
 }
 
-.knn_query = function(df_list, sample1, sample2, k = k){
-  knnq_dist = nn2(df_list[[sample2]], df_list[[sample1]], k = k)$nn.dists[,k]
+.knn_query = function(df_list, query, input, k = k){
+  knnq_dist = nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
   return(knnq_dist)
 }
 

@@ -38,7 +38,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
     kl <- sum(log(dens1/(dens2 + ep))) / n
   }else if(dens == "KNN"){
 
-    knn2 <- .knn_query(df_list, sample2, sample1, k = k)
+    knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
     knn1 <- mod_list[[sample1]]
     kl <- mean(log(knn2/knn1))*ndim +
       log(nrow(df_list[[sample2]])/(nrow(df_list[[sample1]])-1))
