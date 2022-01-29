@@ -2,13 +2,19 @@
 % Please edit documentation in R/calc_dist.R, R/distMat.R
 \name{calc_kl}
 \alias{calc_kl}
+\alias{calc_EMD}
+\alias{calc_JS}
 \alias{calc_dist}
 \alias{distMat}
 \title{calculate  KL for a pair of samples}
 \usage{
 calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
 
-calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim)
+calc_EMD(mod_list, sample1, sample2, dens, ndim)
+
+calc_JS(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
+
+calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim, dist_mat)
 
 distMat(
   x,
@@ -19,6 +25,7 @@ distMat(
   dens = c("GMM", "KNN"),
   n = 10000,
   ep = 1e-64,
+  dist_mat = c("KL", "EMD", "JS"),
   BPPARAM = BiocParallel::bpparam()
 )
 }
@@ -45,6 +52,8 @@ distMat(
 
 \item{s2}{sample 2 name}
 
+\item{dist_mat}{distance metric to calculate the distance}
+
 \item{x}{a data frame with row corresponding to single cell, contains a column of sample ID, and columns of dimension
 reduction embedding}
 
@@ -57,7 +66,11 @@ reduction embedding}
 \value{
 a numeric value of distance between sample1 and sample2's distribution.
 
-a numeric value of estimatedsymmatrised KL divergence between
+a numeric value of distance between sample1 and sample2's distribution.
+
+a numeric value of distance between sample1 and sample2's distribution.
+
+a numeric value of estimated symmatrised KL divergence between
 sample1 and sample2's distribution.
 
 A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
@@ -76,7 +89,7 @@ in the form "dim_i". Dimension reduction embedding is used to calculate the dens
 data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-                    ndim = 10, dens = "GMM", n=10000, ep = 1e-64,
+                    ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
                     BPPARAM = BiocParallel::SerialParam())
 
 #print out the distance matrix using PCA embedding.

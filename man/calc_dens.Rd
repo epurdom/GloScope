@@ -37,7 +37,7 @@ df_list <- split(example_data, example_data[,"donor_label"])
 df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
 #working with large data set, use BiocParallel
-mod_list <- calc_dens(df_list, dens = "GMM", k = k, BPPARAM = BiocParallel::SerialParam())
+mod_list <- calc_dens(df_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam())
 
 
 }

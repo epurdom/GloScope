@@ -13,13 +13,14 @@
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
+#' @param dist_mat distance metric to calculate the distance
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
 #' data("example_data")
 #' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-#'                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64,
+#'                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
 #'                     BPPARAM = BiocParallel::SerialParam())
 #'
 #' #print out the distance matrix using PCA embedding.
@@ -42,7 +43,7 @@
 
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
-                   n = 10000,ep = 1e-64,
+                   n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
                    BPPARAM=BiocParallel::bpparam()){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
@@ -64,7 +65,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
     s2 <- all_combn[i, 2]
     dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
                                       s1 = s1, s2 = s2, dens = dens, ndim = ndim,
-                                      n=n, ep = ep))
+                                      n=n, ep = ep, dist_mat = dist_mat))
   }
 
   dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))

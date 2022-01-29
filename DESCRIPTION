@@ -1,7 +1,7 @@
 Package: popPackage
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
-Version: 0.1.0
+Version: 0.2.0
 Author: c(person("Hao", "Wang", email = "hao_wang@berkeley.edu",
             role = c("aut")),
 	     person("Elizabeth", "Purdom", email = "epurdom@stat.berkeley.edu", role = c("aut"),
@@ -22,6 +22,8 @@ Imports:
     dplyr, 
     ggplot2, 
     RANN,
+    transport,
+    psych,
     BiocParallel
 LazyData: true
 Depends: R (>= 4.1),
