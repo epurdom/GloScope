@@ -27,15 +27,15 @@
 # KL divergence
 calc_kl <- function(mod_list, sample1, sample2, df_list, n,
                     dens, k,
-                    ep, ndim){
+                     ndim){
 
   if(dens == "GMM"){
     mclust_mod1 <- mod_list[[sample1]]
     mclust_mod2 <- mod_list[[sample2]]
     s <- .sample_mclust(mclust_mod1, n=n)
-    dens1 <- predict(mclust_mod1, s, what = "dens")
-    dens2 <- predict(mclust_mod2, s, what = "dens")
-    kl <- sum(log(dens1/(dens2 + ep))) / n
+    dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
+    dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
+    kl <- sum(dens1 - dens2) / n
   }else if(dens == "KNN"){
 
     knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
@@ -178,9 +178,9 @@ calc_dist <- function(mod_list, s1, s2, df_list, n,
                       dens,k, ep, ndim, dist_mat){
   if(dist_mat == "KL"){
     mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-                     dens = dens, k = k, ndim = ndim, n = n, ep = ep) +
+                     dens = dens, k = k, ndim = ndim, n = n) +
       calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-              dens = dens, k = k, ndim = ndim, n = n, ep = ep)
+              dens = dens, k = k, ndim = ndim, n = n)
 
   }else if(dist_mat == "EMD"){
       mydist = calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
