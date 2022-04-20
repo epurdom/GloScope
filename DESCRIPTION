@@ -1,13 +1,13 @@
 Package: popPackage
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
-Version: 0.2.0
+Version: 0.3.0
 Author: c(person("Hao", "Wang", email = "hao_wang@berkeley.edu",
             role = c("aut")),
 	     person("Elizabeth", "Purdom", email = "epurdom@stat.berkeley.edu", role = c("aut"),
 	     person("Boying", "Gong", email = "boyinggong@berkeley.edu", role = "aut"))
 Maintainer: Hao Wang <hao_wang@berkeley.edu>
-Description: Estimate patient distribution to summarizing patient level representation on scRNA-Seq data.
+Description: Estimate patient distribution to summarize patient level representation on scRNA-Seq data.
 BugReports: https://github.com/epurdom/popPackage/issues
 License: Artistic-2.0
 Encoding: UTF-8
@@ -22,6 +22,7 @@ Imports:
     dplyr, 
     ggplot2, 
     RANN,
+    FNN,
     transport,
     psych,
     BiocParallel

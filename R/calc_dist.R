@@ -19,6 +19,7 @@
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @importFrom RANN nn2
+#' @importFrom FNN KL.dist
 #' @rdname CalcDist
 #' @export
 
@@ -38,10 +39,11 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
     kl <- sum(dens1 - dens2) / n
   }else if(dens == "KNN"){
 
-    knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
-    knn1 <- mod_list[[sample1]]
-    kl <- mean(log(knn2/knn1))*ndim +
-      log(nrow(df_list[[sample2]])/(nrow(df_list[[sample1]])-1))
+    #knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
+    #knn1 <- mod_list[[sample1]]
+    #kl <- mean(log(knn2) - log(knn1))*ndim +
+    #  (log(nrow(df_list[[sample2]]))- log(nrow(df_list[[sample1]])-1))
+    kl <- KL.dist(df_list[[sample1]], df_list[[sample2]], k = k)[k]
   }
 
   return(kl)
@@ -114,6 +116,7 @@ calc_EMD = function(mod_list, sample1, sample2, dens, ndim){
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @importFrom RANN nn2
+#' @importFrom FNN KL.dist
 #' @rdname CalcDist
 #' @export
 
@@ -177,10 +180,15 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 calc_dist <- function(mod_list, s1, s2, df_list, n,
                       dens,k, ep, ndim, dist_mat){
   if(dist_mat == "KL"){
+    if(dens == "KNN"){
     mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+                     dens = dens, k = k, ndim = ndim, n = n)
+    }else{
+      mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                      dens = dens, k = k, ndim = ndim, n = n) +
-      calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-              dens = dens, k = k, ndim = ndim, n = n)
+        calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
+                dens = dens, k = k, ndim = ndim, n = n)
+    }
 
   }else if(dist_mat == "EMD"){
       mydist = calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,

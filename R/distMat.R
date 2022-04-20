@@ -32,6 +32,7 @@
 #' @importFrom MASS mvrnorm
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
+#' @importFrom FNN KL.dist
 #' @import BiocParallel
 #' @rdname CalcDist
 #' @export

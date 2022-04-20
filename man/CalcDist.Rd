@@ -8,7 +8,7 @@
 \alias{distMat}
 \title{calculate  KL for a pair of samples}
 \usage{
-calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
+calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ndim)
 
 calc_EMD(mod_list, sample1, sample2, dens, ndim)
 
@@ -44,9 +44,9 @@ distMat(
 
 \item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
 
-\item{ep}{error term added to the KL divergence calculation}
-
 \item{ndim}{number of dimension reduction to keep}
+
+\item{ep}{error term added to the KL divergence calculation}
 
 \item{s1}{sample 1 name}
 
