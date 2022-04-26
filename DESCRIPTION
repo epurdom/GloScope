@@ -25,7 +25,8 @@ Imports:
     FNN,
     transport,
     psych,
-    BiocParallel
+    BiocParallel,
+    rags2ridges
 LazyData: true
 Depends: R (>= 4.1),
         SingleCellExperiment,

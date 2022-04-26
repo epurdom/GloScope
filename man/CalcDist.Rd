@@ -8,13 +8,13 @@
 \alias{distMat}
 \title{calculate  KL for a pair of samples}
 \usage{
-calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ndim)
+calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ndim, varapp)
 
 calc_EMD(mod_list, sample1, sample2, dens, ndim)
 
 calc_JS(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
 
-calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim, dist_mat)
+calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim, dist_mat, varapp)
 
 distMat(
   x,
@@ -26,7 +26,8 @@ distMat(
   n = 10000,
   ep = 1e-64,
   dist_mat = c("KL", "EMD", "JS"),
-  BPPARAM = BiocParallel::bpparam()
+  BPPARAM = BiocParallel::bpparam(),
+  varapp = FALSE
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ distMat(
 \item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
 
 \item{ndim}{number of dimension reduction to keep}
+
+\item{varapp}{logic variable for using variational approximation or not}
 
 \item{ep}{error term added to the KL divergence calculation}
 
@@ -90,7 +93,7 @@ data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
-                    BPPARAM = BiocParallel::SerialParam())
+                    BPPARAM = BiocParallel::SerialParam(), varapp = FALSE)
 
 #print out the distance matrix using PCA embedding.
 dist_mat

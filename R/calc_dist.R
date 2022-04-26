@@ -13,6 +13,7 @@
 #' @param sample2 sample 2 index
 #' @param df_list a list contain each samples' dimension reduction embedding
 #' @param ndim number of dimension reduction to keep
+#' @param varapp logic variable for using variational approximation or not
 #' @return a numeric value of distance between sample1 and sample2's distribution.
 #'
 #' @importFrom mclust densityMclust
@@ -20,6 +21,7 @@
 #' @importFrom MASS mvrnorm
 #' @importFrom RANN nn2
 #' @importFrom FNN KL.dist
+#' @importFrom rags2ridges KLdiv
 #' @rdname CalcDist
 #' @export
 
@@ -28,15 +30,24 @@
 # KL divergence
 calc_kl <- function(mod_list, sample1, sample2, df_list, n,
                     dens, k,
-                     ndim){
+                     ndim, varapp){
 
   if(dens == "GMM"){
     mclust_mod1 <- mod_list[[sample1]]
     mclust_mod2 <- mod_list[[sample2]]
     s <- .sample_mclust(mclust_mod1, n=n)
+    pi_1 <- mclust_mod1$parameters$pro
+    pi_2 <- mclust_mod2$parameters$pro
+    cov_1 <- mclust_mod1$parameters$variance$sigma
+    cov_2 <- mclust_mod2$parameters$variance$sigma
+
+    mu_1 <- mclust_mod1$parameters$mean
+    mu_2 <- mclust_mod2$parameters$mean
+    kl_var <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
     dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
     dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
     kl <- sum(dens1 - dens2) / n
+    if(varapp) kl <- kl_var
   }else if(dens == "KNN"){
 
     #knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
@@ -163,6 +174,8 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #' @param s2 sample 2 name
 #' @param df_list a list contain each samples' dimension reduction embedding
 #' @param ndim number of dimension reduction to keep
+#' @param dist_mat which distance metric to use
+#' @param varapp logic variable for using variational approximation or not
 #' @return a numeric value of estimated symmatrised KL divergence between
 #' sample1 and sample2's distribution.
 #'
@@ -172,22 +185,23 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #' @importFrom RANN nn2
 #' @importFrom transport transport
 #' @importFrom psych tr
+#' @importFrom rags2ridges KLdiv
 #' @rdname CalcDist
 
 #' @export
 #'
 # make symmatrised KL
 calc_dist <- function(mod_list, s1, s2, df_list, n,
-                      dens,k, ep, ndim, dist_mat){
+                      dens,k, ep, ndim, dist_mat,varapp){
   if(dist_mat == "KL"){
     if(dens == "KNN"){
     mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-                     dens = dens, k = k, ndim = ndim, n = n)
+                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp)
     }else{
       mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-                     dens = dens, k = k, ndim = ndim, n = n) +
+                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp) +
         calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-                dens = dens, k = k, ndim = ndim, n = n)
+                dens = dens, k = k, ndim = ndim, n = n, varapp = varapp)
     }
 
   }else if(dist_mat == "EMD"){
