@@ -84,7 +84,9 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
     dist_mat[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
     dist_mat[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
   }
-  mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+  if(dens == "GMM"){
+    mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+  }
   if(returndens){
     return(list(dist = dist_mat,
                 modlist = mod_list))
