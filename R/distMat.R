@@ -9,12 +9,14 @@
 #' @param dim_redu dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").
 #' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
+#' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param dist_mat distance metric to calculate the distance
 #' @param varapp logic variable for using variational approximation or not
+#' @param returndens return the GMM parameter list or not
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
@@ -22,7 +24,8 @@
 #' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
 #'                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
-#'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE)
+#'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
+#'                     returndens = FALSE, epapp = FALSE)
 #'
 #' #print out the distance matrix using PCA embedding.
 #' dist_mat
@@ -48,7 +51,7 @@
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
                    n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
                    BPPARAM=BiocParallel::bpparam(),
-                   varapp = FALSE){
+                   varapp = FALSE, returndens = FALSE, epapp = FALSE){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
 
@@ -69,7 +72,8 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
     s2 <- all_combn[i, 2]
     dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
                                       s1 = s1, s2 = s2, dens = dens, ndim = ndim,
-                                      n=n, ep = ep, dist_mat = dist_mat, varapp = varapp))
+                                      n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
+                                      epapp = epapp))
   }
 
   dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
@@ -80,8 +84,13 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
     dist_mat[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
     dist_mat[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
   }
-
-  return(dist_mat)
+  mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+  if(returndens){
+    return(list(dist = dist_mat,
+                modlist = mod_list))
+  }else{
+    return(dist_mat)
+    }
 }
 
 

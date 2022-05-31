@@ -45,8 +45,7 @@ calc_dens = function(df_list, dens = c("GMM", "KNN"), k = 50,
                               BPPARAM=BPPARAM)
   }else if(dens == "KNN"){
 
-    mod_list <- bplapply(df_list, function(z) nn2(z, query = z, k = k)$nn.dists[,k],
-                         BPPARAM=BPPARAM)
+    mod_list <- df_list
   }
 
   return(mod_list)

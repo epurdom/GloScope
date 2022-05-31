@@ -8,13 +8,38 @@
 \alias{distMat}
 \title{calculate  KL for a pair of samples}
 \usage{
-calc_kl(mod_list, sample1, sample2, df_list, n, dens, k, ndim, varapp)
+calc_kl(
+  mod_list,
+  sample1,
+  sample2,
+  df_list,
+  n,
+  dens,
+  k,
+  ndim,
+  varapp,
+  epapp,
+  ep
+)
 
 calc_EMD(mod_list, sample1, sample2, dens, ndim)
 
 calc_JS(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
 
-calc_dist(mod_list, s1, s2, df_list, n, dens, k, ep, ndim, dist_mat, varapp)
+calc_dist(
+  mod_list,
+  s1,
+  s2,
+  df_list,
+  n,
+  dens,
+  k,
+  ep,
+  ndim,
+  dist_mat,
+  varapp,
+  epapp
+)
 
 distMat(
   x,
@@ -27,7 +52,9 @@ distMat(
   ep = 1e-64,
   dist_mat = c("KL", "EMD", "JS"),
   BPPARAM = BiocParallel::bpparam(),
-  varapp = FALSE
+  varapp = FALSE,
+  returndens = FALSE,
+  epapp = FALSE
 )
 }
 \arguments{
@@ -49,6 +76,8 @@ distMat(
 
 \item{varapp}{logic variable for using variational approximation or not}
 
+\item{epapp}{whether to apply the error term}
+
 \item{ep}{error term added to the KL divergence calculation}
 
 \item{s1}{sample 1 name}
@@ -65,6 +94,8 @@ reduction embedding}
 \item{dim_redu}{dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").}
 
 \item{BPPARAM}{BiocParallel parameters}
+
+\item{returndens}{return the GMM parameter list or not}
 }
 \value{
 a numeric value of distance between sample1 and sample2's distribution.
@@ -93,7 +124,8 @@ data("example_data")
 set.seed(1)
 dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
-                    BPPARAM = BiocParallel::SerialParam(), varapp = FALSE)
+                    BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
+                    returndens = FALSE, epapp = FALSE)
 
 #print out the distance matrix using PCA embedding.
 dist_mat

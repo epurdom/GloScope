@@ -7,6 +7,7 @@
 #'
 #' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
+#' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
 #' @param sample1 sample 1 index
@@ -30,7 +31,7 @@
 # KL divergence
 calc_kl <- function(mod_list, sample1, sample2, df_list, n,
                     dens, k,
-                     ndim, varapp){
+                     ndim, varapp,epapp, ep){
 
   if(dens == "GMM"){
     mclust_mod1 <- mod_list[[sample1]]
@@ -48,13 +49,14 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
     dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
     kl <- sum(dens1 - dens2) / n
     if(varapp) kl <- kl_var
+    if(epapp) kl = sum(dens1 - (dens2+ep))/n
   }else if(dens == "KNN"){
 
     #knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
     #knn1 <- mod_list[[sample1]]
     #kl <- mean(log(knn2) - log(knn1))*ndim +
     #  (log(nrow(df_list[[sample2]]))- log(nrow(df_list[[sample1]])-1))
-    kl <- KL.dist(df_list[[sample1]], df_list[[sample2]], k = k)[k]
+    kl <- KL.dist(mod_list[[sample1]], mod_list[[sample2]], k = k)[k]
   }
 
   return(kl)
@@ -168,6 +170,7 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #'
 #' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
+#' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
 #' @param s1 sample 1 name
@@ -192,16 +195,19 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #'
 # make symmatrised KL
 calc_dist <- function(mod_list, s1, s2, df_list, n,
-                      dens,k, ep, ndim, dist_mat,varapp){
+                      dens,k, ep, ndim, dist_mat,varapp, epapp){
   if(dist_mat == "KL"){
     if(dens == "KNN"){
     mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp)
+                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
+                     epapp = epapp, ep = ep)
     }else{
       mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp) +
+                     dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
+                     epapp = epapp, ep = ep) +
         calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-                dens = dens, k = k, ndim = ndim, n = n, varapp = varapp)
+                dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
+                epapp = epapp, ep = ep)
     }
 
   }else if(dist_mat == "EMD"){
