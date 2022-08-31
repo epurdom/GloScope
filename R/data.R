@@ -2,9 +2,9 @@
 #'
 #'
 #' @description A data frame contains a subset of data
-#' from Allen mouse data. The data includes the mouse
-#' ID (donor_label), region of the brain where the data was
-#' sampled, and PCA dimenstion reduction (PC_1 to PC_50)
+#' from COVID PBMC data. The data includes the patient
+#' ID (patient_id), condition of the patients (Status),
+#' and PCA dimenstion reduction (PC_1 to PC_50)
 #'
 #'
 #' @format A data frame with 5000 rows and 52 variables

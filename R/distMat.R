@@ -22,8 +22,8 @@
 #' @examples
 #' data("example_data")
 #' set.seed(1)
-#' dist_mat <- distMat(example_data, sample_id = "donor_label", dim_redu = "PC",
-#'                     ndim = 10, dens = "GMM", n=10000, ep = 1e-64, dist_mat = "KL",
+#' dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+#'                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
 #'                     returndens = FALSE, epapp = FALSE)
 #'

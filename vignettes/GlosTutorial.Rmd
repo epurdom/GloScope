@@ -1,0 +1,126 @@
+---
+title: "Density estimation and visualization using scRNA-Seq data"
+author:
+- name: Hao Wang
+  affiliation:
+  - &UCB University of California, Berkeley, California, USA
+  email: hao_wang@berkeley.edu
+- name: Elizabeth Purdom
+  affiliation:
+  - *UCB
+date: "`r Sys.Date()`"
+output: 
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Glos}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Load packages {-}
+
+```{r load-libs, message = FALSE,  warning = FALSE}
+library(dplyr)
+library(popPackage)
+```
+
+# Introduction {#Intro}
+
+This package will go through each steps introduced in the paper (...) for the ``Glos`` framework. The output from the package would be a distance matrix summarizing the differences among different samples. Also, the function `plotMDS` in the package would allow the user to visualize the distance matrix.  
+
+## Glos framework
+
+The package allow the users to select different density estimation methods (e.g. GMM and KNN) to estimate the distribution of the samples based on their cell info. Here for computation efficiency purpose, we adopted different dimension reduction techniques such as PCA and ScVI. Users should provide with a dataframe contains each cell's (dimension reduction) embeddings and the meta data associated with the cell, such as which sample and the condition of the sample that cell belongs to. See an example below.
+
+
+```{r}
+head(example_data[,1:10])
+```
+
+The workflow of ``Glos`` can be summarised as:
+
+1. Obtain the dimension reduction embedding of the cells and specify how many dimensions (`ndim`) needed (by default, ndim = 10).
+
+2. Choose a density estimation method (GMM/KNN) to estimate the distribution of each patients.
+
+3. Approximate the KL divergence using Monte-Carlo estimation and obtain the divergence matrix of each sample pair.
+
+4. Visualize the distance matrix through MDS first two dimensions using the `plotMDS` function (could also obtain MDS embedding with user-defined number of dimensions for further analysis purpose).
+
+
+# Example implmentation {# Examp}
+
+In this section, we would use a toy example to illustrate the input, output and visualization of `Glos` pipeline. 
+
+## Data description
+
+The data was a subset from the Allenmouse data set, retrieved from [Yao et al (2021)](https://www.sciencedirect.com/science/article/pii/S0092867421005018?dgcid=rss_sd_all), using package https://github.com/drighelli/AllenInstituteBrainData. There was a total of 1,169,213 cells sequenced from 54 mice's different brain regions such as primary motor (Mop) region. For computational timing consideration, we subset the data to contains the samples from three regions: Anterior cingulate (ACA), Auditory (AUD), and primary motor (Mop). We further down-sampled the data so each sample has 500 cells.
+
+```{r}
+table(example_data$patient_id, example_data$Status)
+```
+
+We performed PCA on the gene expression matrix and obtained the PC embedding wiht 50 dimensions. This would be our input dataframe for ``Glos`` pipeline. A example of construct the input data frame from Seurat object would be:
+
+```{r eval = F}
+plot_df <- cbind(seurat_object@meta.data, 
+                 seurat_object@reductions$pca@cell.embeddings)
+```
+
+
+## Calculating distance matrix
+
+After the input data frame is ready, we use the function `distMat` to approximate the divergence matrix. To do so, several major parameters are required to be specified:
+
+1. The variable name for sample ID in the input data, and variable name for dimension reduction embedding (e.g, `PC` for PC_1, PC_2, etc.,)
+
+2. which density estimation method the user want to implement. Regarding computing time, KNN method is much faster than GMM.
+
+2. How many dimensions user want to use for dimension reductions.
+
+3. If KNN is chosen in Step1, `k` needs to be selected. By default, `k = 50`.
+
+Following is the illustration of using example data, KNN density estimation, to calcualte the KL divergence among samples.
+
+```{r}
+dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
+                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
+                     returndens = FALSE, epapp = FALSE)
+
+dist_mat[1:5,1:5]
+```
+
+
+## visualization of distance matrix
+
+A classical way to visualize the distance matrix is using the heatmap. 
+
+```{r}
+library(NMF)
+library(RColorBrewer)
+
+aheatmap(dist_mat)
+```
+
+
+The user could also choose to use the function `plotMDS` in this package to draw the MDS plots. In order to do so, we also need to obtain the sample level meta data. An example is presented below.
+
+```{r}
+pat_info <- unique(example_data[, c("patient_id", "Status")])
+
+mds_result = plotMDS(dist_mat = dist_mat, n = 2,
+                     x =  pat_info, "patient_id", "Status")
+
+mds_result$plot
+```
+
+

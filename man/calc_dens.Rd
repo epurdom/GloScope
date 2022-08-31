@@ -31,9 +31,9 @@ This function loads a vector of the sample names, with length of the
 data("example_data")
 library(stringr)
 set.seed(1)
-sample_name <- as.character(unique(example_data[, "donor_label"]))
-example_data[,"donor_label"] <- as.character(example_data[,"donor_label"])
-df_list <- split(example_data, example_data[,"donor_label"])
+sample_name <- as.character(unique(example_data[, "patient_id"]))
+example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
+df_list <- split(example_data, example_data[,"patient_id"])
 df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
 #working with large data set, use BiocParallel
