@@ -26,15 +26,19 @@ Imports:
     transport,
     psych,
     BiocParallel,
-    rags2ridges
+    rags2ridges,
+    gtools
 LazyData: true
 Depends: R (>= 4.1),
         SingleCellExperiment,
-	      SummarizedExperiment (>= 1.15.4)
+	      SummarizedExperiment (>= 1.15.4),
+	      NMF,
+	      RColorBrewer
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
+VignetteBuilder: knitr
 biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
 RoxygenNote: 7.2.1
 Config/testthat/edition: 3

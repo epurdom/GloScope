@@ -1,4 +1,4 @@
-#' @title example of data frame as the input for distMat
+#' example of data frame as the input for distMat
 #'
 #'
 #' @description A data frame contains a subset of data
