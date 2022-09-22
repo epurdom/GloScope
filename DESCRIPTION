@@ -30,8 +30,6 @@ Imports:
     gtools
 LazyData: true
 Depends: R (>= 4.1),
-        SingleCellExperiment,
-	      SummarizedExperiment (>= 1.15.4),
 	      NMF,
 	      RColorBrewer
 Suggests:

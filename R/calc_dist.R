@@ -143,12 +143,12 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
     mclust_mod2 <- mod_list[[sample2]]
     s1 <- .sample_mclust(mclust_mod1, n=n)
     s2 <- .sample_mclust(mclust_mod2, n=n)
-    dens1_1 <- predict(mclust_mod1, s1, what = "dens")
-    dens2_1 <- predict(mclust_mod2, s1, what = "dens")
-    dens1_2 <- predict(mclust_mod1, s2, what = "dens")
-    dens2_2 <- predict(mclust_mod2, s2, what = "dens")
-    js <- sum(log(dens1_1/(1/2*(dens1_1+dens2_1) + ep)))/(2*n) +
-      sum(log(dens2_2/(1/2*(dens1_2+dens2_2) + ep)))/(2*n)
+    dens1_1 <- predict(mclust_mod1, s1, what = "dens", logarithm = TRUE)
+    dens2_1 <- predict(mclust_mod2, s1, what = "dens", logarithm = TRUE)
+    dens1_2 <- predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
+    dens2_2 <- predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
+    js <- sum(dens1_1 - 1/2*(dens1_1+dens2_1))/(2*n) +
+      sum(dens2_2 - (1/2*(dens1_2+dens2_2)))/(2*n)
   }else if(dens == "KNN"){
 
     knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
