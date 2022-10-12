@@ -11,6 +11,7 @@
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
+#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
@@ -50,7 +51,7 @@
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
                    n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
-                   BPPARAM=BiocParallel::bpparam(),
+                   num_components = c(1:9), BPPARAM=BiocParallel::bpparam(),
                    varapp = FALSE, returndens = FALSE, epapp = FALSE){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
@@ -60,7 +61,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
   df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
   df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
-  mod_list = calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
+  mod_list = calc_dens(df_list, dens = dens, num_components = num_components, k = k, BPPARAM = BPPARAM)
 
 
   all_combn <- t(combn(sample_names, 2))
