@@ -37,7 +37,7 @@
 
 
 
-calc_dens = function(df_list, dens = c("GMM", "KNN"), k = 50, num_components = c(1:9),
+calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
                      BPPARAM = BiocParallel::bpparam()){
 
 
