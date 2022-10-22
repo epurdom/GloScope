@@ -42,12 +42,18 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 
     mu_1 <- mclust_mod1$parameters$mean
     mu_2 <- mclust_mod2$parameters$mean
-    kl_var <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
-    dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
-    dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
-    kl <- sum(dens1 - dens2) / n
-    if(varapp) kl <- kl_var
-    if(epapp) kl = sum(dens1 - (dens2+ep))/n
+	  
+    if(varapp) {
+    	kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
+    } else {
+    	dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
+    	dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
+	if(epapp) {
+		kl = sum(dens1 - (dens2+ep))/n
+	} else {
+    		kl <- sum(dens1 - dens2) / n
+	}
+   }
   }else if(dens == "KNN"){
 
     #knn2 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
