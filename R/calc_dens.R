@@ -42,7 +42,7 @@ calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
 
 
   if(dens == "GMM"){
-    mod_list <- bplapply(df_list, function(z) densityMclust(z, G = num_components, verbose = F, plot = F),
+    mod_list <- BiocParallel::bplapply(df_list, function(z) densityMclust(z, G = num_components, verbose = F, plot = F),
                               BPPARAM=BPPARAM)
   }else if(dens == "KNN"){
 
