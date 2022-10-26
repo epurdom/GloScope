@@ -21,6 +21,7 @@
 .sample_mclust <- function(mclust_mod, n){
   p <- table(mclust_mod$classification)/mclust_mod$n
   z <- rmultinom(1, size = n, prob = p)[,1]
+  z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
   samples <- list()
   for ( i in 1:length(z)){
     samples[[i]] <- mvrnorm(z[i],
