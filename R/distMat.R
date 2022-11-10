@@ -12,10 +12,12 @@
 #' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
 #' @param ndim number of dimension reduction to keep
-#' @param BPPARAM BiocParallel parameters
+#' @param BPPARAM BiocParallel parameters; NULL to let system pick
+#' @param requested_cores if NULL BPPARAM, the number of requested cores
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param dist_mat distance metric to calculate the distance
 #' @param varapp logic variable for using variational approximation or not
+#' @param fit_density a named list containing the fit density for each patient
 #' @param returndens return the GMM parameter list or not
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
@@ -50,9 +52,30 @@
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
                    n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
-                   BPPARAM=BiocParallel::bpparam(),
-                   varapp = FALSE, returndens = FALSE, epapp = FALSE){
-  sample_names = as.character(unique(x[, sample_id]))
+                   BPPARAM=NULL,requested_cores=1,
+                   varapp=FALSE, returndens=FALSE, epapp=FALSE,
+		   fit_density=NULL){
+
+  # check available cores for parallelzation unless user has specified BPPARAM
+  if (is.null(BPPARAM)){
+  	BPPARAM <- BiocParallel::bpparam()
+	# check if multicore to set number of cores; not available on Windows with BioC
+  	if (class(BPPARAM) == "MulticoreParam"){
+  		available_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK")) # if using slurm
+  		if(is.na(available_cores)){ available_cores <- parallel::detectCores() } # else get local cores
+  		if (available_cores < requested_cores){
+        		warning(paste0(requested_cores," reuqested cores not available. Using ",available_cores," instead."))
+        		requested_cores <- available_cores
+		}
+        	BPPARAM <- BiocParallel::MulticoreParam(requested_cores)
+  	}
+  }
+
+  if(is.null(fit_density)){
+  	sample_names <- as.character(unique(x[, sample_id]))
+  } else{ 
+	sample_names <- as.character(names(fit_density))
+  }
   x[,sample_id] = as.character(x[,sample_id])
 
 
@@ -60,30 +83,44 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
   df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
   df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
-  mod_list = calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
-
-
-  all_combn <- t(combn(sample_names, 2))
-  dist_vec <- c()
-
-  # calculate the distance
-  for (i in 1:nrow(all_combn)){
-    s1 <- all_combn[i, 1]
-    s2 <- all_combn[i, 2]
-    dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
-                                      s1 = s1, s2 = s2, dens = dens, ndim = ndim,
-                                      n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
-                                      epapp = epapp))
+  if(is.null(fit_density)){
+  	mod_list <- calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
+  } else {
+	mod_list <- fit_density
   }
 
+  all_combn <- combn(sample_names, 2)
+  # convert patient pairs to list for bplapply
+  patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
+
+  distance_list <- BiocParallel::bplapply(patient_pair_list, function(x){ calc_dist(mod_list = mod_list, df_list = df_list, k = k,
+								       s1 = x[1], s2 = x[2], dens = dens, ndim = ndim,
+							     	       n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
+								       epapp = epapp)},BPPARAM=BPPARAM)
+  dist_vec <- unlist(distance_list)
+# 
+#   # old sequential code
+#   # calculate the distance
+#   for (i in 1:nrow(all_combn)){
+#     s1 <- all_combn[i, 1]
+#     s2 <- all_combn[i, 2]
+#     dist_vec <- c(dist_vec, calc_dist(mod_list = mod_list, df_list = df_list, k = k,
+#                                       s1 = s1, s2 = s2, dens = dens, ndim = ndim,
+#                                       n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
+#                                       epapp = epapp))
+#   }
+# 
+  # Convert pair-wise distances to a symmetric distance matrix
+  # TODO: This can probably be a one-liner
   dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
   rownames(dist_mat) <- sample_names
   colnames(dist_mat) <- sample_names
 
-  for (i in 1:nrow(all_combn)){
-    dist_mat[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
-    dist_mat[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
+  for (i in 1:ncol(all_combn)){
+    dist_mat[all_combn[1, i], all_combn[2, i]] <- dist_vec[i]
+    dist_mat[all_combn[2, i], all_combn[1, i]] <- dist_vec[i]
   }
+
   if(dens == "GMM"){
     mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
   }
