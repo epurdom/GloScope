@@ -10,7 +10,7 @@
 #' @param n number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
-#' @param dens type of density to estimate for.
+#' @param dens type of density to estimate for, options are "GMM" for gaussian mixture model, and "KNN" for K-nearest neighbor.
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
@@ -48,8 +48,8 @@
 
 
 
-distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
-                   n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
+distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens ,
+                   n = 10000,ep = 1e-64, dist_mat,
                    BPPARAM=BiocParallel::bpparam(),
                    varapp = FALSE, returndens = FALSE, epapp = FALSE,
                    min_cell = 500){
@@ -61,10 +61,10 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
   cell_num <- table(x[,sample_id])
   check_num <- names(cell_num)[which(cell_num<min_cell)]
   if(check_num>0){
-    warning(paste0("Some samples have numbers of cells smaller than the minimum cell number,", min_cell,"!"))
+    warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell,"!"))
   }
-  if(sum(cell_num<k)>0){
-    stop("Some samples have numbers of cells smaller than the valid cell number,", k, "for KNN downstream analysis!")
+  if(sum(cell_num<k)>0 & dens = "KNN"){
+    stop("Some samples have numbers of cells smaller than the valid cell number ", k, " for KNN downstream analysis!")
   }
 
   # density estimation
