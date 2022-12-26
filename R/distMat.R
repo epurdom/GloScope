@@ -51,11 +51,23 @@
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
                    n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
                    BPPARAM=BiocParallel::bpparam(),
-                   varapp = FALSE, returndens = FALSE, epapp = FALSE){
+                   varapp = FALSE, returndens = FALSE, epapp = FALSE,
+                   min_cell = 500){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
 
 
+  # check cell number
+  cell_num <- table(x[,sample_id])
+  check_num <- names(cell_num)[which(cell_num<min_cell)]
+  if(check_num>0){
+    warning(paste0("Some samples have numbers of cells smaller than the minimum cell number,", min_cell,"!"))
+  }
+  if(sum(cell_num<k)>0){
+    stop("Some samples have numbers of cells smaller than the valid cell number,", k, "for KNN downstream analysis!")
+  }
+
+  # density estimation
   df_list = split(x, x[,sample_id])
   df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
   df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
