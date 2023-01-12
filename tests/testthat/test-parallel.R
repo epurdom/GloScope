@@ -1,7 +1,7 @@
 test_that("setBPParam", {
-	# check silent run with default arguments	
+	# check silent run with default arguments
 	expect_silent(
-		setBPParam(BPPARAM=NULL,requested_cores=1)	
+		setBPParam(BPPARAM=NULL,requested_cores=1)
 	)
 
 	# only run this test is Bioc detects multicore available
