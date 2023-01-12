@@ -49,27 +49,27 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 		BPPARAM=NULL,requested_cores=1,
 		varapp=FALSE, returndens=FALSE, epapp=FALSE,
 		fit_density=NULL){
-	
+
 	# check available cores for parallelzation unless user has specified BPPARAM
 	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
-	
+
 	if(is.null(fit_density)){
 		sample_names <- as.character(unique(x[, sample_id]))
 	} else{ 
 		sample_names <- as.character(names(fit_density))
 	}
 	x[,sample_id] = as.character(x[,sample_id])
-	
+
 	df_list = split(x, x[,sample_id])
 	df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
 	df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
-	
+
 	if(is.null(fit_density)){
 		mod_list <- calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
 	} else {
 		mod_list <- fit_density
 	}
-	
+
 	all_combn <- combn(sample_names, 2)
 	# convert patient pairs to list for bplapply
 	patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
@@ -78,7 +78,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 			s1 = x[1], s2 = x[2], dens = dens, ndim = ndim,
 			n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
 			epapp = epapp)},BPPARAM=BPPARAM)
-	
+
 	dist_vec <- unlist(distance_list)
 	# Convert pair-wise distances to a symmetric distance matrix
 	dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
@@ -89,7 +89,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 		dist_mat[all_combn[1, i], all_combn[2, i]] <- dist_vec[i]
 		dist_mat[all_combn[2, i], all_combn[1, i]] <- dist_vec[i]
 	}
-	
+
 	if(dens == "GMM"){
 		mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
 	}
@@ -100,12 +100,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 	}
 }
 
-#' Helper function to set parallelization parameters 
-#' 
+#' Helper function to set parallelization parameters
+#'
 #' @param BPPARAM (list) Request BiocParallel parameters
 #' @param requested_cores (integer) Number of cores to parallelize over if possible
 #' @return BPPARAM (list) BiocParallel parameters that match system availability
-#' 
+#'
 #' @importFrom BiocParallel bpparam MulticoreParam
 #' @importFrom Sys getenv
 #' @importFrom parallel detectCores
