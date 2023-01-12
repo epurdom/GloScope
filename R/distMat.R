@@ -69,8 +69,8 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens ,
 
   # density estimation
   df_list = split(x, x[,sample_id])
-  df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
-  df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
+  df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
+  #df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
   mod_list = calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
 
