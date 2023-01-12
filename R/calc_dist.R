@@ -192,20 +192,20 @@ calc_dist <- function(mod_list, s1, s2, df_list, n,
 		      dens, k, ep, ndim, dist_mat, varapp, epapp){
 	if(dist_mat == "KL"){
 		if(dens == "KNN"){
-			mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
 					 dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
 					 epapp = epapp, ep = ep)
 		} else{
-			mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-					 dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep) +
-				calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-					dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep)
+			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+						dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep) +
+					calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
+						dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep)
 		}
 	} else if(dist_mat == "EMD"){
-		mydist = calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
+		mydist <- calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
 				  dens = dens, ndim = ndim)
 	} else if(dist_mat == "JS"){
-		mydist = calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+		mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
 				 dens = dens, k = k, ndim = ndim, n = n, ep = ep)
 	}
 	
