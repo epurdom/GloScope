@@ -186,7 +186,7 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #' @param s2 sample 2 name
 #' @param df_list a list contain each samples' dimension reduction embedding
 #' @param ndim number of dimension reduction to keep
-#' @param dist_metric which distance metric to use
+#' @param dist_mat which distance metric to use
 #' @param varapp logic variable for using variational approximation or not
 #' @return a numeric value of estimated symmatrised KL divergence between
 #' sample1 and sample2's distribution.
@@ -204,8 +204,8 @@ calc_JS = function(mod_list, sample1, sample2, df_list, n,
 #'
 # make symmatrised KL
 calc_dist <- function(mod_list, s1, s2, df_list, n,
-                      dens,k, ep, ndim, dist_metric,varapp, epapp){
-  if(dist_metric == "KL"){
+                      dens,k, ep, ndim, dist_mat, varapp, epapp){
+  if(dist_mat == "KL"){
     if(dens == "KNN"){
     mydist = calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                      dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
@@ -219,10 +219,10 @@ calc_dist <- function(mod_list, s1, s2, df_list, n,
                 epapp = epapp, ep = ep)
     }
 
-  }else if(dist_metric == "EMD"){
+  }else if(dist_mat == "EMD"){
       mydist = calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
                         dens = dens, ndim = ndim)
-  }else if(dist_metric == "JS"){
+  }else if(dist_mat == "JS"){
     mydist = calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                      dens = dens, k = k, ndim = ndim, n = n, ep = ep)
   } else {

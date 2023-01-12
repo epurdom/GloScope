@@ -32,10 +32,6 @@
   return(samples)
 }
 
-.sample_mclust_revised <- function(mclust_mod, n){
-	
-}
-
 .knn_query = function(df_list, query, input, k = k){
   knnq_dist = nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
   return(knnq_dist)
