@@ -38,10 +38,10 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 		pi_2 <- mclust_mod2$parameters$pro
 		cov_1 <- mclust_mod1$parameters$variance$sigma
 		cov_2 <- mclust_mod2$parameters$variance$sigma
-		
+
 		mu_1 <- mclust_mod1$parameters$mean
 		mu_2 <- mclust_mod2$parameters$mean
-		
+
 		if(varapp) {
 			kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
 		} else {
@@ -80,7 +80,6 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 	}
 	x1 <- mod_list[[sample1]]$parameters
 	x2 <- mod_list[[sample2]]$parameters
-	
 	dist <- matrix(NA, length(x1$pro), length(x2$pro))
 	for(i in 1:length(x1$pro)){
 		for(j in 1:length(x2$pro)){
@@ -96,9 +95,9 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 	w1 <- x1$pro
 	w2 <- x2$pro
 	flow <- transport(w1, w2, dist, method='primaldual')
-	
+
 	EMD <- 0
-	
+
 	for(i in 1:nrow(flow)){
 		EMD <- EMD +  dist[flow[i,1], flow[i,2]]*flow[i,3]
 	}
@@ -130,8 +129,7 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 
 # TODO: Put into one rd file?
 
-calc_JS <- function(mod_list, sample1, sample2, df_list, n,
-		    dens, k, ep, ndim){
+calc_JS <- function(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
@@ -143,7 +141,7 @@ calc_JS <- function(mod_list, sample1, sample2, df_list, n,
 		dens1_2 <- predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
 		dens2_2 <- predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
 		mixture_2 <- log(1/2*exp(dens1_2) + 1/2*exp(dens2_2))
-		
+
 		js <- sum(dens1_1 - mixture_1)/(2*n) + sum(dens2_2 - mixture_2)/(2*n)
 	}else if(dens == "KNN"){
 		knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
@@ -208,6 +206,6 @@ calc_dist <- function(mod_list, s1, s2, df_list, n,
 		mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
 				 dens = dens, k = k, ndim = ndim, n = n, ep = ep)
 	}
-	
+
 	return(mydist)
 }
