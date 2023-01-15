@@ -46,10 +46,10 @@
 #' @export
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
-                   n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
-		   BPPARAM=NULL, requested_cores=1,
-                   varapp = FALSE, returndens = FALSE, epapp = FALSE,
-		   fit_density=NULL){
+		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
+		BPPARAM=NULL, requested_cores=1,
+		varapp = FALSE, returndens = FALSE, epapp = FALSE,
+		fit_density=NULL){
 	# check available cores for parallelzation unless user has specified BPPARAM
 	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
 
