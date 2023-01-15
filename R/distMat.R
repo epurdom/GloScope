@@ -13,10 +13,12 @@
 #' @param dens type of density to estimate for.
 #' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param ndim number of dimension reduction to keep
-#' @param BPPARAM BiocParallel parameters
+#' @param BPPARAM BiocParallel parameters; NULL to let system pick
+#' @param requested_cores if NULL BPPARAM, the number of requested cores
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param dist_mat distance metric to calculate the distance
 #' @param varapp logic variable for using variational approximation or not
+#' @param fit_density a named list containing the fit density for each patient
 #' @param returndens return the GMM parameter list or not
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
