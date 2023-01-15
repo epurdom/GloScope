@@ -11,6 +11,7 @@
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
+#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters; NULL to let system pick
 #' @param requested_cores if NULL BPPARAM, the number of requested cores
@@ -24,13 +25,13 @@
 #' @examples
 #' data("example_data")
 #' set.seed(1)
-#' dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
-#' 		ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
-#' 		BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
-#' 		returndens = FALSE, epapp = FALSE)
+#' dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+#'                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
+#'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
+#'                     returndens = FALSE, epapp = FALSE)
 #'
 #' #print out the distance matrix using PCA embedding.
-#' dist_mat
+#' dist_result
 #'
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom predict
@@ -44,12 +45,11 @@
 #' @rdname CalcDist
 #' @export
 
-distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
-		n = 10000,ep = 1e-64, dist_mat = c("KL", "EMD", "JS"),
-		BPPARAM=NULL,requested_cores=1,
-		varapp=FALSE, returndens=FALSE, epapp=FALSE,
+distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
+		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
+		BPPARAM=NULL, requested_cores=1,
+		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL){
-
 	# check available cores for parallelzation unless user has specified BPPARAM
 	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
 
@@ -99,6 +99,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 		return(dist_mat)
 	}
 }
+
 
 #' Helper function to set parallelization parameters
 #'
