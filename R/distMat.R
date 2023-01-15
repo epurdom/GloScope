@@ -99,3 +99,32 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		return(dist_mat)
 	}
 }
+
+
+#' Helper function to set parallelization parameters
+#'
+#' @param BPPARAM (list) Request BiocParallel parameters
+#' @param requested_cores (integer) Number of cores to parallelize over if possible
+#' @return BPPARAM (list) BiocParallel parameters that match system availability
+#'
+#' @importFrom BiocParallel bpparam MulticoreParam
+#' @importFrom Sys getenv
+#' @importFrom parallel detectCores
+#' @rdname setBPParam
+#' @export
+
+setBPParam <- function(BPPARAM,requested_cores){
+	if (is.null(BPPARAM)){
+		BPPARAM <- BiocParallel::bpparam()
+		if (class(BPPARAM) == "MulticoreParam"){
+			available_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK")) # if using slurm
+			if(is.na(available_cores)){ available_cores <- parallel::detectCores() } # else get local cores
+			if (available_cores < requested_cores){
+				warning(paste0(requested_cores," reuqested cores not available. Using ",available_cores," instead."))
+				requested_cores <- available_cores
+			}
+			BPPARAM <- BiocParallel::MulticoreParam(requested_cores)
+		}
+	}
+	return(BPPARAM)
+}
