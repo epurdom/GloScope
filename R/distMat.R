@@ -50,7 +50,14 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		   BPPARAM=NULL, requested_cores=1,
                    varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		   fit_density=NULL){
-  sample_names = as.character(unique(x[, sample_id]))
+  # check available cores for parallelzation unless user has specified BPPARAM
+  BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
+
+  if(is.null(fit_density)){
+  	sample_names <- as.character(unique(x[, sample_id]))
+  } else{
+	  sample_names <- as.character(names(fit_density))
+  }
   x[,sample_id] = as.character(x[,sample_id])
 
 
