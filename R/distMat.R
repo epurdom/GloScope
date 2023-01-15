@@ -50,20 +50,19 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		   BPPARAM=NULL, requested_cores=1,
                    varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		   fit_density=NULL){
-  # check available cores for parallelzation unless user has specified BPPARAM
-  BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
+	# check available cores for parallelzation unless user has specified BPPARAM
+	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
 
-  if(is.null(fit_density)){
-  	sample_names <- as.character(unique(x[, sample_id]))
-  } else{
-	  sample_names <- as.character(names(fit_density))
-  }
-  x[,sample_id] = as.character(x[,sample_id])
+	if(is.null(fit_density)){
+		sample_names <- as.character(unique(x[, sample_id]))
+	} else{
+		sample_names <- as.character(names(fit_density))
+	}
+	x[,sample_id] = as.character(x[,sample_id])
 
-
-  df_list = split(x, x[,sample_id])
-  df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
-  df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
+	df_list = split(x, x[,sample_id])
+	df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
+	df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
   mod_list = calc_dens(df_list, dens = dens, num_components = num_components, k = k, BPPARAM = BPPARAM)
 
