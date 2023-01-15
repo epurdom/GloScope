@@ -64,11 +64,15 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), dim_redu)])
 	df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
-  mod_list = calc_dens(df_list, dens = dens, num_components = num_components, k = k, BPPARAM = BPPARAM)
+	if(is.null(fit_density)){
+		mod_list <- calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
+	} else {
+		mod_list <- fit_density
+	}
 
+	all_combn <- t(combn(sample_names, 2))
 
-  all_combn <- t(combn(sample_names, 2))
-  dist_vec <- c()
+	dist_vec <- c()
 
   # calculate the distance
   for (i in 1:nrow(all_combn)){
