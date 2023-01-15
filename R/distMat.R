@@ -55,7 +55,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = c("GMM", "KNN"),
 
 	if(is.null(fit_density)){
 		sample_names <- as.character(unique(x[, sample_id]))
-	} else{ 
+	} else{
 		sample_names <- as.character(names(fit_density))
 	}
 	x[,sample_id] = as.character(x[,sample_id])
