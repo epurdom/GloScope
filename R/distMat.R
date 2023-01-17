@@ -52,7 +52,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens ,
                    n = 10000,ep = 1e-64, dist_mat,
                    BPPARAM=BiocParallel::bpparam(),
                    varapp = FALSE, returndens = FALSE, epapp = FALSE,
-                   min_cell = 500){
+                   min_cell = 500, is_scvi = FALSE){
   sample_names = as.character(unique(x[, sample_id]))
   x[,sample_id] = as.character(x[,sample_id])
 
@@ -69,7 +69,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens ,
 
   # density estimation
   df_list = split(x, x[,sample_id])
-  df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
+  if(is_scvi){
+    df_list = lapply(df_list, function(y) y[,str_detect(dim_redu)])
+    message("The choosen dimension reduction is ScVI. All dimensions (columns) would be used.")
+  }else{
+    df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
+  }
   #df_list = lapply(df_list, function(y) as.matrix(y[,1:ndim]))
 
   mod_list = calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
