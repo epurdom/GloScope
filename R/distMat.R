@@ -20,6 +20,8 @@
 #' @param varapp logic variable for using variational approximation or not
 #' @param fit_density a named list containing the fit density for each patient
 #' @param returndens return the GMM parameter list or not
+#' @param min_cell the user defined minimum cell number per sample to check to have reliable results
+#' @param is_scvi whether the dimension reduction is based on ScVI and the entire data frame would be used
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
@@ -49,7 +51,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
 		BPPARAM=NULL, requested_cores=1,
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
-		fit_density=NULL){
+		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
 	# check available cores for parallelzation unless user has specified BPPARAM
 	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
 
@@ -59,12 +61,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		sample_names <- as.character(names(fit_density))
 	}
 	x[,sample_id] = as.character(x[,sample_id])
-  
+
     # check cell number
   cell_num <- table(x[,sample_id])
   check_num <- names(cell_num)[which(cell_num<min_cell)]
   if(check_num>0){
-    warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell,"!"))
+    warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell," to have reliable results!"))
   }
   if(sum(cell_num<k)>0 & dens = "KNN"){
     stop("Some samples have numbers of cells smaller than the valid cell number ", k, " for KNN downstream analysis!")
@@ -78,10 +80,10 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
   }else{
     df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
   }
-  
-  
+
+
 	if(is.null(fit_density)){
-		mod_list <- calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM)
+		mod_list <- calc_dens(df_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
 	} else {
 		mod_list <- fit_density
 	}
@@ -90,7 +92,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	# convert patient pairs to list for bplapply
 	patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
 	distance_list <- BiocParallel::bplapply(patient_pair_list,
-		function(x){ calc_dist(mod_list = mod_list, df_list = df_list, k = k,
+		function(w){ calc_dist(mod_list = mod_list, df_list = df_list, k = k,
 			s1 = x[1], s2 = x[2], dens = dens, ndim = ndim,
 			n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
 			epapp = epapp)},BPPARAM=BPPARAM)
