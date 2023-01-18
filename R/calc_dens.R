@@ -6,12 +6,13 @@
 #'  contains dimension reduction embedding for each cell, which is used to calculate the
 #'  density for each sample.
 #'
-#' @param df_list the list contains each samples' dimension reduction embedding
-#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
-#' @param dens method used to estimate density, options are GMM (Gaussian mixture model)
+#' @param df_list: the list contains each samples' dimension reduction embedding
+#' @param dens: method used to estimate density, options are GMM (Gaussian mixture model)
 #' and KNN (K-nearest Neighbor)
-#' @param BPPARAM BiocParallel parameters
-#' @return A list of length number of samples, contains the estimated density for each
+#' @param k: number of k nearest negibhour for KNN density estimation, default k = 50.
+#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
+#' @param BPPARAM: BiocParallel parameters
+#' @return mod_list: a list of length number of samples, contains the estimated density for each
 #' sample
 #'
 #'
@@ -36,12 +37,12 @@
 
 
 
-calc_dens = function(df_list, dens = c("GMM", "KNN"), k = 50,
-                     BPPARAM){
+calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
+                     BPPARAM = BiocParallel::bpparam()){
 
 
   if(dens == "GMM"){
-    mod_list <- bplapply(df_list, function(z) densityMclust(z, G = 1:9, verbose = F, plot = F),
+    mod_list <- BiocParallel::bplapply(df_list, function(z) densityMclust(z, G = num_components, verbose = F, plot = F),
                               BPPARAM=BPPARAM)
   }else if(dens == "KNN"){
 

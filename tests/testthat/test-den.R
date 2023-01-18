@@ -1,5 +1,3 @@
-context("Manifold density divergence")
-
 test_that("calc_den", {
   expect_silent(
     mod_list <- calc_dens(df_list, dens = "GMM", k = 50, BPPARAM = BiocParallel::SerialParam()))
