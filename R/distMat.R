@@ -93,7 +93,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
 	distance_list <- BiocParallel::bplapply(patient_pair_list,
 		function(w){ calc_dist(mod_list = mod_list, df_list = df_list, k = k,
-			s1 = x[1], s2 = x[2], dens = dens, ndim = ndim,
+			s1 = w[1], s2 = w[2], dens = dens, ndim = ndim,
 			n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
 			epapp = epapp)},BPPARAM=BPPARAM)
 
