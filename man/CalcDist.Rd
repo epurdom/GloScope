@@ -47,14 +47,19 @@ distMat(
   dim_redu,
   ndim,
   k = 50,
-  dens = c("GMM", "KNN"),
+  dens = "GMM",
   n = 10000,
   ep = 1e-64,
-  dist_mat = c("KL", "EMD", "JS"),
-  BPPARAM = BiocParallel::bpparam(),
+  dist_mat = "KL",
+  num_components = c(1:9),
+  BPPARAM = NULL,
+  requested_cores = 1,
   varapp = FALSE,
   returndens = FALSE,
-  epapp = FALSE
+  epapp = FALSE,
+  fit_density = NULL,
+  min_cell = 500,
+  is_scvi = FALSE
 )
 }
 \arguments{
@@ -93,9 +98,19 @@ reduction embedding}
 
 \item{dim_redu}{dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").}
 
-\item{BPPARAM}{BiocParallel parameters}
+\item{BPPARAM}{BiocParallel parameters; NULL to let system pick}
+
+\item{requested_cores}{if NULL BPPARAM, the number of requested cores}
 
 \item{returndens}{return the GMM parameter list or not}
+
+\item{fit_density}{a named list containing the fit density for each patient}
+
+\item{min_cell}{the user defined minimum cell number per sample to check to have reliable results}
+
+\item{is_scvi}{whether the dimension reduction is based on ScVI and the entire data frame would be used}
+
+\item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 }
 \value{
 a numeric value of distance between sample1 and sample2's distribution.
@@ -118,16 +133,19 @@ in the form "dim_i". Dimension reduction embedding is used to calculate the dens
 
 This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
+
+This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
+in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 }
 \examples{
 data("example_data")
 set.seed(1)
-dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
                     returndens = FALSE, epapp = FALSE)
 
 #print out the distance matrix using PCA embedding.
-dist_mat
+dist_result
 
 }

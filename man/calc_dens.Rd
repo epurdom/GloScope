@@ -4,20 +4,28 @@
 \alias{calc_dens}
 \title{calculate density for each samples based on dimension reduction embedding}
 \usage{
-calc_dens(df_list, dens = c("GMM", "KNN"), k = 50, BPPARAM)
+calc_dens(
+  df_list,
+  dens = "GMM",
+  k = 50,
+  num_components = c(1:9),
+  BPPARAM = BiocParallel::bpparam()
+)
 }
 \arguments{
-\item{df_list}{the list contains each samples' dimension reduction embedding}
+\item{df_list:}{the list contains each samples' dimension reduction embedding}
 
-\item{dens}{method used to estimate density, options are GMM (Gaussian mixture model)
+\item{dens:}{method used to estimate density, options are GMM (Gaussian mixture model)
 and KNN (K-nearest Neighbor)}
 
-\item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
+\item{k:}{number of k nearest negibhour for KNN density estimation, default k = 50.}
 
-\item{BPPARAM}{BiocParallel parameters}
+\item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
+
+\item{BPPARAM:}{BiocParallel parameters}
 }
 \value{
-A list of length number of samples, contains the estimated density for each
+mod_list: a list of length number of samples, contains the estimated density for each
 sample
 }
 \description{

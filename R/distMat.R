@@ -53,7 +53,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
 	# check available cores for parallelzation unless user has specified BPPARAM
-	BPPARAM <- set_BPPARAM(BPPARAM,request_cores)
+	BPPARAM <- setBPParam(BPPARAM,request_cores)
 
 	if(is.null(fit_density)){
 		sample_names <- as.character(unique(x[, sample_id]))
@@ -64,18 +64,18 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 
     # check cell number
   cell_num <- table(x[,sample_id])
-  check_num <- names(cell_num)[which(cell_num<min_cell)]
+  check_num <- sum(cell_num<min_cell)
   if(check_num>0){
     warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell," to have reliable results!"))
   }
-  if(sum(cell_num<k)>0 & dens = "KNN"){
+  if(sum(cell_num<k)>0 & dens == "KNN"){
     stop("Some samples have numbers of cells smaller than the valid cell number ", k, " for KNN downstream analysis!")
   }
 
   # density estimation
   df_list = split(x, x[,sample_id])
   if(is_scvi){
-    df_list = lapply(df_list, function(y) y[,str_detect(dim_redu)])
+    df_list = lapply(df_list, function(y) y[,str_detect(colnames(y),dim_redu)])
     message("The choosen dimension reduction is ScVI. All dimensions (columns) would be used.")
   }else{
     df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
@@ -99,22 +99,22 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 
 	dist_vec <- unlist(distance_list)
 	# Convert pair-wise distances to a symmetric distance matrix
-	dist_mat <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
-	rownames(dist_mat) <- sample_names
-	colnames(dist_mat) <- sample_names
+	DM <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
+	rownames(DM) <- sample_names
+	colnames(DM) <- sample_names
 
 	for (i in 1:ncol(all_combn)){
-		dist_mat[all_combn[1, i], all_combn[2, i]] <- dist_vec[i]
-		dist_mat[all_combn[2, i], all_combn[1, i]] <- dist_vec[i]
+	  DM[all_combn[1, i], all_combn[2, i]] <- dist_vec[i]
+	  DM[all_combn[2, i], all_combn[1, i]] <- dist_vec[i]
 	}
 
 	if(dens == "GMM"){
 		mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
 	}
-	if(returndens){
-		return(list(dist = dist_mat,modlist = mod_list))
+	if(returndens &dens == "GMM"){
+		return(list(dist = DM,modlist = mod_list))
 	}else{
-		return(dist_mat)
+		return(DM)
 	}
 }
 
@@ -126,7 +126,6 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 #' @return BPPARAM (list) BiocParallel parameters that match system availability
 #'
 #' @importFrom BiocParallel bpparam MulticoreParam
-#' @importFrom Sys getenv
 #' @importFrom parallel detectCores
 #' @rdname setBPParam
 #' @export

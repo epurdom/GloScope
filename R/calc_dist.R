@@ -54,7 +54,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 			}
 		}
 	}else if(dens == "KNN"){
-		kl <- KL.dist(mod_list[[sample1]], mod_list[[sample2]], k = k)[k]
+		kl <- KL.dist(as.matrix(mod_list[[sample1]]), as.matrix(mod_list[[sample2]]), k = k)[k]
 	}
 
 	return(kl)
