@@ -13,16 +13,16 @@ calc_dens(
 )
 }
 \arguments{
-\item{df_list:}{the list contains each samples' dimension reduction embedding}
+\item{df_list}{the list contains each samples' dimension reduction embedding}
 
-\item{dens:}{method used to estimate density, options are GMM (Gaussian mixture model)
+\item{dens}{method used to estimate density, options are GMM (Gaussian mixture model)
 and KNN (K-nearest Neighbor)}
 
-\item{k:}{number of k nearest negibhour for KNN density estimation, default k = 50.}
+\item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
 
-\item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
+\item{num_components}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 
-\item{BPPARAM:}{BiocParallel parameters}
+\item{BPPARAM}{BiocParallel parameters}
 }
 \value{
 mod_list: a list of length number of samples, contains the estimated density for each

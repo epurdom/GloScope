@@ -6,12 +6,12 @@
 #'  contains dimension reduction embedding for each cell, which is used to calculate the
 #'  density for each sample.
 #'
-#' @param df_list: the list contains each samples' dimension reduction embedding
-#' @param dens: method used to estimate density, options are GMM (Gaussian mixture model)
+#' @param df_list the list contains each samples' dimension reduction embedding
+#' @param dens method used to estimate density, options are GMM (Gaussian mixture model)
 #' and KNN (K-nearest Neighbor)
-#' @param k: number of k nearest negibhour for KNN density estimation, default k = 50.
-#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
-#' @param BPPARAM: BiocParallel parameters
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
+#' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
+#' @param BPPARAM BiocParallel parameters
 #' @return mod_list: a list of length number of samples, contains the estimated density for each
 #' sample
 #'

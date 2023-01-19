@@ -53,7 +53,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
 	# check available cores for parallelzation unless user has specified BPPARAM
-	BPPARAM <- setBPParam(BPPARAM,request_cores)
+	BPPARAM <- setBPParam(BPPARAM,requested_cores)
 
 	if(is.null(fit_density)){
 		sample_names <- as.character(unique(x[, sample_id]))
@@ -63,12 +63,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	x[,sample_id] = as.character(x[,sample_id])
 
     # check cell number
-  cell_num <- table(x[,sample_id])
+  cell_num <- sum(as.numeric(table(x[,sample_id]))<k)
   check_num <- sum(cell_num<min_cell)
   if(check_num>0){
     warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell," to have reliable results!"))
   }
-  if(sum(cell_num<k)>0 & dens == "KNN"){
+  if(cell_num>0 & dens == "KNN"){
     stop("Some samples have numbers of cells smaller than the valid cell number ", k, " for KNN downstream analysis!")
   }
 
