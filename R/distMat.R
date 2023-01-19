@@ -109,7 +109,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	}
 
 	if(dens == "GMM"){
-		mod_list = lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+		mod_list = lapply(mod_list, function(z) z[c("data", "classification", "uncertainty", "density")] = NULL)
 	}
 	if(returndens &dens == "GMM"){
 		return(list(dist = DM,modlist = mod_list))
