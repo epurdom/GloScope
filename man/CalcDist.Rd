@@ -98,6 +98,8 @@ reduction embedding}
 
 \item{dim_redu}{dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").}
 
+\item{num_components}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
+
 \item{BPPARAM}{BiocParallel parameters; NULL to let system pick}
 
 \item{requested_cores}{if NULL BPPARAM, the number of requested cores}
@@ -109,8 +111,6 @@ reduction embedding}
 \item{min_cell}{the user defined minimum cell number per sample to check to have reliable results}
 
 \item{is_scvi}{whether the dimension reduction is based on ScVI and the entire data frame would be used}
-
-\item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 }
 \value{
 a numeric value of distance between sample1 and sample2's distribution.

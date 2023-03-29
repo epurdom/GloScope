@@ -11,7 +11,7 @@
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
-#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
+#' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters; NULL to let system pick
 #' @param requested_cores if NULL BPPARAM, the number of requested cores
@@ -63,12 +63,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	x[,sample_id] = as.character(x[,sample_id])
 
     # check cell number
-  cell_num <- sum(as.numeric(table(x[,sample_id]))<k)
+  cell_num <- as.numeric(table(x[,sample_id]))
   check_num <- sum(cell_num<min_cell)
   if(check_num>0){
     warning(paste0("Some samples have numbers of cells smaller than the minimum cell number ", min_cell," to have reliable results!"))
   }
-  if(cell_num>0 & dens == "KNN"){
+  if(sum(cell_num<k)>0 & dens == "KNN"){
     stop("Some samples have numbers of cells smaller than the valid cell number ", k, " for KNN downstream analysis!")
   }
 
