@@ -34,7 +34,7 @@ library(popPackage)
 
 # Introduction {#Intro}
 
-This package will go through each steps introduced in the paper (...) for the ``Glos`` framework. The output from the package would be a distance matrix summarizing the differences among different samples. Also, the function `plotMDS` in the package would allow the user to visualize the distance matrix.  
+This package will go through each steps introduced in the paper (TBA) for the ``Glos`` framework. The output from the package would be a distance matrix summarizing the differences among different samples. Also, the function `plotMDS` in the package would allow the user to visualize the distance matrix.  
 
 ## Glos framework
 
@@ -51,7 +51,7 @@ The workflow of ``Glos`` can be summarised as:
 
 2. Choose a density estimation method (GMM/KNN) to estimate the distribution of each patients.
 
-3. Approximate the KL divergence using Monte-Carlo estimation and obtain the divergence matrix of each sample pair.
+3. Approximate the KL divergence using Monte-Carlo estimation (if GMM is chosen) and obtain the divergence matrix of each sample pair.
 
 4. Visualize the distance matrix through MDS first two dimensions using the `plotMDS` function (could also obtain MDS embedding with user-defined number of dimensions for further analysis purpose).
 
@@ -62,7 +62,7 @@ In this section, we would use a toy example to illustrate the input, output and 
 
 ## Data description
 
-The data was a subset from the Allenmouse data set, retrieved from [Yao et al (2021)](https://www.sciencedirect.com/science/article/pii/S0092867421005018?dgcid=rss_sd_all), using package https://github.com/drighelli/AllenInstituteBrainData. There was a total of 1,169,213 cells sequenced from 54 mice's different brain regions such as primary motor (Mop) region. For computational timing consideration, we subset the data to contains the samples from three regions: Anterior cingulate (ACA), Auditory (AUD), and primary motor (Mop). We further down-sampled the data so each sample has 500 cells.
+The data was a subset from the COVID PBMC data set, retrieved from [Stephenson et al (2021)](https://doi.org/10.1038/s41591-021-01329-2), using the following link: https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-10026. There was a total of 647,366 blood mononuclear cells from 130 patients, categoriesd into COVID patients, healthy control donor, patients with other non-COVID respiratory disease and volunteers administered with intravenous lipopolysaccharide (IV-LPS). For computational timing consideration, we subset the data to contains the samples only from COVID and healthy control donor. We further down-sampled the data so each sample has 500 cells.
 
 ```{r}
 table(example_data$patient_id, example_data$Status)
