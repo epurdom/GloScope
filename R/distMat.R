@@ -47,13 +47,11 @@
 #' @rdname CalcDist
 #' @export
 
-distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
+distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
-		BPPARAM=NULL, requested_cores=1,
+		BPPARAM = BiocParallel::SerialParam(), requested_cores = 1,
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
-	# check available cores for parallelzation unless user has specified BPPARAM
-	BPPARAM <- setBPParam(BPPARAM,requested_cores)
 
 	if(is.null(fit_density)){
 		sample_names <- as.character(unique(x[, sample_id]))
@@ -118,34 +116,3 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50 , dens = "GMM",
 	}
 }
 
-
-#' Helper function to set parallelization parameters
-#'
-#' @param BPPARAM (list) Request BiocParallel parameters
-#' @param requested_cores (integer) Number of cores to parallelize over if possible
-#' @return BPPARAM (list) BiocParallel parameters that match system availability
-#'
-#' @importFrom BiocParallel bpparam MulticoreParam
-#' @importFrom parallel detectCores
-#' @rdname setBPParam
-#' @export
-
-
-
-
-setBPParam <- function(BPPARAM,requested_cores){
-	if (is.null(BPPARAM)){
-		BPPARAM <- BiocParallel::bpparam()
-		if (class(BPPARAM) == "MulticoreParam"){
-			available_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK")) # if using slurm
-			if(is.na(available_cores)){ available_cores <- parallel::detectCores() } # else get local cores
-			if (available_cores < requested_cores){
-				warning(paste0(requested_cores," reuqested cores not available. Using ",available_cores," instead."))
-				requested_cores <- available_cores
-			}
-			BPPARAM <- BiocParallel::MulticoreParam(requested_cores)
-		}
-	}
-	return(BPPARAM)
-
-}
