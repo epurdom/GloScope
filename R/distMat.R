@@ -49,7 +49,7 @@
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
-		BPPARAM = BiocParallel::SerialParam(), requested_cores = 1,
+		BPPARAM = BiocParallel::SerialParam(), 
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
 
