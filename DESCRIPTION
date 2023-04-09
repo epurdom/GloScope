@@ -1,7 +1,7 @@
 Package: popPackage
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
-Version: 0.6.0
+Version: 0.7.0
 Author: c(person("Hao", "Wang", email = "hao_wang@berkeley.edu",
             role = c("aut", "cre")),
             person("William", "Torous", email = "wtorous@berkeley.edu",
