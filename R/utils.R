@@ -4,7 +4,7 @@
 #' performs monte-carlo simulation based on p hat.
 #'
 #' @param mclust_mod mclust object which contains the estimated density p hat.
-#' @param n number of simulations to generate. Default = 10,000.
+#' @param r number of simulations to generate. Default = 10,000.
 #' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @importFrom mclust densityMclust
@@ -18,9 +18,9 @@
 # ------------------------------------------------------------------------------
 
 
-.sample_mclust <- function(mclust_mod, n){
+.sample_mclust <- function(mclust_mod, r){
   p <- table(mclust_mod$classification)/mclust_mod$n
-  z <- rmultinom(1, size = n, prob = p)[,1]
+  z <- rmultinom(1, size = r, prob = p)[,1]
   z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
   samples <- list()
   for ( i in 1:length(z)){

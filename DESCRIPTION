@@ -13,31 +13,27 @@ Description: Estimate patient distribution to summarize patient level representa
 BugReports: https://github.com/epurdom/popPackage/issues
 License: Artistic-2.0
 Encoding: UTF-8
-Imports: 
-    methods, 
+Imports:  
     utils, 
     stats, 
     MASS,
-    Seurat,
     mclust, 
     stringr, 
-    dplyr, 
     ggplot2, 
     RANN,
     FNN,
     transport,
     psych,
     BiocParallel,
-    rags2ridges,
-    gtools
+    rags2ridges
 LazyData: true
-Depends: R (>= 4.1),
-	      NMF,
-	      RColorBrewer
+Depends: R (>= 4.1)
 Suggests:
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    dplyr,
+    NMF
 VignetteBuilder: knitr
 biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
 RoxygenNote: 7.2.1

@@ -7,14 +7,13 @@
 #' reduction embedding
 #' @param sample_id column names in x that contains the sample ID
 #' @param dim_redu dimension reduction index in x file (e.g. dim_reduc = "PC" for "PC_1").
-#' @param n number of monte-carlo simulations to generate
+#' @param r number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param dens type of density to estimate for.
 #' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param ndim number of dimension reduction to keep
 #' @param BPPARAM BiocParallel parameters; NULL to let system pick
-#' @param requested_cores if NULL BPPARAM, the number of requested cores
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param dist_mat distance metric to calculate the distance
 #' @param varapp logic variable for using variational approximation or not
@@ -28,7 +27,7 @@
 #' data("example_data")
 #' set.seed(1)
 #' dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
-#'                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
+#'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64, dist_mat = "KL",
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
 #'                     returndens = FALSE, epapp = FALSE)
 #'
@@ -48,8 +47,8 @@
 #' @export
 
 distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
-		n = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
-		BPPARAM = BiocParallel::SerialParam(), 
+		r = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
+		BPPARAM = BiocParallel::SerialParam(),
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
 		fit_density=NULL, min_cell = 500, is_scvi = FALSE){
 
@@ -92,7 +91,7 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 	distance_list <- BiocParallel::bplapply(patient_pair_list,
 		function(w){ calc_dist(mod_list = mod_list, df_list = df_list, k = k,
 			s1 = w[1], s2 = w[2], dens = dens, ndim = ndim,
-			n=n, ep = ep, dist_mat = dist_mat, varapp = varapp,
+			r=r, ep = ep, dist_mat = dist_mat, varapp = varapp,
 			epapp = epapp)},BPPARAM=BPPARAM)
 
 	dist_vec <- unlist(distance_list)

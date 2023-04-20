@@ -28,8 +28,8 @@ knitr::opts_chunk$set(
 # Load packages {-}
 
 ```{r load-libs, message = FALSE,  warning = FALSE}
-library(dplyr)
 library(popPackage)
+library(NMF)
 ```
 
 # Introduction {#Intro}
@@ -93,11 +93,26 @@ Following is the illustration of using example data, KNN density estimation, to 
 ```{r}
 set.seed(1)
 dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
-                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
+                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64, dist_mat = "KL",
                      BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
                      returndens = FALSE, epapp = FALSE)
 
 dist_test[1:5,1:5]
+```
+
+### Random seed 
+
+We implement biocparallel when we draw monte-carlo simulation for GMM estimation. Therefore, to ensure we get the same results everytime, we need to set the random seed for GMM. More detatiled could be found here: https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Random_Numbers.html.
+
+
+Following is an example:
+
+```{r eval = F}
+set.seed(1)
+dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+                     ndim = 10, dens = "GMM", r=10000, ep = 1e-64, dist_mat = "KL",
+                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1), varapp = FALSE,
+                     returndens = FALSE, epapp = FALSE)
 ```
 
 
@@ -106,8 +121,7 @@ dist_test[1:5,1:5]
 A classical way to visualize the distance matrix is using the heatmap. 
 
 ```{r}
-library(NMF)
-library(RColorBrewer)
+
 
 aheatmap(dist_test)
 ```

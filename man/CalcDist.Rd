@@ -13,7 +13,7 @@ calc_kl(
   sample1,
   sample2,
   df_list,
-  n,
+  r,
   dens,
   k,
   ndim,
@@ -24,14 +24,14 @@ calc_kl(
 
 calc_EMD(mod_list, sample1, sample2, dens, ndim)
 
-calc_JS(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim)
+calc_JS(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim)
 
 calc_dist(
   mod_list,
   s1,
   s2,
   df_list,
-  n,
+  r,
   dens,
   k,
   ep,
@@ -48,12 +48,11 @@ distMat(
   ndim,
   k = 50,
   dens = "GMM",
-  n = 10000,
+  r = 10000,
   ep = 1e-64,
   dist_mat = "KL",
   num_components = c(1:9),
-  BPPARAM = NULL,
-  requested_cores = 1,
+  BPPARAM = BiocParallel::SerialParam(),
   varapp = FALSE,
   returndens = FALSE,
   epapp = FALSE,
@@ -71,7 +70,7 @@ distMat(
 
 \item{df_list}{a list contain each samples' dimension reduction embedding}
 
-\item{n}{number of monte-carlo simulations to generate}
+\item{r}{number of monte-carlo simulations to generate}
 
 \item{dens}{type of density to estimate for.}
 
@@ -101,8 +100,6 @@ reduction embedding}
 \item{num_components}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 
 \item{BPPARAM}{BiocParallel parameters; NULL to let system pick}
-
-\item{requested_cores}{if NULL BPPARAM, the number of requested cores}
 
 \item{returndens}{return the GMM parameter list or not}
 
@@ -141,7 +138,7 @@ in the form "dim_i". Dimension reduction embedding is used to calculate the dens
 data("example_data")
 set.seed(1)
 dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
-                    ndim = 10, dens = "KNN", n=10000, ep = 1e-64, dist_mat = "KL",
+                    ndim = 10, dens = "KNN", r=10000, ep = 1e-64, dist_mat = "KL",
                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
                     returndens = FALSE, epapp = FALSE)
 

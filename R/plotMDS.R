@@ -18,7 +18,7 @@
 #' data("example_data")
 #' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
-#'                     ndim = 10, dens = "KNN", n=10000, ep = 1e-64,
+#'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64,
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
 #'                     returndens = FALSE, epapp = FALSE)
 #' pat_info <- unique(example_data[, c("patient_id", "Status")])

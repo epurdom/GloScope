@@ -3,7 +3,7 @@
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param n number of monte-carlo simulations to generate
+#' @param r number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
@@ -27,13 +27,13 @@
 # put into one rd file
 
 # KL divergence
-calc_kl <- function(mod_list, sample1, sample2, df_list, n,
+calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 			dens, k,
 			ndim, varapp,epapp, ep){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
-		s <- .sample_mclust(mclust_mod1, n=n)
+		s <- .sample_mclust(mclust_mod1, r=r)
 		pi_1 <- mclust_mod1$parameters$pro
 		pi_2 <- mclust_mod2$parameters$pro
 		cov_1 <- mclust_mod1$parameters$variance$sigma
@@ -48,9 +48,9 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, n,
 			dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
 			dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
 			if(epapp) {
-				kl <- sum(dens1 - (dens2+ep))/n
+				kl <- sum(dens1 - (dens2+ep))/r
 			} else {
-				kl <- sum(dens1 - dens2) / n
+				kl <- sum(dens1 - dens2) / r
 			}
 		}
 	}else if(dens == "KNN"){
@@ -109,7 +109,7 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param n number of monte-carlo simulations to generate
+#' @param r number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
@@ -129,12 +129,12 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 
 # TODO: Put into one rd file?
 
-calc_JS <- function(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim){
+calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
-		s1 <- .sample_mclust(mclust_mod1, n=n)
-		s2 <- .sample_mclust(mclust_mod2, n=n)
+		s1 <- .sample_mclust(mclust_mod1, r=r)
+		s2 <- .sample_mclust(mclust_mod2, r=r)
 		dens1_1 <- predict(mclust_mod1, s1, what = "dens", logarithm = TRUE)
 		dens2_1 <- predict(mclust_mod2, s1, what = "dens", logarithm = TRUE)
 		mixture_1 <- log(1/2*exp(dens1_1) + 1/2*exp(dens2_1))
@@ -142,7 +142,7 @@ calc_JS <- function(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim){
 		dens2_2 <- predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
 		mixture_2 <- log(1/2*exp(dens1_2) + 1/2*exp(dens2_2))
 
-		js <- sum(dens1_1 - mixture_1)/(2*n) + sum(dens2_2 - mixture_2)/(2*n)
+		js <- sum(dens1_1 - mixture_1)/(2*r) + sum(dens2_2 - mixture_2)/(2*r)
 	}else if(dens == "KNN"){
 		knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
 		knn1 <- mod_list[[sample1]]
@@ -162,7 +162,7 @@ calc_JS <- function(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim){
 #' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param n number of monte-carlo simulations to generate
+#' @param r number of monte-carlo simulations to generate
 #' @param ep error term added to the KL divergence calculation
 #' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
@@ -186,25 +186,25 @@ calc_JS <- function(mod_list, sample1, sample2, df_list, n, dens, k, ep, ndim){
 #' @rdname CalcDist
 #' @export
 
-calc_dist <- function(mod_list, s1, s2, df_list, n,
+calc_dist <- function(mod_list, s1, s2, df_list, r,
 		      dens, k, ep, ndim, dist_mat, varapp, epapp){
 	if(dist_mat == "KL"){
 		if(dens == "KNN"){
 			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-					 dens = dens, k = k, ndim = ndim, n = n, varapp = varapp,
+					 dens = dens, k = k, ndim = ndim, r = r, varapp = varapp,
 					 epapp = epapp, ep = ep)
 		} else{
 			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-						dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep) +
+						dens = dens, k = k, ndim = ndim, r = r, varapp = varapp, epapp = epapp, ep = ep) +
 					calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-						dens = dens, k = k, ndim = ndim, n = n, varapp = varapp, epapp = epapp, ep = ep)
+						dens = dens, k = k, ndim = ndim, r = r, varapp = varapp, epapp = epapp, ep = ep)
 		}
 	} else if(dist_mat == "EMD"){
 		mydist <- calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
 				  dens = dens, ndim = ndim)
 	} else if(dist_mat == "JS"){
 		mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-				 dens = dens, k = k, ndim = ndim, n = n, ep = ep)
+				 dens = dens, k = k, ndim = ndim, r = r, ep = ep)
 	}
 
 	return(mydist)
