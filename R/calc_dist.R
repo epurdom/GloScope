@@ -1,6 +1,6 @@
-#' calculate  KL for a pair of samples
+#' @title Main function for computing distance from samples
 #'
-#' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
+#' @description This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
 #' @param r number of monte-carlo simulations to generate
@@ -8,13 +8,89 @@
 #' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
+#' @param s1 sample 1 name
+#' @param s2 sample 2 name
+#' @param df_list a list contain each samples' dimension reduction embedding
+#' @param ndim number of dimension reduction to keep
+#' @param dist_mat which distance metric to use
+#' @param varapp logic variable for using variational approximation or not
+#' @return a numeric value of estimated symmatrised KL divergence between
+#' sample1 and sample2's distribution.
+#' @examples
+#' data(example_data)
+#' library(stringr)
+#' sample_name <- as.character(unique(example_data[, "patient_id"]))
+#' example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
+#' df_list <- split(example_data, example_data[,"patient_id"])
+#' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
+#' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
+#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' all_combn <- combn(sample_name, 2)
+#' patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
+#' distance_list <- BiocParallel::bplapply(patient_pair_list, function(w){
+#'                                         calc_dist(mod_list = mod_list, df_list = df_list, k = 50,
+#'                                         s1 = w[1], s2 = w[2], dens = "KNN", ndim = 10,
+#'                                         r=10000, ep = 1e-64, dist_mat = "KL", varapp = FALSE,
+#'                                         epapp = FALSE)},BPPARAM=BiocParallel::SerialParam())
+#' @importFrom mclust densityMclust
+#' @importFrom stats rmultinom
+#' @importFrom MASS mvrnorm
+#' @importFrom RANN nn2
+#' @importFrom transport transport
+#' @importFrom psych tr
+#' @importFrom rags2ridges KLdiv
+#' @rdname CalcDist
+#' @export
+
+calc_dist <- function(mod_list, s1, s2, df_list, r,
+                      dens, k, ep, ndim, dist_mat, varapp, epapp){
+  if(dist_mat == "KL"){
+    if(dens == "KNN"){
+      mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+                        dens = dens, k = k, r = r, varapp = varapp,
+                        epapp = epapp, ep = ep)
+    } else{
+      mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+                        dens = dens, k = k, r = r, varapp = varapp, epapp = epapp, ep = ep) +
+        calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
+                dens = dens, k = k, r = r, varapp = varapp, epapp = epapp, ep = ep)
+    }
+  }  else if(dist_mat == "JS"){
+    mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+                      dens = dens, k = k, ndim = ndim, r = r, ep = ep)
+  }
+
+  return(mydist)
+}
+
+#' @title calculate KL distance for a pair of samples
+#'
+#' @description This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
+#' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
+#'
+#' @param r number of monte-carlo simulations to generate
+#' @param ep error term added to the KL divergence calculation
+#' @param epapp whether to apply the error term
+#' @param mod_list a list contains each samples' estimated density
+#' @param dens type of density to estimate for.
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param sample1 sample 1 index
 #' @param sample2 sample 2 index
 #' @param df_list a list contain each samples' dimension reduction embedding
-#' @param ndim number of dimension reduction to keep
 #' @param varapp logic variable for using variational approximation or not
 #' @return a numeric value of distance between sample1 and sample2's distribution.
-#'
+#' @examples
+#' data("example_data")
+#' library(stringr)
+#' sample_name <- as.character(unique(example_data[, "patient_id"]))
+#' example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
+#' df_list <- split(example_data, example_data[,"patient_id"])
+#' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
+#' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
+#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' dist_test <- calc_kl(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
+#'                      r = 10000,k=50,varapp=FALSE,epapp=FALSE, ep = 1e-64)
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
@@ -24,12 +100,10 @@
 #' @rdname CalcDist
 #' @export
 
-# put into one rd file
 
 # KL divergence
 calc_kl <- function(mod_list, sample1, sample2, df_list, r,
-			dens, k,
-			ndim, varapp,epapp, ep){
+			dens, k, varapp,epapp, ep){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
@@ -60,49 +134,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 	return(kl)
 }
 
-#' calculate  EMD for a pair of samples
-#'
-#' @param mod_list a list contains each samples' estimated density
-#' @param dens type of density to estimate for.
-#' @param sample1 sample 1 index
-#' @param sample2 sample 2 index
-#' @param ndim number of dimension reduction to keep
-#' @return a numeric value of distance between sample1 and sample2's distribution.
-#'
-#' @importFrom transport transport
-#' @importFrom psych tr
-#' @rdname CalcDist
-#' @export
 
-calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
-	if(dens == "KNN"){
-		stop("kNN density estimation is incompatible with the EMD metric.")
-	}
-	x1 <- mod_list[[sample1]]$parameters
-	x2 <- mod_list[[sample2]]$parameters
-	dist <- matrix(NA, length(x1$pro), length(x2$pro))
-	for(i in 1:length(x1$pro)){
-		for(j in 1:length(x2$pro)){
-			dist[i,j] <- 1/2*(log(max(colSums(x2$variance$sigma[,,j]))/max(colSums(x1$variance$sigma[,,i]))) -ndim +
-					tr(solve(x2$variance$sigma[,,j])%*%x1$variance$sigma[,,i]) +
-					t(x2$mean[,j] - x1$mean[,i])%*%solve(x2$variance$sigma[,,j])%*%(x2$mean[,j] - x1$mean[,i])) +
-					1/2*(log(max(colSums(x1$variance$sigma[,,i]))/max(colSums(x2$variance$sigma[,,j]))) - ndim +
-					tr(solve(x1$variance$sigma[,,i])%*%x2$variance$sigma[,,j]) +
-					t(x1$mean[,i] - x2$mean[,j])%*%solve(x1$variance$sigma[,,i])%*%(x1$mean[,i] - x2$mean[,j]))
-		}
-	}
-	colnames(dist) <- 1:ncol(dist)
-	w1 <- x1$pro
-	w2 <- x2$pro
-	flow <- transport(w1, w2, dist, method='primaldual')
-
-	EMD <- 0
-
-	for(i in 1:nrow(flow)){
-		EMD <- EMD +  dist[flow[i,1], flow[i,2]]*flow[i,3]
-	}
-	return(EMD)
-}
 
 #' Calculate JS divergence for a pair of samples
 #'
@@ -113,12 +145,24 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 #' @param ep error term added to the KL divergence calculation
 #' @param mod_list a list contains each samples' estimated density
 #' @param dens type of density to estimate for.
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param sample1 sample 1 index
 #' @param sample2 sample 2 index
 #' @param df_list a list contain each samples' dimension reduction embedding
 #' @param ndim number of dimension reduction to keep
 #' @return a numeric value of distance between sample1 and sample2's distribution.
-#'
+#' @examples
+#' data(example_data)
+#' library(stringr)
+#' sample_name <- as.character(unique(example_data[, "patient_id"]))
+#' example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
+#' df_list <- split(example_data, example_data[,"patient_id"])
+#' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
+#' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
+#' #working with large data set, use BiocParallel
+#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' dist_test <- calc_JS(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
+#'                      r = 10000,k=50,ep = 1e-64,ndim = 10)
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
@@ -127,7 +171,6 @@ calc_EMD <- function(mod_list, sample1, sample2, dens, ndim){
 #' @rdname CalcDist
 #' @export
 
-# TODO: Put into one rd file?
 
 calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
 	if(dens == "GMM"){
@@ -157,55 +200,4 @@ calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
 	return(js)
 }
 
-#' Main function for computing distance from samples
-#'
-#' This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
-#' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
-#'
-#' @param r number of monte-carlo simulations to generate
-#' @param ep error term added to the KL divergence calculation
-#' @param epapp whether to apply the error term
-#' @param mod_list a list contains each samples' estimated density
-#' @param dens type of density to estimate for.
-#' @param s1 sample 1 name
-#' @param s2 sample 2 name
-#' @param df_list a list contain each samples' dimension reduction embedding
-#' @param ndim number of dimension reduction to keep
-#' @param dist_mat which distance metric to use
-#' @param varapp logic variable for using variational approximation or not
-#' @return a numeric value of estimated symmatrised KL divergence between
-#' sample1 and sample2's distribution.
-#'
-#' @importFrom mclust densityMclust
-#' @importFrom stats rmultinom
-#' @importFrom MASS mvrnorm
-#' @importFrom RANN nn2
-#' @importFrom transport transport
-#' @importFrom psych tr
-#' @importFrom rags2ridges KLdiv
-#' @rdname CalcDist
-#' @export
 
-calc_dist <- function(mod_list, s1, s2, df_list, r,
-		      dens, k, ep, ndim, dist_mat, varapp, epapp){
-	if(dist_mat == "KL"){
-		if(dens == "KNN"){
-			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-					 dens = dens, k = k, ndim = ndim, r = r, varapp = varapp,
-					 epapp = epapp, ep = ep)
-		} else{
-			mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-						dens = dens, k = k, ndim = ndim, r = r, varapp = varapp, epapp = epapp, ep = ep) +
-					calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
-						dens = dens, k = k, ndim = ndim, r = r, varapp = varapp, epapp = epapp, ep = ep)
-		}
-	} else if(dist_mat == "EMD"){
-		mydist <- calc_EMD(mod_list = mod_list, sample1 = s1, sample2 = s2,
-				  dens = dens, ndim = ndim)
-	} else if(dist_mat == "JS"){
-		mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
-				 dens = dens, k = k, ndim = ndim, r = r, ep = ep)
-	}
-
-	return(mydist)
-}

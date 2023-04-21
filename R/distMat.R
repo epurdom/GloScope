@@ -1,4 +1,4 @@
-#' @title calculate symmetrised  KL for each pair of samples
+#' @title calculate statistical divergence for each pair of samples
 #'
 #' @description This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
@@ -24,8 +24,7 @@
 #' @return A distance matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
 #' @examples
-#' data("example_data")
-#' set.seed(1)
+#' data(example_data)
 #' dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
 #'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64, dist_mat = "KL",
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
@@ -43,10 +42,10 @@
 #' @importFrom FNN KL.dist
 #' @importFrom rags2ridges KLdiv
 #' @import BiocParallel
-#' @rdname CalcDist
+#' @rdname distMat
 #' @export
 
-distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
+distMat <- function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 		r = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
 		BPPARAM = BiocParallel::SerialParam(),
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,
@@ -70,12 +69,12 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
   }
 
   # density estimation
-  df_list = split(x, x[,sample_id])
+  df_list <- split(x, x[,sample_id])
   if(is_scvi){
-    df_list = lapply(df_list, function(y) y[,str_detect(colnames(y),dim_redu)])
+    df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y),dim_redu)])
     message("The choosen dimension reduction is ScVI. All dimensions (columns) would be used.")
   }else{
-    df_list = lapply(df_list, function(y) y[,paste0(dim_redu, "_", 1:ndim)])
+    df_list <- lapply(df_list, function(y) y[,paste0(dim_redu, "_", seq_len(ndim))])
   }
 
 
@@ -100,13 +99,13 @@ distMat = function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 	rownames(DM) <- sample_names
 	colnames(DM) <- sample_names
 
-	for (i in 1:ncol(all_combn)){
+	for (i in seq_len(ncol(all_combn))){
 	  DM[all_combn[1, i], all_combn[2, i]] <- dist_vec[i]
 	  DM[all_combn[2, i], all_combn[1, i]] <- dist_vec[i]
 	}
 
 	if(dens == "GMM"){
-		mod_list = lapply(mod_list, function(z) z[c("data", "classification", "uncertainty", "density")] = NULL)
+		mod_list <- lapply(mod_list, function(z) z[c("data", "classification", "uncertainty", "density")] = NULL)
 	}
 	if(returndens &dens == "GMM"){
 		return(list(dist = DM,modlist = mod_list))

@@ -3,17 +3,12 @@
 \docType{data}
 \name{bigPalette}
 \alias{bigPalette}
-\alias{massivePalette}
 \title{prepare for plotting colors}
 \format{
 An object of class \code{character} of length 56.
-
-An object of class \code{character} of length 484.
 }
 \usage{
 bigPalette
-
-massivePalette
 }
 \description{
 prepare for plotting colors

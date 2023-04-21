@@ -16,7 +16,6 @@
 #'
 #' @examples
 #' data("example_data")
-#' set.seed(1)
 #' dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
 #'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64,
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
@@ -32,7 +31,7 @@
 #' @importFrom MASS isoMDS
 #' @export
 #'
-plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
+plotMDS <- function(dist_mat, n=10, x, sample_id, group_id){
   if(nrow(dist_mat)!= nrow(x)){
     stop(paste("Not consistent patient number. Make sure your
                distance matrix and meta info have the same patient
@@ -43,14 +42,14 @@ plotMDS = function(dist_mat, n=10, x, sample_id, group_id){
                distance matrix and meta info have the same patients."))
   }
   if(!(identical(rownames(dist_mat), x[, sample_id]))){
-   x = x[match(rownames(dist_mat), x[,sample_id]),]
+   x <- x[match(rownames(dist_mat), x[,sample_id]),]
    }
     fit_df <- isoMDS(dist_mat, k = n, trace = FALSE)
-    colnames(fit_df$points) <- paste0("Coordinate",1:n)
+    colnames(fit_df$points) <- paste0("Coordinate",seq_len(n))
     mds_df <- cbind(x, fit_df$points)
 # add the mds coordinates
     # invisible() for the plot
-  mds_plot = ggplot(mds_df, aes_string(x = "Coordinate1", y = "Coordinate2",
+  mds_plot <- ggplot(mds_df, aes_string(x = "Coordinate1", y = "Coordinate2",
                                     color = group_id)) + geom_point() +
     scale_color_manual(values=bigPalette) +
     theme_bw()

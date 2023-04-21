@@ -1,6 +1,6 @@
 #' example of data frame as the input for distMat
-#'
-#'
+#' @rdname data
+#' @name example_data
 #' @description A data frame contains a subset of data
 #' from COVID PBMC data. The data includes the patient
 #' ID (patient_id), condition of the patients (Status),
@@ -9,5 +9,5 @@
 #'
 #' @format A data frame with 5000 rows and 52 variables
 #'
-"example_data"
+NULL
 

@@ -121,13 +121,3 @@ bigPalette<-c(
 	'cadetblue3'
 )
 
-#' @importFrom grDevices colors
-.rcolors<-function(){
-	#so sure that setting seed doesn't mess up when installing package
-	set.seed(23589)
-	return(sample(colors()[-c(152:361)]))
-}
-
-#' @rdname plottingColors
-#' @export
-massivePalette<-unique(c(bigPalette,.rcolors()))
