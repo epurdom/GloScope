@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 # Load packages {-}
 
 ```{r load-libs, message = FALSE,  warning = FALSE}
-library(popPackage)
+library(GloScope)
 library(NMF)
 data("example_data")
 ```

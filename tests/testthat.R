@@ -1,4 +1,4 @@
 library(testthat)
-library(popPackage)
+library(GloScope)
 
-test_check("popPackage")
+test_check("GloScope")
