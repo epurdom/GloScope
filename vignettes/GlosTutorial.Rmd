@@ -13,7 +13,7 @@ output:
   BiocStyle::html_document:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Glos}
+  %\VignetteIndexEntry{GloScope}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -51,7 +51,7 @@ A common workflow of using `GloScope` for :
 In this section, we use a toy example to illustrate the input, output and visualization of `GloScope` pipeline. 
 
 
-The data was a subset from the COVID PBMC data set, retrieved from [Stephenson et al (2021)](https://doi.org/10.1038/s41591-021-01329-2), using the following link: https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-10026. There were a total of 647,366 blood mononuclear cells from 130 patients, categorized into COVID patients, healthy control donor, patients with other non-COVID respiratory disease and volunteers administered with intravenous lipopolysaccharide (IV-LPS). For computational timing consideration, we subset the data to contains the samples only from COVID and healthy control donor. We further down-sampled the data so each sample has 500 cells.
+The data was a subset from the COVID PBMC data set, retrieved from [Stephenson et al (2021)](https://doi.org/10.1038/s41591-021-01329-2), using the following link: https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-10026. There were a total of 647,366 blood mononuclear cells from 130 patients, categorized into COVID patients, healthy control donor, patients with other non-COVID respiratory disease and volunteers administered with intravenous lipopolysaccharide (IV-LPS). For computational timing consideration, we subset the data to contains the samples only from COVID and healthy control donor. We further down-sampled the data so each sample has 500 cells; this is not a recommended step for normal analysis, but done just to create a small manageable dataset for this tutorial.
 
 
 ## Data Input
@@ -108,43 +108,59 @@ dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
 dist_test[1:5,1:5]
 ```
 
-### Random seed 
+# Visualization of the divergence matrix
 
-We implement biocparallel when we draw monte-carlo simulation for GMM estimation. Therefore, to ensure we get the same results everytime, we need to set the random seed for GMM. More detatiled could be found here: https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Random_Numbers.html.
-
-
-Following is an example:
-
-```{r eval = F}
-set.seed(1)
-dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
-                     ndim = 10, dens = "GMM", r=10000, ep = 1e-64, dist_mat = "KL",
-                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1), varapp = FALSE,
-                     returndens = FALSE, epapp = FALSE)
-```
-
-
-## visualization of distance matrix
-
-A classical way to visualize the distance matrix is using the heatmap. 
+A classical way to visualize a divergence matrix is using a heatmap. 
 
 ```{r}
 library(NMF)
-
 aheatmap(dist_test)
 ```
 
 
-The user could also choose to use the function `plotMDS` in this package to draw the MDS plots. In order to do so, we also need to obtain the sample level meta data. An example is presented below.
+The user could also choose to use the function `plotMDS` in this package to draw the MDS plots. `plotMDS` simply a wrapper to the `isoMDS` function from the package `MASS`, where `plotMDS` color-codes the samples based on other meta data. 
+
+To run `plotMDS`, we also need to create a matrix with the relevant meta data at the sample level, rather than the cell level
 
 ```{r}
 pat_info <- unique(example_data[, c("patient_id", "Status")])
+head(pat_info)
+```
+We can then plot the MDS representation with each sample/patient color-coded by the `Status` variable. 
 
+```{r}
 mds_result = plotMDS(dist_mat = dist_test, n = 2,
-                     x =  pat_info, "patient_id", "Status")
+                     x =  pat_info, sample_id="patient_id", group_id="Status")
+```
 
+`plotMDS` returns a list with the `plot` element containing the `ggplot2` object. We can visualize the plot by calling it:
+
+```{r}
 mds_result$plot
 ```
+
+
+# Parallelization and Random Seeds
+
+To speed-up calculations of the pair-wise divergences, `GloScope` allows for parallelizing the calculation. The argument `BPPARAM` controls the parameters of the parallelization (see `bplapply`). 
+
+The default is no parallelization, but the iteration across sample-pairs will still via the function `bplapply`. In this case (i.e. no parallelization), the argument is simply `BPPARAM = BiocParallel::SerialParam()`. 
+
+## Random seed 
+
+The calculation of the KL divergence from the GMM density estimate uses Monte-Carlo approximation, and hence has to randomly sample from the estimated density. To set the seed for the pseudo-random number generator used in the simulation, the seed needs to be set within the argument to `BPPARAM` and **not** by a call to `set.seed` (see https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Random_Numbers.html for more information). 
+
+This is how the seed must be set, *even if there is no parallelization* chosen (the default), because the iteration over sample pairs is sent through `bplapply` function regardless, as noted above. Setting the seed outside the function via `set.seed` will not have an effect on the function. 
+
+The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization (this code is not evaluated, so `eval=FALSE`):
+
+```{r eval = F}
+dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+                     ndim = 10, dens = "GMM", dist_mat = "KL",
+                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
+```
+
+Note that the `KNN` estimation procedure does not have any Monte-Carlo approximation steps, and thus does not need to have a random seed.
 
 # SessionInfo {-}
 
