@@ -160,6 +160,8 @@ dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
                      BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
 ```
 
+The same argument (`RNGseed`) can be added to other `BPPARAM` arguments to set the seed.
+
 Note that the `KNN` estimation procedure does not have any Monte-Carlo approximation steps, and thus does not need to have a random seed.
 
 # SessionInfo {-}
