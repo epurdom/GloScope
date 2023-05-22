@@ -31,6 +31,7 @@ Imports:
     rags2ridges
 Depends: R (>= 4.1)
 Suggests:
+    BiocStyle,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
