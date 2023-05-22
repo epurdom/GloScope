@@ -30,7 +30,7 @@ based on the condition.
 }
 \examples{
 data("example_data")
-dist_mat <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
+dist_mat <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64,
                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
                     returndens = FALSE, epapp = FALSE)

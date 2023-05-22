@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{example_data}
 \alias{example_data}
-\title{example of data frame as the input for distMat}
+\title{example of data frame as the input for gloscope}
 \format{
 A data frame with 5000 rows and 52 variables
 }

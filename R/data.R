@@ -1,4 +1,4 @@
-#' example of data frame as the input for distMat
+#' example of data frame as the input for gloscope
 #' @rdname data
 #' @name example_data
 #' @description A data frame contains a subset of data

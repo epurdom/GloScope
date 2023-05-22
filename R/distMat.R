@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' data(example_data)
-#' dist_result <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+#' dist_result <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC",
 #'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64, dist_mat = "KL",
 #'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
 #'                     returndens = FALSE, epapp = FALSE)
@@ -42,10 +42,10 @@
 #' @importFrom FNN KL.dist
 #' @importFrom rags2ridges KLdiv
 #' @import BiocParallel
-#' @rdname distMat
+#' @rdname gloscope
 #' @export
 
-distMat <- function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
+gloscope <- function(x, sample_id, dim_redu, ndim, k=50, dens = "GMM",
 		r = 10000,ep = 1e-64, dist_mat = "KL", num_components = c(1:9),
 		BPPARAM = BiocParallel::SerialParam(),
 		varapp = FALSE, returndens = FALSE, epapp = FALSE,

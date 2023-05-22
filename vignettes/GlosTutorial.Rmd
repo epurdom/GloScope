@@ -87,7 +87,7 @@ cbind(seurat_object@meta.data,
 
 ## Calculating divergence matrix
 
-After the input data frame is ready, we use the function `distMat` to approximate the divergence matrix. To do so, several arguments are required to be specified:
+After the input data frame is ready, we use the function `gloscope` to approximate the divergence matrix. To do so, several arguments are required to be specified:
 
 1. The column name that identifies the sample id of each cell in the input data (`sample_id`)
 
@@ -102,7 +102,7 @@ After the input data frame is ready, we use the function `distMat` to approximat
 Following is the illustration of using example data, with KNN density estimation, to calculate the KL divergence among samples.
 
 ```{r}
-dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+dist_test <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC",
                      ndim = 10, dens = "KNN", dist_mat = "KL")
 
 dist_test[1:5,1:5]
@@ -155,7 +155,7 @@ This is how the seed must be set, *even if there is no parallelization* chosen (
 The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization (this code is not evaluated, so `eval=FALSE`):
 
 ```{r eval = F}
-dist_test <- distMat(example_data, sample_id = "patient_id", dim_redu = "PC",
+dist_test <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC",
                      ndim = 10, dens = "GMM", dist_mat = "KL",
                      BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
 ```
