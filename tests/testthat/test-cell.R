@@ -1,9 +1,7 @@
-#context("cellNumber")
-
 test_that("gloscope", {
-  expect_warning(gloscope(sub_data_350, sample_id = "patient_id",dim_redu = "PC", ndim = 10, dens = "KNN", dist_mat = "KL", BPPARAM = BiocParallel::SerialParam()), "Some samples have numbers of cells smaller than the minimum cell number 500 to have reliable results!")
-  expect_error(gloscope(sub_data_40, sample_id = "patient_id",dim_redu = "PC", ndim = 10, dens = "KNN", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam()), "Some samples have numbers of cells smaller than the valid cell number 50 for KNN downstream analysis!")
-
-
+	expect_error(gloscope(pca_embeddings_subset, c(sample_ids,NA)), 
+		regexp="The number of cells in the embedding matrix does not match the number of sample labels.",fixed=TRUE),
+	expect_warning(gloscope(pca_embeddings_subset,sample_ids,dens="KNN"),
+		regexp = "^The following samples have fewer than 50 cells.*")
 })
 
