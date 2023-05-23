@@ -151,11 +151,10 @@ The calculation of the KL divergence from the GMM density estimate uses Monte-Ca
 
 This is how the seed must be set, *even if there is no parallelization* chosen (the default), because the iteration over sample pairs is sent through `bplapply` function regardless, as noted above. Setting the seed outside the function via `set.seed` will not have an effect on the function. 
 
-The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization (this code is not evaluated, so `eval=FALSE`):
+The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization:
 
 ```{r eval = F}
-dist_test <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC",
-                     ndim = 10, dens = "GMM", dist_mat = "KL",
+dist_test_GMM <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id, dens = "GMM", dist_mat = "KL",
                      BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
 ```
 
