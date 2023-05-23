@@ -32,7 +32,6 @@
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
 #' @importFrom FNN KL.dist
-#' @importFrom rags2ridges KLdiv
 #' @import BiocParallel
 #' @rdname gloscope
 #' @export

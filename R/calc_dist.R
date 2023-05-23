@@ -37,10 +37,7 @@
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @importFrom RANN nn2
-#' @importFrom transport transport
-#' @importFrom psych tr
 #' @rdname CalcDist
-#' @export
 
 .calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
                       ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA){
@@ -96,7 +93,6 @@
 #' @importFrom RANN nn2
 #' @importFrom FNN KL.dist
 #' @rdname CalcDist
-#' @export
 
 # KL divergence
 .calc_kl <- function(mod_list, sample1, sample2, df_list, r,
@@ -168,8 +164,6 @@
 #' @importFrom RANN nn2
 #' @importFrom FNN KL.dist
 #' @rdname CalcDist
-#' @export
-
 
 .calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
 	if(dens == "GMM"){

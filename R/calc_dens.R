@@ -32,9 +32,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom RANN nn2
 #' @import BiocParallel
-#' @export
-
-
+#' @rdname CalcDist
 
 .calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
                      BPPARAM = BiocParallel::bpparam()){
