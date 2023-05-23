@@ -95,7 +95,7 @@
 #' @rdname CalcDist
 
 # KL divergence
-.calc_kl <- function(mod_list, sample1, sample2, df_list, r,
+.calc_kl <- function(mod_list, sample1, sample2, df_list, r,varapp=FALSE,
 			dens, k, epapp, ep){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
@@ -109,9 +109,8 @@
 		mu_1 <- mclust_mod1$parameters$mean
 		mu_2 <- mclust_mod2$parameters$mean
 
-    ## Old option for approximating KL; have disabled it.
-    varapp<-FALSE
-		if(varapp) {
+    ## Old option for approximating KL; have disabled it so don't have to import the package for .KLvar
+    if(varapp) {
 #			kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
 		} else {
 			dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)

@@ -30,7 +30,18 @@
   ep = NA
 )
 
-.calc_kl(mod_list, sample1, sample2, df_list, r, dens, k, epapp, ep)
+.calc_kl(
+  mod_list,
+  sample1,
+  sample2,
+  df_list,
+  r,
+  varapp = FALSE,
+  dens,
+  k,
+  epapp,
+  ep
+)
 
 .calc_JS(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim)
 }

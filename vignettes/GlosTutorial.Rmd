@@ -102,8 +102,7 @@ After the input data frame is ready, we use the function `gloscope` to approxima
 Following is the illustration of using example data, with KNN density estimation, to calculate the KL divergence among samples.
 
 ```{r}
-dist_test <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC",
-                     ndim = 10, dens = "KNN", dist_mat = "KL")
+dist_test <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id,  dens = "KNN", dist_mat = "KL")
 
 dist_test[1:5,1:5]
 ```
