@@ -43,3 +43,6 @@ vignettes/*.pdf
 
 # The script to create the example data from the full pre-processing 
 R/create_example_object.R
+
+# A workspace for preparing vignette code
+R/vignette_scratch.R
