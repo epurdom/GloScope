@@ -1,7 +1,5 @@
 data(example_data)
 
-library(dplyr)
-library(stringr)
 sub_pat <- sample(unique(example_data$patient_id),3)
 
 sub_data <- example_data[example_data$patient_id %in% sub_pat,]
