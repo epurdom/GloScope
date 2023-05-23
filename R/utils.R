@@ -37,21 +37,21 @@
   return(knnq_dist)
 }
 
-.KLvar <- function(pi_1, pi_2, mu_1,mu_2, cov_1, cov_2){
-  Dvar <- 0
-  for(i in 1:length(pi_1)){
-
-    num <- don <- 0
-    for(j in 1:length(pi_1)){
-      num <- num + pi_1[j]*exp(-KLdiv(mu_1[,i], mu_1[,j], cov_1[,,i], cov_1[,,j]))
-    }
-    for(k in 1:length(pi_2)){
-      don <- don + pi_2[k]*exp(-KLdiv(mu_1[,i], mu_2[,k], cov_1[,,i], cov_2[,,k]))
-    }
-    Dvar <- Dvar + pi_1[i]*(log(num) - log(don))
-  }
-  return(Dvar)
-}
+# .KLvar <- function(pi_1, pi_2, mu_1,mu_2, cov_1, cov_2){
+#   Dvar <- 0
+#   for(i in 1:length(pi_1)){
+#
+#     num <- don <- 0
+#     for(j in 1:length(pi_1)){
+#       num <- num + pi_1[j]*exp(-rags2ridges::KLdiv(mu_1[,i], mu_1[,j], cov_1[,,i], cov_1[,,j]))
+#     }
+#     for(k in 1:length(pi_2)){
+#       don <- don + pi_2[k]*exp(-rags2ridges::KLdiv(mu_1[,i], mu_2[,k], cov_1[,,i], cov_2[,,k]))
+#     }
+#     Dvar <- Dvar + pi_1[i]*(log(num) - log(don))
+#   }
+#   return(Dvar)
+# }
 
 
 #' prepare for plotting colors

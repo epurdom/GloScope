@@ -1,1 +1,18 @@
 ^R/create_example_object\.R$
+^.*\.Rproj$
+^\.Rproj\.user$
+
+^.*\\.md$
+^\\.DS_Store$
+
+# Git and SVN related
+^.svn
+^\\.git
+
+
+# R related
+^vignettes/.*[.](pdf|PDF)$
+^vignettes/.*[.](r|R)$
+^vignettes/.*[.](html)$
+^vignettes/R_cache
+^vignettes/R_figure

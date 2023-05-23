@@ -86,7 +86,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	# Saved `mclust` densities can be used instead of running the package by setting the
 	# `fit_density` optional argument to a list indexed by sample ID containing a fit `densityMclust` object
 	if(is.null(fit_density)){
-		mod_list <- calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
+		mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
 	} else {
 		mod_list <- fit_density
 	}
@@ -96,9 +96,9 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
 	# IMPORTANT: There are additional algorithms for divergence estimation implemented in this package
 	# which are not accessible from the `gloscope` function. The optional arguments
-	# `ndim`, `varapp`, `epapp`, and `ep` must be manually set below. See `R/calc_dist.R` for their details.
+	# `ndim`, `varapp`, `epapp`, and `ep` must be manually set below. See `R/.calc_dist.R` for their details.
 	divergence_list <- BiocParallel::bplapply(patient_pair_list,
-		function(w){ calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
+		function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
 				       df_list = df_list, dist_mat = dist_mat, dens = dens,
 				       r = r, k = k,
 				       ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)

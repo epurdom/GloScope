@@ -25,7 +25,7 @@
 #' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 #' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
 #' #working with large data set, use BiocParallel
-#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
 #'
 #'
 #' @importFrom mclust densityMclust
@@ -36,7 +36,7 @@
 
 
 
-calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
+.calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
                      BPPARAM = BiocParallel::bpparam()){
 
 

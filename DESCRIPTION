@@ -27,8 +27,7 @@ Imports:
     FNN,
     transport,
     psych,
-    BiocParallel,
-    rags2ridges
+    BiocParallel
 Depends: R (>= 4.1)
 Suggests:
     BiocStyle,

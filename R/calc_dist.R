@@ -25,11 +25,11 @@
 #' df_list <- split(example_data, example_data[,"patient_id"])
 #' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 #' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
 #' all_combn <- combn(sample_name, 2)
 #' patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
 #' distance_list <- BiocParallel::bplapply(patient_pair_list, function(w){
-#'                                         calc_dist(mod_list = mod_list, df_list = df_list, k = 50,
+#'                                         .calc_dist(mod_list = mod_list, df_list = df_list, k = 50,
 #'                                         s1 = w[1], s2 = w[2], dens = "KNN", ndim = 10,
 #'                                         r=10000, ep = 1e-64, dist_mat = "KL", varapp = FALSE,
 #'                                         epapp = FALSE)},BPPARAM=BiocParallel::SerialParam())
@@ -39,25 +39,24 @@
 #' @importFrom RANN nn2
 #' @importFrom transport transport
 #' @importFrom psych tr
-#' @importFrom rags2ridges KLdiv
 #' @rdname CalcDist
 #' @export
 
-calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
+.calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
                       ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA){
   if(dist_mat == "KL"){
     if(dens == "KNN"){
-      mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+      mydist <- .calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                         dens = dens, k = k, r = r, varapp = varapp,
                         epapp = epapp, ep = ep)
     } else{
-      mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+      mydist <- .calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                         dens = dens, k = k, r = r, varapp = varapp, epapp = epapp, ep = ep) +
-        calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
+        .calc_kl(mod_list, sample1 = s2, sample2 = s1, df_list = df_list,
                 dens = dens, k = k, r = r, varapp = varapp, epapp = epapp, ep = ep)
     }
   }  else if(dist_mat == "JS"){
-    mydist <- calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
+    mydist <- .calc_JS(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
                       dens = dens, k = k, ndim = ndim, r = r, ep = ep)
   }
 
@@ -88,22 +87,20 @@ calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
 #' df_list <- split(example_data, example_data[,"patient_id"])
 #' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 #' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-#' dist_test <- calc_kl(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
+#' mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' dist_test <- .calc_kl(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
 #'                      r = 10000,k=50,varapp=FALSE,epapp=FALSE, ep = 1e-64)
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @importFrom RANN nn2
 #' @importFrom FNN KL.dist
-#' @importFrom rags2ridges KLdiv
 #' @rdname CalcDist
 #' @export
 
-
 # KL divergence
-calc_kl <- function(mod_list, sample1, sample2, df_list, r,
-			dens, k, varapp,epapp, ep){
+.calc_kl <- function(mod_list, sample1, sample2, df_list, r,
+			dens, k, epapp, ep){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
@@ -116,8 +113,10 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 		mu_1 <- mclust_mod1$parameters$mean
 		mu_2 <- mclust_mod2$parameters$mean
 
+    ## Old option for approximating KL; have disabled it.
+    varapp<-FALSE
 		if(varapp) {
-			kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
+#			kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
 		} else {
 			dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
 			dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
@@ -160,8 +159,8 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 #' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
 #' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
 #' #working with large data set, use BiocParallel
-#' mod_list <- calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-#' dist_test <- calc_JS(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
+#' mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' dist_test <- .calc_JS(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
 #'                      r = 10000,k=50,ep = 1e-64,ndim = 10)
 #' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
@@ -172,7 +171,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 #' @export
 
 
-calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
+.calc_JS <- function(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
