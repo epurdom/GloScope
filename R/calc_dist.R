@@ -105,8 +105,8 @@ calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
 calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 			dens, k, varapp,epapp, ep){
 	if(dens == "GMM"){
-		mclust_mod1 <- mod_list[[sample2]]
-		mclust_mod2 <- mod_list[[sample3]]
+		mclust_mod1 <- mod_list[[sample1]]
+		mclust_mod2 <- mod_list[[sample2]]
 		s <- .sample_mclust(mclust_mod2, r=r)
 		pi_1 <- mclust_mod1$parameters$pro
 		pi_2 <- mclust_mod2$parameters$pro
@@ -128,7 +128,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 			}
 		}
 	}else if(dens == "KNN"){
-		kl <- KL.dist(as.matrix(mod_list[[sample2,]]), as.matrix(mod_list[[sample3]]), k = k)[k]
+		kl <- KL.dist(as.matrix(mod_list[[sample1]]), as.matrix(mod_list[[sample2]]), k = k)[k]
 	}
 
 	return(kl)

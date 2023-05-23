@@ -1,5 +1,13 @@
 library(here)
-seurat_object <- readRDS(here::here("data","testing_data.Rds")) # Load data             
+seurat_object <- readRDS(here::here("data","example_data.Rds")) # Load data             
 sample_ids <- seurat_object[[]]$sample # Get sample IDs for each cell     
-pca_embeddings <- seurat_object@reductions$pca@cell.embeddings # Extract PCA embeddings from Seurat object
-pca_embeddings_subset <- pca_embeddings[,1:10] # Warning: Never subsample scVI embeddings
+
+# get full subset
+full_pca_embeddings <- seurat_object@reductions$pca@cell.embeddings # Extract PCA embeddings from Seurat object
+full_pca_embeddings_subset <- full_pca_embeddings[,1:10] # Warning: Never subsample scVI embeddings
+
+# subset one sample to 49 cells to check cell count-based warnings
+subset_sample_id <- sample_ids[20]
+sample_drop_indices <- sample(which(seurat_object[[]]$sample==subset_sample_id),(500-49),replace=FALSE)
+reliability_pca_embeddings_subset <- full_pca_embeddings_subset[-sample_drop_indices,]
+reliability_sample_ids <- sample_ids[-sample_drop_indices] 
