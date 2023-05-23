@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # R test problem
 *problems.rds
+
+# The script to create the example data from the full pre-processing 
+R/create_example_object.R

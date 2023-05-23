@@ -3,18 +3,18 @@
 #' @description This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
 #' in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
 #'
-#' @param r number of monte-carlo simulations to generate
-#' @param ep error term added to the KL divergence calculation
-#' @param epapp whether to apply the error term
 #' @param mod_list a list contains each samples' estimated density
-#' @param dens type of density to estimate for.
-#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
 #' @param s1 sample 1 name
 #' @param s2 sample 2 name
 #' @param df_list a list contain each samples' dimension reduction embedding
-#' @param ndim number of dimension reduction to keep
 #' @param dist_mat which distance metric to use
-#' @param varapp logic variable for using variational approximation or not
+#' @param dens type of density to estimate for.
+#' @param r number of monte-carlo simulations to generate
+#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
+#' @param ndim number of dimension reduction to keep; only applicable for JS distance, default = 10
+#' @param varapp logic variable for using variational approximation or not, default = FALSE
+#' @param epapp whether to apply the error term, default = FALSE
+#' @param ep error term added to the KL divergence calculation, default = NA
 #' @return a numeric value of estimated symmatrised KL divergence between
 #' sample1 and sample2's distribution.
 #' @examples
@@ -43,8 +43,8 @@
 #' @rdname CalcDist
 #' @export
 
-calc_dist <- function(mod_list, s1, s2, df_list, r,
-                      dens, k, ep, ndim, dist_mat, varapp, epapp){
+calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
+                      ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA){
   if(dist_mat == "KL"){
     if(dens == "KNN"){
       mydist <- calc_kl(mod_list = mod_list, sample1 = s1, sample2 = s2, df_list = df_list,
@@ -105,9 +105,9 @@ calc_dist <- function(mod_list, s1, s2, df_list, r,
 calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 			dens, k, varapp,epapp, ep){
 	if(dens == "GMM"){
-		mclust_mod1 <- mod_list[[sample1]]
-		mclust_mod2 <- mod_list[[sample2]]
-		s <- .sample_mclust(mclust_mod1, r=r)
+		mclust_mod1 <- mod_list[[sample2]]
+		mclust_mod2 <- mod_list[[sample3]]
+		s <- .sample_mclust(mclust_mod2, r=r)
 		pi_1 <- mclust_mod1$parameters$pro
 		pi_2 <- mclust_mod2$parameters$pro
 		cov_1 <- mclust_mod1$parameters$variance$sigma
@@ -128,7 +128,7 @@ calc_kl <- function(mod_list, sample1, sample2, df_list, r,
 			}
 		}
 	}else if(dens == "KNN"){
-		kl <- KL.dist(as.matrix(mod_list[[sample1]]), as.matrix(mod_list[[sample2]]), k = k)[k]
+		kl <- KL.dist(as.matrix(mod_list[[sample2,]]), as.matrix(mod_list[[sample3]]), k = k)[k]
 	}
 
 	return(kl)
