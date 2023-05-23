@@ -1,4 +1,1 @@
-^.*\.Rproj$
-^\.Rproj\.user$
-^R$
-^create_example_object\.R$
+^R/create_example_object\.R$
