@@ -153,8 +153,9 @@ This is how the seed must be set, *even if there is no parallelization* chosen (
 
 The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization:
 
-```{r eval = F}
-dist_test_GMM <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id, dens = "GMM", dist_mat = "KL",
+```{r eval = TRUE}
+dist_test_gmm <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id, dens = "GMM", dist_mat = "KL",
+
                      BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
 ```
 

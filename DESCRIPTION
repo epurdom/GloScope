@@ -32,7 +32,6 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    dplyr,
     NMF
 VignetteBuilder: knitr
 LazyData: false
