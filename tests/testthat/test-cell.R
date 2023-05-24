@@ -15,7 +15,7 @@ test_that("gloscope works with KNN",{
       dist_mat = "KL",BPPARAM = BiocParallel::SerialParam()))
   #test dimensions
   expect_equal(dim(temp_knn),c(3,3))
-  #test distances the same
+  #test distances the same as in the past
   expect_equal(round(temp_knn[upper.tri(temp_knn)],6),c(2.479180, 2.330122, 3.203009))
   #test diag zero
   expect_equal(unname(diag(temp_knn)),rep(0,3))
@@ -30,11 +30,18 @@ test_that("gloscope works with GMM",{
                                    dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed = 1)))
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
-  #test distances the same
+  #test distances the same as in the past
   expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),c(10.196157,  9.458072, 10.453753))
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,3))
   #test row names/colnames
   expect_equal(sort(colnames(temp_gmm)),sort(unique(sub_data$patient_id)))
   expect_equal(sort(rownames(temp_gmm)),sort(unique(sub_data$patient_id)))
+})
+
+test_that("plotMDS works with output",{
+  expect_silent(dist_mat <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids=example_data[,"patient_id"],dens="KNN"))
+  pat_info <- unique(example_data[, c("patient_id", "Status")])
+  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat, n = 2,
+    x =  pat_info, "patient_id", "Status"))
 })
