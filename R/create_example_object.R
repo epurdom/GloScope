@@ -1,8 +1,8 @@
 #library(dplyr)
 #library(here)
 #library(Seurat)
-set.seed(2)
-print("Seed set")
+# set.seed(2)
+# print("Seed set")
 
 # Load the full pre-processed 143 sample COVID PBMC data
 #seurat_object <- readRDS(here::here("..","GloScope_analysis","data","Processed_Datasets","stephensonCOVIDPBMC","stephensonCOVIDPBMC_default","stephensonCOVIDPBMC_default.Rds"))
