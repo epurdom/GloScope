@@ -1,4 +1,5 @@
 data(example_data)
+set.seed(2)
 
 sub_pat <- sample(unique(example_data$patient_id),3)
 
