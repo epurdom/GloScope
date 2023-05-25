@@ -1,12 +1,12 @@
-#' @title calculate density for each samples based on dimension reduction embedding
+#' @title Calculate density for each sample based on reduced dimension embedding
 #'
-#' @description This function loads a vector of the sample names, with length of the
-#'  number of samples whose density is to be estimated, a data frame x contains the info
-#'  of cells, with row number equals the cell number, a data matrix or frame dim_redu
-#'  contains dimension reduction embedding for each cell, which is used to calculate the
-#'  density for each sample.
+#' @description This function fits separate multivariate densities to each sample.
+#' As input, the function expects a named list with names corresponding to sample IDs,
+#' and elements holding a matrix or data.frame of dimensionality reduced cells from the samples.
+#' Each matrix-type will have rows corresponding to each cell and columns corresponding to
+#' the cells projection into each latent dimension.
 #'
-#' @param df_list the list contains each samples' dimension reduction embedding
+#' @param df_list A list containing each samples' dimension reduction embedding
 #' @param dens method used to estimate density, options are GMM (Gaussian mixture model)
 #' and KNN (K-nearest Neighbor)
 #' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
@@ -15,34 +15,26 @@
 #' @return mod_list: a list of length number of samples, contains the estimated density for each
 #' sample
 #'
-#'
 #' @examples
-#' data("example_data")
-#' library(stringr)
-#' sample_name <- as.character(unique(example_data[, "patient_id"]))
-#' example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
-#' df_list <- split(example_data, example_data[,"patient_id"])
-#' df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-#' df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-#' #working with large data set, use BiocParallel
-#' mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
+#' sample_ids <- example_data$metadata$sample_id
+#' pca_embeddings <- example_data$pca_embeddings
+#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+#' # the following `lapply` creates the necessary input data structure for this fn.
+#' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+#' mod_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam())
 #'
-#'
-#' @importFrom mclust densityMclust
-#' @importFrom stringr str_detect
-#' @importFrom RANN nn2
 #' @import BiocParallel
+#' @importFrom mclust densityMclust
 #' @rdname CalcDist
 
 .calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
                      BPPARAM = BiocParallel::bpparam()){
-
-
   if(dens == "GMM"){
+    # run (in parallel) GMM density fitting with `mclust::densityMclust`
     mod_list <- BiocParallel::bplapply(df_list, function(z) densityMclust(z, G = num_components, verbose = FALSE, plot = FALSE),
                               BPPARAM=BPPARAM)
   }else if(dens == "KNN"){
-
+    # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
     mod_list <- df_list
   }
 
