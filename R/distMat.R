@@ -25,8 +25,8 @@
 #' dist_result
 #' }
 #'
-#' @importFrom utils combn
 #' @import BiocParallel
+#' @importFrom utils combn
 #' @rdname gloscope
 #' @export
 

@@ -83,7 +83,6 @@ bigPalette<-c(
 	'#4d0776',
 	'maroon3',
 	'blue',
-#	'grey',
 	'#E5D8BD',
 	'cadetblue4',
 	'#e5a25a',
@@ -115,9 +114,6 @@ bigPalette<-c(
 	'#85848f',
 	"lightpink3",
 	"olivedrab",
-#	"plum",
-#	"lightskyblue3",
-#	"mediumturquoise",
 	'cadetblue3'
 )
 
