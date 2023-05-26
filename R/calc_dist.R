@@ -95,7 +95,7 @@
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
 		mclust_mod2 <- mod_list[[sample2]]
-		s <- .sample_mclust(mclust_mod2, r=r)
+		s <- .sample_mclust(mclust_mod1, r=r)
 		pi_1 <- mclust_mod1$parameters$pro
 		pi_2 <- mclust_mod2$parameters$pro
 		cov_1 <- mclust_mod1$parameters$variance$sigma
