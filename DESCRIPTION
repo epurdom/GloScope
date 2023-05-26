@@ -16,12 +16,11 @@ Description: This package aims at representing and summarizing the entire single
 BugReports: https://github.com/epurdom/GloScope/issues
 License: Artistic-2.0
 Encoding: UTF-8
-Imports:  
+Imports: 
     utils, 
     stats, 
     MASS,
     mclust, 
-    stringr, 
     ggplot2, 
     RANN,
     FNN,
@@ -36,5 +35,5 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: false
 biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Config/testthat/edition: 3
