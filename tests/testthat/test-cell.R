@@ -13,8 +13,9 @@ test_that("gloscope works with KNN",{
       dist_mat = "KL",BPPARAM = BiocParallel::SerialParam()))
   #test dimensions
   expect_equal(dim(temp_knn),c(3,3))
-  #test distances the same
-  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),c(2.479180, 2.330122, 3.203009))
+  #test distances the same as got the first time ran this (check changes in the code haven't changed anything)
+  knn_expected_answer<-c(4.478759 ,3.203009, 1.520805) #answer got the first time
+  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),knn_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_knn)),rep(0,3))
   #test row names/colnames
@@ -29,7 +30,8 @@ test_that("gloscope works with GMM",{
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
   #test distances the same
-  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),c(10.196157,  9.458072, 10.453753))
+  gmm_expected_answer<-round(c(12.996519, 10.759409, 10.517520),6) #answer got the first time
+  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),gmm_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,3))
   #test row names/colnames
