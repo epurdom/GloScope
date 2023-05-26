@@ -4,12 +4,14 @@
 #' As input, the function expects a named list with names corresponding to sample IDs,
 #' and elements holding a matrix or data.frame of dimensionality reduced cells from the samples.
 #' Each matrix-type will have rows corresponding to each cell and columns corresponding to
-#' the cells projection into each latent dimension.
+#' the cells projection into a latent dimension. The k-nearest neighbour algorithm
+#' does density and distance estimation in a single step, and for that `dens` specification
+#' this function simply returns the input embedding matrices (see R/calc_dist.R).
 #'
 #' @param df_list A list containing each samples' dimension reduction embedding
 #' @param dens method used to estimate density, options are GMM (Gaussian mixture model)
-#' and KNN (K-nearest Neighbor)
-#' @param k number of k nearest negibhour for KNN density estimation, default k = 50.
+#' and KNN (k-nearest Neighbor)
+#' @param k number of k nearest neighbour for KNN density estimation, default k = 50.
 #' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param BPPARAM BiocParallel parameters
 #' @return mod_list: a list of length number of samples, contains the estimated density for each
@@ -21,6 +23,7 @@
 #' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
 #' # the following `lapply` creates the necessary input data structure for this fn.
 #' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+#' names(embeddings_list) <- unique(sample_ids)
 #' mod_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam())
 #'
 #' @import BiocParallel
