@@ -5,7 +5,7 @@
 \alias{.calc_dist}
 \alias{.calc_kl}
 \alias{.calc_JS}
-\title{calculate density for each samples based on dimension reduction embedding}
+\title{Calculate density for each sample based on reduced dimension embedding}
 \usage{
 .calc_dens(
   df_list,
@@ -32,125 +32,136 @@
 
 .calc_kl(
   mod_list,
+  df_list,
   sample1,
   sample2,
-  df_list,
-  r,
-  varapp = FALSE,
   dens,
-  k,
-  epapp,
-  ep
+  r = 10000,
+  k = 50,
+  varapp = FALSE,
+  epapp = FALSE,
+  ep = NA
 )
 
-.calc_JS(mod_list, sample1, sample2, df_list, r, dens, k, ep, ndim)
+.calc_JS(
+  mod_list,
+  df_list,
+  sample1,
+  sample2,
+  dens,
+  ndim = 10,
+  r = 10000,
+  k = 50
+)
 }
 \arguments{
-\item{df_list}{a list contain each samples' dimension reduction embedding}
+\item{df_list}{A named list with each sample's reduced dimension embedding}
 
-\item{dens}{type of density to estimate for.}
+\item{dens}{The density estimation method (GMM or KNN)}
 
-\item{k}{number of k nearest negibhour for KNN density estimation, default k = 50.}
+\item{k}{Number of k nearest neighbours for KNN density estimation, default k = 50.}
 
 \item{num_components}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 
 \item{BPPARAM}{BiocParallel parameters}
 
-\item{mod_list}{a list contains each samples' estimated density}
+\item{mod_list}{A named list with each sample's estimated density}
 
-\item{s1}{sample 1 name}
+\item{s1}{The name or index of the first sample in a pair (must be a key in mod_list)}
 
-\item{s2}{sample 2 name}
+\item{s2}{The name or index of the second sample in a pair}
 
-\item{dist_mat}{which distance metric to use}
+\item{dist_mat}{The distance metric to use (KL or JS)}
 
-\item{r}{number of monte-carlo simulations to generate}
+\item{r}{Number of Monte Carlo simulations to generate}
 
-\item{ndim}{number of dimension reduction to keep}
+\item{ndim}{The number of dimension reduction to keep if using k-NN}
 
-\item{varapp}{logic variable for using variational approximation or not}
+\item{varapp}{Boolean for using variation approximation of KL divergence; NOTE: Currently disabled'}
 
-\item{epapp}{whether to apply the error term}
+\item{epapp}{Boolean for applying an epsilon perturbation to MC calculated KL, default = FALSE}
 
-\item{ep}{error term added to the KL divergence calculation}
+\item{ep}{Epsilon perturbation size to add to MC KL divergence calculation, default = NA}
 
-\item{sample1}{sample 1 index}
+\item{sample1}{The name or index of the first sample in a pair (must be a key in mod_list)}
 
-\item{sample2}{sample 2 index}
+\item{sample2}{The name or index of the second sample in a pair}
 }
 \value{
 mod_list: a list of length number of samples, contains the estimated density for each
 sample
 
-a numeric value of estimated symmatrised KL divergence between
-sample1 and sample2's distribution.
+The estimated statistical divergence between two GloScope represenations
 
 a numeric value of distance between sample1 and sample2's distribution.
 
 a numeric value of distance between sample1 and sample2's distribution.
 }
 \description{
-This function loads a vector of the sample names, with length of the
- number of samples whose density is to be estimated, a data frame x contains the info
- of cells, with row number equals the cell number, a data matrix or frame dim_redu
- contains dimension reduction embedding for each cell, which is used to calculate the
- density for each sample.
+This function fits separate multivariate densities to each sample.
+As input, the function expects a named list with names corresponding to sample IDs,
+and elements holding a matrix or data.frame of dimensionality reduced cells from the samples.
+Each matrix-type will have rows corresponding to each cell and columns corresponding to
+the cells projection into a latent dimension. The k-nearest neighbour algorithm
+does density and distance estimation in a single step, and for that `dens` specification
+this function simply returns the input embedding matrices (see R/calc_dist.R).
 
-This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
-in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
+This function calculates a statistical divergences between
+two specified samples of an input list of sample GloScope representations. Different
+subroutines are called depending on the divergence specified (symmetric KL or Jensen-Shannon)
+and density estimation used for the GloScope representations (GMM or KNN).
 
-This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
-in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
+This calculates the symmetric KL divergence between two
+GloScope representations. This is implemented with Monte Carlo approximation
+(with an optional epsilon perturbation term) if GMM is used for the density
+estimate of each cell or a plug-in formula if KNN is used for the density.
 
-This function loads the metadata, which contains the sample id, disease group, dimension reduction embedding which has names
-in the form "dim_i". Dimension reduction embedding is used to calculate the density for each sample, denoted by their sample id.
+This calculates the Jensen-Shannon distance between two
+GloScope representations. This is implemented with Monte Carlo approximation
+(with an optional epsilon perturbation term) if GMM is used for the density
+estimate of each cell or a plug-in formula if KNN is used for the density.
 }
 \examples{
-data("example_data")
-library(stringr)
-sample_name <- as.character(unique(example_data[, "patient_id"]))
-example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
-df_list <- split(example_data, example_data[,"patient_id"])
-df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-#working with large data set, use BiocParallel
-mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+# the following `lapply` creates the necessary input data structure for this fn.
+embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+names(embeddings_list) <- unique(sample_ids)
+mod_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam())
 
 data(example_data)
-library(stringr)
-sample_name <- as.character(unique(example_data[, "patient_id"]))
-example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
-df_list <- split(example_data, example_data[,"patient_id"])
-df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-all_combn <- combn(sample_name, 2)
-patient_pair_list <- lapply(seq_len(ncol(all_combn)), function(i) all_combn[,i])
-distance_list <- BiocParallel::bplapply(patient_pair_list, function(w){
-                                        .calc_dist(mod_list = mod_list, df_list = df_list, k = 50,
-                                        s1 = w[1], s2 = w[2], dens = "KNN", ndim = 10,
-                                        r=10000, ep = 1e-64, dist_mat = "KL", varapp = FALSE,
-                                        epapp = FALSE)},BPPARAM=BiocParallel::SerialParam())
-data("example_data")
-library(stringr)
-sample_name <- as.character(unique(example_data[, "patient_id"]))
-example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
-df_list <- split(example_data, example_data[,"patient_id"])
-df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-dist_test <- .calc_kl(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
-                     r = 10000,k=50,varapp=FALSE,epapp=FALSE, ep = 1e-64)
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+names(embeddings_list) <- unique(sample_ids)
+density_list <- .calc_dens(embeddings_list, dens = "KNN")
+sample_pairs <- utils::combn(unique(sample_ids), 2)
+patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
+w <- patient_pair_list[[1]]
+.calc_dist(mod_list = density_list, df_list = embeddings_list, dens = "KNN", k = 50,
+           s1 = w[1], s2 = w[2], dist_mat = "KL")
 data(example_data)
-library(stringr)
-sample_name <- as.character(unique(example_data[, "patient_id"]))
-example_data[,"patient_id"] <- as.character(example_data[,"patient_id"])
-df_list <- split(example_data, example_data[,"patient_id"])
-df_list <- lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-df_list <- lapply(df_list, function(y) as.matrix(y[,1:10]))
-#working with large data set, use BiocParallel
-mod_list <- .calc_dens(df_list, dens = "KNN", BPPARAM = BiocParallel::SerialParam())
-dist_test <- .calc_JS(mod_list, sample_name[1], sample_name[2], df_list, dens = "KNN",
-                     r = 10000,k=50,ep = 1e-64,ndim = 10)
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+names(embeddings_list) <- unique(sample_ids)
+density_list <- .calc_dens(embeddings_list, dens = "KNN")
+sample_pairs <- utils::combn(unique(sample_ids), 2)
+patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
+w <- patient_pair_list[[1]]
+.calc_kl(density_list, embeddings_list, w[1], w[2], dens = "KNN")
+data(example_data)
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
+names(embeddings_list) <- unique(sample_ids)
+density_list <- .calc_dens(embeddings_list, dens = "KNN")
+sample_pairs <- utils::combn(unique(sample_ids), 2)
+patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
+w <- patient_pair_list[[1]]
+.calc_JS(density_list, embeddings_list,w[1], w[2], dens = "KNN", ndim = 10)
 }

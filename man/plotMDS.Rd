@@ -2,42 +2,38 @@
 % Please edit documentation in R/plotMDS.R
 \name{plotMDS}
 \alias{plotMDS}
-\title{plot MDS representation of the distance matrix}
+\title{Plot the multidimensional scaling of the GloScope represenation}
 \usage{
-plotMDS(dist_mat, n = 10, x, sample_id, group_id)
+plotMDS(dist_mat, metadata_df, sample_id, group_id, n = 10)
 }
 \arguments{
-\item{dist_mat}{the distance matrix of comparing each pairs
-of patients' distributions}
+\item{dist_mat}{The divergence matrix output of `gloscope()`}
 
-\item{n}{number of MDS dimension to generate}
+\item{metadata_df}{A data frame contains each sample's metadata. Note this is NOT at the cell-level.}
 
-\item{x}{a data frame contains each patients' info}
+\item{sample_id}{The column name or index in metadata_df that contains the sample ID}
 
-\item{sample_id}{column name in x that contains the sample ID}
+\item{group_id}{The column name or index in metadata_df that contains the patient condition}
 
-\item{group_id}{column name in x that contains the patient condition}
+\item{n}{Number of MDS dimension to generate, default = 10}
 }
 \value{
-a list contains the MDS embedding and plot of the distance matrix, color-coded by patient conditions
+A list containing the MDS embedding and plot of the distance matrix
 }
 \description{
-This function loads the distance matrix,
-and the info for each patients, including patient id
-and patient condition group. It will create the MDS plot
-for the distance matrix and color-coded each patient's dot
-based on the condition.
+This function creates a multidimensional scaling plot for
+ a set of samples using their GloScope divergence. Each sample's scatter will
+be color-coded based on their phenotype.
 }
 \examples{
-data("example_data")
-dist_mat <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
-                    ndim = 10, dens = "KNN", r=10000, ep = 1e-64,
-                    BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
-                    returndens = FALSE, epapp = FALSE)
-pat_info <- unique(example_data[, c("patient_id", "Status")])
-
-mds_result = plotMDS(dist_mat = dist_mat, n = 2,
- x =  pat_info, "patient_id", "Status")
+data(example_data)
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+dist_result <- gloscope(pca_embeddings_subset, sample_ids,
+                    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+mds_result <- plotMDS(dist_mat = dist_result, metadata_df =  unique(example_data$metadata),
+"sample_id", "phenotype",n=2)
 
 mds_result$plot
 mds_result$mds

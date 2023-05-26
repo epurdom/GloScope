@@ -2,7 +2,7 @@
 % Please edit documentation in R/distMat.R
 \name{gloscope}
 \alias{gloscope}
-\title{calculate statistical divergence for each pair of samples}
+\title{Calculate statistical divergence between all sample pairs}
 \usage{
 gloscope(
   embedding_matrix,
@@ -26,30 +26,30 @@ gloscope(
 
 \item{dist_mat:}{distance metric to calculate the distance. One of c("KL","JS")}
 
-\item{r:}{number of monte-carlo simulations to generate}
+\item{r:}{number of Monte Carlo simulations to generate}
 
 \item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 
-\item{k:}{number of k nearest negibhour for KNN density estimation, default k = 50.}
+\item{k:}{number of nearest neighbours for KNN density estimation, default k = 50.}
 
-\item{BPPARAM:}{BiocParallel parameters, default is running in serial}
+\item{BPPARAM:}{BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument}
 
-\item{prefit_density:}{a named list of `densityMclust` objects for each sample, default is NULL}
+\item{prefit_density:}{a named list of pre-fit `densityMclust` objects for each sample, default is NULL}
 
 \item{return_density:}{return the GMM parameter list or not (if applicable), default is FALSE}
 }
 \value{
-A matrix containing the paitwise divergence or distance between all pairs of samples
+A matrix containing the pairwise divergence or distance between all pairs of samples
 }
 \description{
-This function calculates a matrisx of pairwise divergences between input GloScope representations.
+This function calculates a matrix of pairwise divergences between input GloScope representations.
 }
 \examples{
 \dontrun{
 data(example_data)
-sample_ids <- seurat_object[[]]$sample
-pca_embeddings <- seurat_object@reductions$pca@cell.embeddings
-pca_embeddings_subset <- pca_embeddings[,1:10]
+sample_ids <- example_data$metadata$sample_id
+pca_embeddings <- example_data$pca_embeddings
+pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
 dist_result <- gloscope(pca_embeddings_subset, sample_ids,
                     BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 dist_result
