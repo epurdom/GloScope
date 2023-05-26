@@ -1,29 +1,25 @@
-#' @title plot MDS representation of the distance matrix
+#' @title Plot the multidimensional scaling of the GloScope represenation
 #'
-#' @description This function loads the distance matrix,
-#' and the info for each patients, including patient id
-#' and patient condition group. It will create the MDS plot
-#' for the distance matrix and color-coded each patient's dot
-#' based on the condition.
+#' @description This function creates a multidimensional scaling plot for
+#'  a set of samples using their GloScope divergence. Each sample's scatter will
+#' be color-coded based on their phenotype.
 #'
-#' @param dist_mat the distance matrix of comparing each pairs
-#' of patients' distributions
-#' @param x a data frame contains each patients' info
-#' @param sample_id column name in x that contains the sample ID
-#' @param group_id column name in x that contains the patient condition
-#' @param n number of MDS dimension to generate
-#' @return a list contains the MDS embedding and plot of the distance matrix, color-coded by patient conditions
+#' @param dist_mat The divergence matrix output of `gloscope()`
+#' @param metadata_df A data frame contains each sample's metadata. Note this is NOT at the cell-level.
+#' @param sample_id The column name or index in metadata_df that contains the sample ID
+#' @param group_id The column name or index in metadata_df that contains the patient condition
+#' @param n Number of MDS dimension to generate, default = 10
+#' @return A list containing the MDS embedding and plot of the distance matrix
 #'
 #' @examples
-#' data("example_data")
-#' dist_mat <- gloscope(example_data, sample_id = "patient_id", dim_redu = "PC", dist_mat = "KL",
-#'                     ndim = 10, dens = "KNN", r=10000, ep = 1e-64,
-#'                     BPPARAM = BiocParallel::SerialParam(), varapp = FALSE,
-#'                     returndens = FALSE, epapp = FALSE)
-#' pat_info <- unique(example_data[, c("patient_id", "Status")])
-#'
-#' mds_result = plotMDS(dist_mat = dist_mat, n = 2,
-#'  x =  pat_info, "patient_id", "Status")
+#' data(example_data)
+#' sample_ids <- example_data$metadata$sample_id
+#' pca_embeddings <- example_data$pca_embeddings
+#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+#' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
+#'                     BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+#' mds_result <- plotMDS(dist_mat = dist_result, metadata_df =  unique(example_data$metadata),
+#' "sample_id", "phenotype",n=2)
 #'
 #' mds_result$plot
 #' mds_result$mds
@@ -31,29 +27,29 @@
 #' @importFrom MASS isoMDS
 #' @export
 #'
-plotMDS <- function(dist_mat, n=10, x, sample_id, group_id){
-  if(nrow(dist_mat)!= nrow(x)){
+plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, n=10){
+  if(nrow(dist_mat)!= nrow(metadata_df)){
     stop(paste("Not consistent patient number. Make sure your
                distance matrix and meta info have the same patient
                number."))
   }
-  if(length(intersect(rownames(dist_mat), x[, sample_id]))!= nrow(dist_mat)){
+  if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
     stop(paste("Not consistent patient IDs. Make sure your
                distance matrix and meta info have the same patients."))
   }
-  if(!(identical(rownames(dist_mat), x[, sample_id]))){
-   x <- x[match(rownames(dist_mat), x[,sample_id]),]
-   }
-    fit_df <- isoMDS(dist_mat, k = n, trace = FALSE)
-    colnames(fit_df$points) <- paste0("Coordinate",seq_len(n))
-    mds_df <- cbind(x, fit_df$points)
-# add the mds coordinates
-    # invisible() for the plot
-  mds_plot <- ggplot(mds_df, aes_string(x = "Coordinate1", y = "Coordinate2",
-                                    color = group_id)) + geom_point() +
-    scale_color_manual(values=bigPalette) +
-    theme_bw()
+  if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
+    metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),]
+  }
 
-  return(list(mds = mds_df,
-              plot = mds_plot))
+  fit_df <- MASS::isoMDS(dist_mat, k = n, trace = FALSE)
+  colnames(fit_df$points) <- paste0("Coordinate",seq_len(n))
+  mds_df <- cbind(metadata_df, fit_df$points)
+
+  mds_plot <- ggplot2::ggplot(mds_df, aes_string(x = "Coordinate1", y = "Coordinate2",
+    color = group_id)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_color_manual(values=bigPalette) +
+    ggplot2::theme_bw()
+
+  return(list(mds = mds_df, plot = mds_plot))
 }
