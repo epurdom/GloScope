@@ -2,16 +2,16 @@
 #'
 #' @description This function calculates a matrix of pairwise divergences between input GloScope representations.
 #'
-#' @param embedding_matrix: a matrix of latent embeddings with rows corresponding to cells and columns to dimensions
-#' @param cell_sample_ids: a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`
-#' @param dens: the density estimation. One of c("GMM","KNN")
-#' @param dist_mat: distance metric to calculate the distance. One of c("KL","JS")
-#' @param r: number of Monte Carlo simulations to generate
-#' @param num_components: a vector of integers for the number of components to fit GMMS to, default is 1:9
-#' @param k: number of nearest neighbours for KNN density estimation, default k = 50.
-#' @param BPPARAM: BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument
-#' @param prefit_density: a named list of pre-fit `densityMclust` objects for each sample, default is NULL
-#' @param return_density: return the GMM parameter list or not (if applicable), default is FALSE
+#' @param embedding_matrix a matrix of latent embeddings with rows corresponding to cells and columns to dimensions
+#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`
+#' @param dens the density estimation. One of c("GMM","KNN")
+#' @param dist_mat distance metric to calculate the distance. One of c("KL","JS")
+#' @param r number of Monte Carlo simulations to generate
+#' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
+#' @param k number of nearest neighbours for KNN density estimation, default k = 50.
+#' @param BPPARAM BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument
+#' @param prefit_density a named list of pre-fit `densityMclust` objects for each sample, default is NULL
+#' @param return_density return the GMM parameter list or not (if applicable), default is FALSE
 #' @return A matrix containing the pairwise divergence or distance between all pairs of samples
 #'
 #' @examples
