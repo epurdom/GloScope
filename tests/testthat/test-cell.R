@@ -1,13 +1,13 @@
 library(testthat)
-test_that("gloscope warnings for small cells", {
+test_that("gloscope warnings for small cell counts", {
 	expect_error(gloscope(full_pca_embeddings_subset, c(sample_ids,NA)),
 		regexp="The number of cells in the embedding matrix does not match the number of sample labels.",fixed=TRUE)
-	sample_size_warnings <- capture_warnings(gloscope(reliability_pca_embeddings_subset,reliability_sample_ids,dens="KNN"))
+	sample_size_warnings <- capture_warnings(gloscope(undersized_data,undersized_metadata$sample_id,dens="KNN"))
 	expect_match(sample_size_warnings,"^The following samples have fewer than 500 cells.*",all = FALSE)
 	expect_match(sample_size_warnings,"^The following samples have fewer than the minimum of 50 cells*",all = FALSE)
 	#expect_warning(gloscope(reliability_pca_embeddings_subset,sample_ids,dens="KNN"),
 	#	regexp = "^The following samples have fewer than 50 cells.*")
-  })
+})
 
 test_that("gloscope works with KNN",{
   expect_silent(temp_knn<-gloscope(sub_data,sample_id = "patient_id",
