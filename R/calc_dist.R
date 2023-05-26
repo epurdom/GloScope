@@ -88,6 +88,7 @@
 #' w <- patient_pair_list[[1]]
 #' .calc_kl(density_list, embeddings_list, w[1], w[2], dens = "KNN")
 #' @importFrom FNN KL.dist
+#' @importFrom stats predict
 #' @rdname CalcDist
 .calc_kl <- function(mod_list, df_list, sample1, sample2, dens, r = 10000 ,
 			k = 50, varapp=FALSE, epapp = FALSE, ep = NA){
@@ -108,8 +109,8 @@
 			#kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
       stop("A variational approximation to the KL divergence is not available at this time")
 		} else {
-			dens1 <- predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
-			dens2 <- predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
+			dens1 <- stats::predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
+			dens2 <- stats::predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
 			if(epapp) {
 				kl <- sum(dens1 - (dens2+ep))/r
 			} else {
@@ -151,6 +152,7 @@
 #' patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
 #' w <- patient_pair_list[[1]]
 #' .calc_JS(density_list, embeddings_list,w[1], w[2], dens = "KNN", ndim = 10)
+#' @importFrom stats predict
 #' @rdname CalcDist
 
 .calc_JS <- function(mod_list, df_list, sample1, sample2, dens, ndim = 10,
@@ -160,11 +162,11 @@
 		mclust_mod2 <- mod_list[[sample2]]
 		s1 <- .sample_mclust(mclust_mod1, r=r)
 		s2 <- .sample_mclust(mclust_mod2, r=r)
-		dens1_1 <- predict(mclust_mod1, s1, what = "dens", logarithm = TRUE)
-		dens2_1 <- predict(mclust_mod2, s1, what = "dens", logarithm = TRUE)
+		dens1_1 <- stats::predict(mclust_mod1, s1, what = "dens", logarithm = TRUE)
+		dens2_1 <- stats::predict(mclust_mod2, s1, what = "dens", logarithm = TRUE)
 		mixture_1 <- log(1/2*exp(dens1_1) + 1/2*exp(dens2_1))
-		dens1_2 <- predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
-		dens2_2 <- predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
+		dens1_2 <- stats::predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
+		dens2_2 <- stats::predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
 		mixture_2 <- log(1/2*exp(dens1_2) + 1/2*exp(dens2_2))
 
 		js <- sum(dens1_1 - mixture_1)/(2*r) + sum(dens2_2 - mixture_2)/(2*r)
