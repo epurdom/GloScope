@@ -38,7 +38,7 @@ test_that("gloscope works with GMM",{
 test_that("different random seeds give different GMM results",{
   expect_false(all(gloscope(subsample_data_subset,subsample_metadata$sample_id,
                                    dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)) ==
-                 gloscope(subsample_data,subsample_metadata$sample_id,
+                 gloscope(subsample_data_subset,subsample_metadata$sample_id,
                           dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
 })
 
