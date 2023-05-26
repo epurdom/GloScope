@@ -1,30 +1,25 @@
-#' generate monte-carlo simulation from GMM estimated density for integrating expectation for KL divergence
+#' @title Draw samples from a fit GMM for Monte Carlo approximation
 #'
-#' This function uses a object from mclust package as input, which contains the estimated density \hat{p} and
-#' performs monte-carlo simulation based on p hat.
+#' @description This helper function draws `r` samples from a GMM fit to a
+#' sample's latent embedding. This is used in `.calc_KL()` to compute a Monte Carlo
+#' approximation of the symmetric KL divergence between sample pairs.
 #'
-#' @param mclust_mod mclust object which contains the estimated density p hat.
-#' @param r number of simulations to generate. Default = 10,000.
+#' @param mclust_mod An `mclustDensity` object of a sample's estimated density
+#' @param r Number of Monte Carolosimulations to generate, default = 10000.
 #' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
 #'
-#' @importFrom mclust densityMclust
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
 #' @noRd
 
-# ==============================================================================
-# generate monte-carlo simulation from GMM estimated density \hat{p} for integrating
-# expectation in KL divergence
-# ------------------------------------------------------------------------------
-
-
+# Helper function to sample from a fit `mclust` GMM
 .sample_mclust <- function(mclust_mod, r){
   p <- table(mclust_mod$classification)/mclust_mod$n
-  z <- rmultinom(1, size = r, prob = p)[,1]
+  z <- stats::rmultinom(1, size = r, prob = p)[,1]
   z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
   samples <- list()
   for ( i in 1:length(z)){
-    samples[[i]] <- mvrnorm(z[i],
+    samples[[i]] <- MASS::mvrnorm(z[i],
                             mu = mclust_mod$parameters$mean[, i],
                             Sigma = mclust_mod$parameters$variance$sigma[, , i])
   }
@@ -32,29 +27,24 @@
   return(samples)
 }
 
-.knn_query = function(df_list, query, input, k = k){
-  knnq_dist = nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
+#' @title Helper function to query nearest neighbour distances
+#'
+#' @description This helper function gets the distance from each cell in a query matrix to
+#' its k-th nearest neighbour in a target matrix. This is used to approximate various
+#' statistical divergences in `R/calc_dist.R`.
+#'
+#' @param df_list A named list with each sample's reduced dimension embedding
+#' @param query The name or index of the sample whose query matrix is used to compute distances from
+#' @param input The name or index of the sample whose matrix is used to find the k-th NN
+#' @param k Number of k nearest neighbours for KNN density estimation
+#' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
+#'
+#' @importFrom RANN nn2
+#' @noRd
+.knn_query = function(df_list, query, input, k){
+  knnq_dist = RANN::nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
   return(knnq_dist)
 }
-
-# .KLvar <- function(pi_1, pi_2, mu_1,mu_2, cov_1, cov_2){
-#   Dvar <- 0
-#   for(i in 1:length(pi_1)){
-#
-#     num <- don <- 0
-#     for(j in 1:length(pi_1)){
-#       num <- num + pi_1[j]*exp(-rags2ridges::KLdiv(mu_1[,i], mu_1[,j], cov_1[,,i], cov_1[,,j]))
-#     }
-#     for(k in 1:length(pi_2)){
-#       don <- don + pi_2[k]*exp(-rags2ridges::KLdiv(mu_1[,i], mu_2[,k], cov_1[,,i], cov_2[,,k]))
-#     }
-#     Dvar <- Dvar + pi_1[i]*(log(num) - log(don))
-#   }
-#   return(Dvar)
-# }
-
-
-#' prepare for plotting colors
 
 #' @rdname plottingColors
 #' @export
