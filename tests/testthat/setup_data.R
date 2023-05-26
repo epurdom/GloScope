@@ -1,22 +1,14 @@
 data(example_data)
 set.seed(2)
 
-sub_pat <- sample(unique(example_data$patient_id),3)
+sample_ids <- example_data$metadata$sample_id
+subsample_patients <- sample(unique(sample_ids),3)
+subsample_metadata <- example_data$metadata[sample_ids %in% subsample_patients,]
+subsample_data <- example_data$pca_embeddings[sample_ids %in% subsample_patients,]
+subsample_data_subset <- subsample_data[,1:10] # Pick the first 10 PCs
 
-sub_data <- example_data[example_data$patient_id %in% sub_pat,]
-#sub_meta <- unique(sub_data[, c("patient_id", "Status")])
-
-#sample_name = as.character(unique(sub_meta[, "patient_id"]))
-#sub_meta[,"patient_id"] = as.character(sub_meta[,"patient_id"])
-#df_list = split(sub_data, sub_data[,"patient_id"])
-#df_list = lapply(df_list, function(y) y[,str_detect(colnames(y), "PC")])
-#df_list = lapply(df_list, function(y) as.matrix(y[,1:10]))
-##################################################
-
-sub_ids_40 <- sample(which(sub_data$patient_id == sub_pat[1]),40)
-sub_data_40 <- rbind(sub_data[sub_data$patient_id!=sub_pat[1],],
-                       sub_data[sub_ids_40,])
-
-sub_ids_350 <- sample(which(sub_data$patient_id == sub_pat[1]),350)
-sub_data_350 <- rbind(sub_data[sub_data$patient_id!=sub_pat[1],],
-                     sub_data[sub_ids_350,])
+undersized_patient <- subsample_patients[1]
+sample_drop_indices <- sample(which(subsample_metadata==undersized_patient),(500-49),replace=FALSE)
+undersized_metadata <- subsample_metadata[-sample_drop_indices,]
+undersized_data <- subsample_data[-sample_drop_indices,]
+undersized_data_subset <- undersized_data[,1:10]
