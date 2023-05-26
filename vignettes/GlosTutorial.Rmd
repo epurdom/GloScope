@@ -64,14 +64,14 @@ data("example_data")
 ```
 
 ```{r}
-head(example_data[,1:10])
+head(example_data$pca_embeddings[,1:10])
 ```
 Each row of the matrix is a cell, and the data.frame has columns for meta data (`patient_id` and `Status`) as well as the PC embeddings for each cell.
 
 We can see that each sample has 500 cells, as expected (because we downsampled to only 500 cells per patient).
 
 ```{r}
-table(example_data$patient_id, example_data$Status)
+table(example_data$metadata$sample_id, example_data$metadata$phenotype)
 ```
 
 
@@ -80,8 +80,8 @@ table(example_data$patient_id, example_data$Status)
 The example dataset above consists of the PCA embeddings calculated from our small example COVID dataset. These were created by performing PCA on the gene expression matrix and obtained the first 50 PC embeddings. This would be typically done within other packages, such as `Seurat`.  A example of construct the input data frame from Seurat object would be (not evaluated here):
 
 ```{r eval = F}
-cbind(seurat_object@meta.data, 
-                 seurat_object@reductions$pca@cell.embeddings)
+#cbind(seurat_object@meta.data, 
+#                 seurat_object@reductions$pca@cell.embeddings)
 ```
 
 
@@ -102,9 +102,9 @@ After the input data frame is ready, we use the function `gloscope` to approxima
 Following is the illustration of using example data, with KNN density estimation, to calculate the KL divergence among samples.
 
 ```{r}
-dist_test <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id,  dens = "KNN", dist_mat = "KL")
+#dist_test <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = #example_data$patient_id,  dens = "KNN", dist_mat = "KL")
 
-dist_test[1:5,1:5]
+#dist_test[1:5,1:5]
 ```
 
 # Visualization of the divergence matrix
@@ -112,8 +112,8 @@ dist_test[1:5,1:5]
 A classical way to visualize a divergence matrix is using a heatmap. 
 
 ```{r}
-library(NMF)
-aheatmap(dist_test)
+#library(NMF)
+#aheatmap(dist_test)
 ```
 
 
@@ -122,20 +122,20 @@ The user could also choose to use the function `plotMDS` in this package to draw
 To run `plotMDS`, we also need to create a matrix with the relevant meta data at the sample level, rather than the cell level
 
 ```{r}
-pat_info <- unique(example_data[, c("patient_id", "Status")])
-head(pat_info)
+#pat_info <- unique(example_data[, c("patient_id", "Status")])
+#head(pat_info)
 ```
 We can then plot the MDS representation with each sample/patient color-coded by the `Status` variable. 
 
 ```{r}
-mds_result = plotMDS(dist_mat = dist_test, n = 2,
-                     x =  pat_info, sample_id="patient_id", group_id="Status")
+#mds_result = plotMDS(dist_mat = dist_test, n = 2,
+#                     x =  pat_info, sample_id="patient_id", group_id="Status")
 ```
 
 `plotMDS` returns a list with the `plot` element containing the `ggplot2` object. We can visualize the plot by calling it:
 
 ```{r}
-mds_result$plot
+#mds_result$plot
 ```
 
 
@@ -154,9 +154,8 @@ This is how the seed must be set, *even if there is no parallelization* chosen (
 The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization:
 
 ```{r eval = TRUE}
-dist_test_gmm <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = example_data$patient_id, dens = "GMM", dist_mat = "KL",
-
-                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
+#dist_test_gmm <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = #example_data$patient_id, dens = "GMM", dist_mat = "KL",
+#                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
 ```
 
 The same argument (`RNGseed`) can be added to other `BPPARAM` arguments to set the seed.
