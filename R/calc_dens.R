@@ -18,6 +18,7 @@
 #' sample
 #'
 #' @examples
+#' data(example_data)
 #' sample_ids <- example_data$metadata$sample_id
 #' pca_embeddings <- example_data$pca_embeddings
 #' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
