@@ -90,11 +90,12 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	# IMPORTANT: There are additional algorithms for divergence estimation implemented in this package
 	# which are not accessible from the `gloscope` function. The optional arguments
 	# `ndim`, `varapp`, `epapp`, and `ep` must be manually set below. See `R/.calc_dist.R` for their details.
-	divergence_list <- BiocParallel::bplapply(patient_pair_list,
+	set.seed(2)
+	divergence_list <- lapply(patient_pair_list,
 		function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
 				       df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
 				       r = r, k = k,
-				       ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
+				       ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA)})
 
 	divergence_vec <- unlist(divergence_list)
 	# Convert pair-wise distances to a symmetric distance matrix
