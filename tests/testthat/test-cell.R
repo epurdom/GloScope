@@ -13,7 +13,8 @@ test_that("gloscope works with KNN",{
   #test dimensions
   expect_equal(dim(temp_knn),c(3,3))
   #test distances the same as in the past
-  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),c(4.478759 ,3.203009, 1.520805))
+  knn_expected_answer<-c(4.478759 ,3.203009, 1.520805) #answer got the first time
+  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),knn_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_knn)),rep(0,3))
   #test row names/colnames
@@ -27,12 +28,13 @@ test_that("gloscope works with GMM",{
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
   #test distances the same as in the past
-  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),c(12.996519, 10.759409, 10.517520))
+  gmm_expected_answer<-round(c(12.996519, 10.759409, 10.517520),6) #answer got the first time
+  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),gmm_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,3))
   #test row names/colnames
-  expect_equal(unname(sort(colnames(temp_gmm))),sort(unique(sub_data$patient_id)))
-  expect_equal(unname(sort(rownames(temp_gmm))),sort(unique(sub_data$patient_id)))
+  expect_equal(unname(sort(colnames(temp_gmm))),sort(unique(subsample_metadata$sample_id)))
+  expect_equal(unname(sort(rownames(temp_gmm))),sort(unique(subsample_metadata$sample_id)))
 })
 
 test_that("different random seeds give different GMM results",{
