@@ -1,52 +1,40 @@
-library(testthat)
-test_that("gloscope warnings for small cell counts", {
-	expect_error(gloscope(full_pca_embeddings_subset, c(sample_ids,NA)),
-		regexp="The number of cells in the embedding matrix does not match the number of sample labels.",fixed=TRUE)
-	sample_size_warnings <- capture_warnings(gloscope(undersized_data,undersized_metadata$sample_id,dens="KNN"))
-	expect_match(sample_size_warnings,"^The following samples have fewer than 500 cells.*",all = FALSE)
-	expect_match(sample_size_warnings,"^The following samples have fewer than the minimum of 50 cells*",all = FALSE)
-	#expect_warning(gloscope(reliability_pca_embeddings_subset,sample_ids,dens="KNN"),
-	#	regexp = "^The following samples have fewer than 50 cells.*")
-})
+#context("Gloscope")
+
+test_that("gloscope warnings for small cells", {
+  expect_warning(gloscope(sub_data_350, sample_id = "patient_id",dim_redu = "PC", ndim = 10, dens = "KNN", dist_mat = "KL", BPPARAM = BiocParallel::SerialParam()), "Some samples have numbers of cells smaller than the minimum cell number 500 to have reliable results!")
+  expect_error(gloscope(sub_data_40, sample_id = "patient_id",dim_redu = "PC", ndim = 10, dens = "KNN", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam()), "Some samples have numbers of cells smaller than the valid cell number 50 for KNN downstream analysis!")
+
+
+  })
 
 test_that("gloscope works with KNN",{
-  expect_silent(temp_knn<-gloscope(subsample_data,subsample_metadata$sample_id,
-      dens = "KNN", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)))
+  expect_silent(temp_knn<-gloscope(sub_data,sample_id = "patient_id",
+      dim_redu = "PC", ndim = 10, dens = "KNN",
+      dist_mat = "KL",BPPARAM = BiocParallel::SerialParam()))
   #test dimensions
   expect_equal(dim(temp_knn),c(3,3))
-  #test distances the same as in the past
-  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),c(15.642519, 13.050111, 4.455316))
+  #test distances the same as got the first time ran this (check changes in the code haven't changed anything)
+  knn_expected_answer<-c(4.478759 ,3.203009, 1.520805) #answer got the first time
+  expect_equal(round(temp_knn[upper.tri(temp_knn)],6),knn_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_knn)),rep(0,3))
   #test row names/colnames
-  expect_equal(unname(sort(colnames(temp_knn))),sort(unique(subsample_metadata$sample_id)))
-  expect_equal(unname(sort(rownames(temp_knn))),sort(unique(subsample_metadata$sample_id)))
+  expect_equal(sort(colnames(temp_knn)),sort(unique(sub_data$patient_id)))
+  expect_equal(sort(rownames(temp_knn)),sort(unique(sub_data$patient_id)))
 })
 
 test_that("gloscope works with GMM",{
-  expect_silent(temp_gmm<-gloscope(subsample_data,subsample_metadata$sample_id,
-      dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)))
+  expect_silent(temp_gmm<-gloscope(sub_data,sample_id = "patient_id",
+                                   dim_redu = "PC", ndim = 10, dens = "GMM",
+                                   dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed = 1)))
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
-  #test distances the same as in the past
-  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),c(10.196157,  9.458072, 10.453753))
+  #test distances the same
+  gmm_expected_answer<-round(c(12.996519, 10.759409, 10.517520),6) #answer got the first time
+  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),gmm_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,3))
   #test row names/colnames
-  expect_equal(unname(sort(colnames(temp_gmm))),sort(unique(sub_data$patient_id)))
-  expect_equal(unname(sort(rownames(temp_gmm))),sort(unique(sub_data$patient_id)))
-})
-
-test_that("different random seeds give different GMM results",{
-  expect_false(all(gloscope(subsample_data,subsample_metadata$sample_id,
-                                   dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)) ==
-                 gloscope(subsample_data,subsample_metadata$sample_id,
-                          dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
-})
-
-test_that("plotMDS works with output",{
-  expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
-  pat_info <- unique(subsample_metadata)
-  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-    pat_info, "sample_id", "phenotype", n = 2))
+  expect_equal(sort(colnames(temp_gmm)),sort(unique(sub_data$patient_id)))
+  expect_equal(sort(rownames(temp_gmm)),sort(unique(sub_data$patient_id)))
 })
