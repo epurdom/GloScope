@@ -45,7 +45,7 @@
       mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
                          dens = dens, r = r, k = k, varapp = varapp,
                          epapp = epapp, ep = ep) +
-        .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
+        .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s2, sample2 = s1,
                  dens = dens, r = r, k = k, varapp = varapp,
                  epapp = epapp, ep = ep)
     }
@@ -104,10 +104,10 @@
 		mu_1 <- mclust_mod1$parameters$mean
 		mu_2 <- mclust_mod2$parameters$mean
 
-    # Deprecated option for approximating KL
-    if(varapp) {
+    		# Deprecated option for approximating KL
+		if(varapp) {
 			#kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
-      stop("A variational approximation to the KL divergence is not available at this time")
+      			stop("A variational approximation to the KL divergence is not available at this time")
 		} else {
 			dens1 <- stats::predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
 			dens2 <- stats::predict(mclust_mod2, s, what = "dens", logarithm = TRUE)
@@ -117,10 +117,9 @@
 				kl <- sum(dens1 - dens2) / r
 			}
 		}
-	}else if(dens == "KNN"){
+	} else if(dens == "KNN"){
 		kl <- FNN::KL.dist(as.matrix(mod_list[[sample1]]), as.matrix(mod_list[[sample2]]), k = k)[k]
 	}
-
 	return(kl)
 }
 
