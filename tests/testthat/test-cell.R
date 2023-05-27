@@ -24,7 +24,7 @@ test_that("gloscope works with KNN",{
 
 test_that("gloscope works with GMM",{
   expect_silent(temp_gmm<-gloscope(subsample_data_subset,subsample_metadata$sample_id,
-      dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)))
+      dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
   #test distances the same as in the past
