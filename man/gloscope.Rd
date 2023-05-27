@@ -13,30 +13,30 @@ gloscope(
   num_components = c(1:9),
   k = 50,
   BPPARAM = BiocParallel::SerialParam(),
-  fit_density = NULL,
+  prefit_density = NULL,
   return_density = FALSE
 )
 }
 \arguments{
-\item{embedding_matrix:}{a matrix of latent embeddings with rows corresponding to cells and columns to dimensions}
+\item{embedding_matrix}{a matrix of latent embeddings with rows corresponding to cells and columns to dimensions}
 
-\item{cell_sample_ids:}{a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`}
+\item{cell_sample_ids}{a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`}
 
-\item{dens:}{the density estimation. One of c("GMM","KNN")}
+\item{dens}{the density estimation. One of c("GMM","KNN")}
 
-\item{dist_mat:}{distance metric to calculate the distance. One of c("KL","JS")}
+\item{dist_mat}{distance metric to calculate the distance. One of c("KL","JS")}
 
-\item{r:}{number of Monte Carlo simulations to generate}
+\item{r}{number of Monte Carlo simulations to generate}
 
-\item{num_components:}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
+\item{num_components}{a vector of integers for the number of components to fit GMMS to, default is 1:9}
 
-\item{k:}{number of nearest neighbours for KNN density estimation, default k = 50.}
+\item{k}{number of nearest neighbours for KNN density estimation, default k = 50.}
 
-\item{BPPARAM:}{BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument}
+\item{BPPARAM}{BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument}
 
-\item{prefit_density:}{a named list of pre-fit `densityMclust` objects for each sample, default is NULL}
+\item{prefit_density}{a named list of pre-fit `densityMclust` objects for each sample, default is NULL}
 
-\item{return_density:}{return the GMM parameter list or not (if applicable), default is FALSE}
+\item{return_density}{return the GMM parameter list or not (if applicable), default is FALSE}
 }
 \value{
 A matrix containing the pairwise divergence or distance between all pairs of samples

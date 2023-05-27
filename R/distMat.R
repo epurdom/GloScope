@@ -33,7 +33,7 @@
 gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat = "KL",
 		r = 10000, num_components = c(1:9), k=50,
 		BPPARAM = BiocParallel::SerialParam(),
-		fit_density = NULL, return_density = FALSE){
+		prefit_density = NULL, return_density = FALSE){
 
 	# Input safety check
 	if(length(cell_sample_ids)!=nrow(embedding_matrix)){
@@ -77,11 +77,11 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	# We create a list indexed by sample ID containing each sample's embedding matrix
 	sample_matrix_list <- lapply(unique_sample_ids,function(x){embedding_matrix[(cell_sample_ids==x),]})
 	# Saved `mclust` densities can be used instead of running the package by setting the
-	# `fit_density` optional argument to a list indexed by sample ID containing a fit `densityMclust` object for each
-	if(is.null(fit_density)){
+	# `prefit_density` optional argument to a list indexed by sample ID containing a fit `densityMclust` object for each
+	if(is.null(prefit_density)){
 		mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
 	} else {
-		mod_list <- fit_density
+		mod_list <- prefit_density
 	}
 
 	sample_pairs <- utils::combn(unique_sample_ids, 2)
