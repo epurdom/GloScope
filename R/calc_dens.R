@@ -14,22 +14,10 @@
 #' @param k number of k nearest neighbour for KNN density estimation, default k = 50.
 #' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
 #' @param BPPARAM BiocParallel parameters
-#' @return mod_list: a list of length number of samples, contains the estimated density for each
-#' sample
-#'
-#' @examples
-#' data(example_data)
-#' sample_ids <- example_data$metadata$sample_id
-#' pca_embeddings <- example_data$pca_embeddings
-#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
-#' # the following `lapply` creates the necessary input data structure for this fn.
-#' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
-#' names(embeddings_list) <- unique(sample_ids)
-#' mod_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam())
+#' @return mod_list: a list of length number of samples, contains the estimated density for each sample
 #'
 #' @import BiocParallel
 #' @importFrom mclust densityMclust
-#' @rdname CalcDist
 
 .calc_dens = function(df_list, dens = "GMM", k = 50, num_components = c(1:9),
                      BPPARAM = BiocParallel::bpparam()){

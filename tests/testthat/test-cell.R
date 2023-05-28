@@ -50,3 +50,12 @@ test_that("plotMDS works with output",{
   expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
     pat_info, "sample_id", "phenotype", n = 2))
 })
+
+test_that("GMM density fitting returns `densityMclust` objects",{
+  sample_ids <- subsample_metadata$sample_id
+  # the following `lapply` creates the necessary input data structure for this fn.
+  embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
+  gmm_fit_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  # confirm that each element is in the output is a `densityMclust` object
+  expect_true(all(unlist(lapply(gmm_fit_list,function(x){class(x)[1]=="densityMclust"}))))
+})
