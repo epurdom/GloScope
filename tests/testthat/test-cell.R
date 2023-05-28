@@ -55,7 +55,43 @@ test_that("GMM density fitting returns `densityMclust` objects",{
   sample_ids <- subsample_metadata$sample_id
   # the following `lapply` creates the necessary input data structure for this fn.
   embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
-  gmm_fit_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  names(embeddings_list) <- unique(sample_ids)
+  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   # confirm that each element is in the output is a `densityMclust` object
-  expect_true(all(unlist(lapply(gmm_fit_list,function(x){class(x)[1]=="densityMclust"}))))
+  expect_true(all(unlist(lapply(gmm_density_list,function(x){class(x)[1]=="densityMclust"}))))
+})
+
+test_that("sKL and JS divergences are properly computed with KNN",{
+  sample_ids <- subsample_metadata$sample_id
+  embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
+  names(embeddings_list) <- unique(sample_ids)
+  knn_density_list <- .calc_dens(embeddings_list, dens = "KNN")
+  sample_pairs <- utils::combn(unique(sample_ids), 2)
+  patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
+  w <- patient_pair_list[[3]] # pick one unit
+  w_div_kl_expected <- 1.52
+  w_div_kl <- .calc_kl(knn_density_list, embeddings_list, w[1], w[2], dens = "KNN")
+  w_div_js_expected <- 0.04
+  w_div_js <- .calc_JS(knn_density_list, embeddings_list, w[1], w[2], dens = "KNN")
+  expect_equal(round(w_div_kl,2),w_div_kl_expected)
+  expect_equal(round(w_div_js,2),w_div_js_expected)
+})
+
+
+test_that("sKL and JS divergences are properly computed with GMM",{
+  sample_ids <- subsample_metadata$sample_id
+  embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
+  names(embeddings_list) <- unique(sample_ids)
+  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  sample_pairs <- utils::combn(unique(sample_ids), 2)
+  patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
+  w <- patient_pair_list[[1]] # pick one unit
+  w_div_kl_expected <- 4.89
+  set.seed(2)
+  w_div_kl <- .calc_kl(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM")
+  w_div_js_expected <- 0.49
+  set.seed(2)
+  w_div_js <- .calc_JS(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM")
+  expect_equal(round(w_div_kl,2),w_div_kl_expected)
+  expect_equal(round(w_div_js,2),w_div_js_expected)
 })

@@ -170,14 +170,16 @@
 
 		js <- sum(dens1_1 - mixture_1)/(2*r) + sum(dens2_2 - mixture_2)/(2*r)
 	}else if(dens == "KNN"){
+	  knn1_1 <- .knn_query(df_list, input = sample1, query = sample1, k = k)
+	  knn2_2 <- .knn_query(df_list, input = sample2, query = sample2, k = k)
 		knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
 		knn1 <- mod_list[[sample1]]
 		knn1_2 <- .knn_query(df_list, input = sample1, query = sample2, k = k)
 		knn2 <- mod_list[[sample2]]
-		js <- 1/(2*length(knn1))*sum(log(2*length(knn2) * knn2_1^ndim/(length(knn2) * knn2_1^ndim +
-			(length(knn1)-1) * knn1^ndim))) +
-			1/(2*length(knn2))*sum(log(2*length(knn1) * knn1_2^ndim/(length(knn1) * knn1_2^ndim +
-			(length(knn2)-1) * knn2^ndim)))
+		js <- 1/(2*dim(knn1)[1])*sum(log(2*dim(knn2)[1] * knn2_1^ndim/(dim(knn2)[1] * knn2_1^ndim +
+			(dim(knn1)[1]-1) * knn1_1^ndim))) +
+			1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
+			(dim(knn2)[1]-1) * knn2_2^ndim)))
 	}
 
 	return(js)
