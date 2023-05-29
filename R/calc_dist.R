@@ -37,7 +37,7 @@
     }
   }  else if(dist_mat == "JS"){
     mydist <- .calc_JS(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                      dens = dens, ndim = ndim, r = r, k = k)
+                      dens = dens, r = r, k = k)
   }
 
   return(mydist)

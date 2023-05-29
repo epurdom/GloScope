@@ -29,6 +29,7 @@ This function creates a multidimensional scaling plot for
 be color-coded based on their phenotype.
 }
 \examples{
+\dontrun{
 data(example_data)
 sample_ids <- example_data$metadata$sample_id
 pca_embeddings <- example_data$pca_embeddings
@@ -37,7 +38,7 @@ dist_result <- gloscope(pca_embeddings_subset, sample_ids,
                     BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 mds_result <- plotMDS(dist_mat = dist_result, metadata_df =  unique(example_data$metadata),
 "sample_id", "phenotype",n=2)
-
 mds_result$plot
 mds_result$mds
+}
 }
