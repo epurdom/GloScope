@@ -13,28 +13,14 @@
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k = 50.
-#' @param ndim number of reduced dimensions to keep; only applicable for KNN + JS, default = 10
 #' @param varapp Boolean for using variation approximation of KL divergence; NOTE: Currently disabled
 #' @param epapp Boolean for applying an epsilon perturbation to MC calculated KL, default = FALSE
 #' @param ep Epsilon perturbation size to add to MC KL divergence calculation, default = NA
 #' @return The estimated statistical divergence between two GloScope represenations
-#' @examples
-#' data(example_data)
-#' sample_ids <- example_data$metadata$sample_id
-#' pca_embeddings <- example_data$pca_embeddings
-#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
-#' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
-#' names(embeddings_list) <- unique(sample_ids)
-#' density_list <- .calc_dens(embeddings_list, dens = "KNN")
-#' sample_pairs <- utils::combn(unique(sample_ids), 2)
-#' patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
-#' w <- patient_pair_list[[1]]
-#' .calc_dist(mod_list = density_list, df_list = embeddings_list, dens = "KNN", k = 50,
-#'            s1 = w[1], s2 = w[2], dist_mat = "KL")
 #' @rdname CalcDist
 
 .calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
-                      ndim = 10, varapp = FALSE, epapp = FALSE, ep = NA){
+                      varapp = FALSE, epapp = FALSE, ep = NA){
   if(dist_mat == "KL"){
     if(dens == "KNN"){
       mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
@@ -75,18 +61,6 @@
 #' @param epapp Boolean for applying an epsilon perturbation to MC calculated KL, default = FALSE
 #' @param ep Epsilon perturbation size to add to MC KL divergence calculation, default = NA
 #' @return a numeric value of distance between sample1 and sample2's distribution.
-#' @examples
-#' data(example_data)
-#' sample_ids <- example_data$metadata$sample_id
-#' pca_embeddings <- example_data$pca_embeddings
-#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
-#' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
-#' names(embeddings_list) <- unique(sample_ids)
-#' density_list <- .calc_dens(embeddings_list, dens = "KNN")
-#' sample_pairs <- utils::combn(unique(sample_ids), 2)
-#' patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
-#' w <- patient_pair_list[[1]]
-#' .calc_kl(density_list, embeddings_list, w[1], w[2], dens = "KNN")
 #' @importFrom FNN KL.dist
 #' @importFrom stats predict
 #' @rdname CalcDist
@@ -135,26 +109,13 @@
 #' @param sample1 The name or index of the first sample in a pair (must be a key in mod_list)
 #' @param sample2 The name or index of the second sample in a pair
 #' @param dens The density estimation method (GMM or KNN)
-#' @param ndim The number of dimension reduction to keep if using k-NN
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k = 50.
 #' @return a numeric value of distance between sample1 and sample2's distribution.
-#' @examples
-#' data(example_data)
-#' sample_ids <- example_data$metadata$sample_id
-#' pca_embeddings <- example_data$pca_embeddings
-#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
-#' embeddings_list <- lapply(unique(sample_ids),function(x){pca_embeddings_subset[(sample_ids==x),]})
-#' names(embeddings_list) <- unique(sample_ids)
-#' density_list <- .calc_dens(embeddings_list, dens = "KNN")
-#' sample_pairs <- utils::combn(unique(sample_ids), 2)
-#' patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
-#' w <- patient_pair_list[[1]]
-#' .calc_JS(density_list, embeddings_list,w[1], w[2], dens = "KNN", ndim = 10)
 #' @importFrom stats predict
 #' @rdname CalcDist
 
-.calc_JS <- function(mod_list, df_list, sample1, sample2, dens, ndim = 10,
+.calc_JS <- function(mod_list, df_list, sample1, sample2, dens,
                      r = 10000, k = 50){
 	if(dens == "GMM"){
 		mclust_mod1 <- mod_list[[sample1]]
@@ -173,9 +134,11 @@
 	  knn1_1 <- .knn_query(df_list, input = sample1, query = sample1, k = k)
 	  knn2_2 <- .knn_query(df_list, input = sample2, query = sample2, k = k)
 		knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
-		knn1 <- mod_list[[sample1]]
 		knn1_2 <- .knn_query(df_list, input = sample1, query = sample2, k = k)
+		knn1 <- mod_list[[sample1]]
 		knn2 <- mod_list[[sample2]]
+		if(dim(knn1)[2] != dim(knn2)[2]){stop("This method assumes both densities are of equal dimension.")}
+		ndim <- dim(knn1)[2]
 		js <- 1/(2*dim(knn1)[1])*sum(log(2*dim(knn2)[1] * knn2_1^ndim/(dim(knn2)[1] * knn2_1^ndim +
 		    (dim(knn1)[1]-1) * knn1_1^ndim))) +
 		  1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
@@ -184,5 +147,3 @@
 
 	return(js)
 }
-
-
