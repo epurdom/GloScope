@@ -177,9 +177,9 @@
 		knn1_2 <- .knn_query(df_list, input = sample1, query = sample2, k = k)
 		knn2 <- mod_list[[sample2]]
 		js <- 1/(2*dim(knn1)[1])*sum(log(2*dim(knn2)[1] * knn2_1^ndim/(dim(knn2)[1] * knn2_1^ndim +
-			(dim(knn1)[1]-1) * knn1_1^ndim))) +
-			1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
-			(dim(knn2)[1]-1) * knn2_2^ndim)))
+		    (dim(knn1)[1]-1) * knn1_1^ndim))) +
+		  1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
+		    (dim(knn2)[1]-1) * knn2_2^ndim)))
 	}
 
 	return(js)
