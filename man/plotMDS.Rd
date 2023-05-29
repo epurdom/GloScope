@@ -29,7 +29,7 @@ This function creates a multidimensional scaling plot for
 be color-coded based on their phenotype.
 }
 \examples{
-\dontrun{
+\donttest{
 data(example_data)
 sample_ids <- example_data$metadata$sample_id
 pca_embeddings <- example_data$pca_embeddings

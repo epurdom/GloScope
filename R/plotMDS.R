@@ -12,7 +12,7 @@
 #' @return A list containing the MDS embedding and plot of the distance matrix
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(example_data)
 #' sample_ids <- example_data$metadata$sample_id
 #' pca_embeddings <- example_data$pca_embeddings

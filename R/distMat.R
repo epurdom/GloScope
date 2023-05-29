@@ -15,7 +15,7 @@
 #' @return A matrix containing the pairwise divergence or distance between all pairs of samples
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(example_data)
 #' sample_ids <- example_data$metadata$sample_id
 #' pca_embeddings <- example_data$pca_embeddings
@@ -48,7 +48,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	# Results may be unreliable for samples with less than 500 cells
 	# We raise a warning denoting samples for which this is the case
 	MIN_CELLS <- 500
-	cells_per_sample <- sapply(unique_sample_ids, function(x){nrow(embedding_matrix[cell_sample_ids==x,])})
+	cells_per_sample <- vapply(unique_sample_ids, function(x){nrow(embedding_matrix[cell_sample_ids==x,])})
 	if(sum(cells_per_sample < MIN_CELLS) > 0){
 		small_samples <- names(cells_per_sample)[cells_per_sample < MIN_CELLS]
 		warning(paste0("The following samples have fewer than ", MIN_CELLS,
@@ -110,7 +110,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat =
 	  # pad matrix with NA divergences if kNN density estimate cannot be run for some units
 		full_samples <- c(unique_sample_ids, knn_withheld_samples)
 		num_total <- length(full_samples)
-		num_included = length(unique_sample_ids)
+		num_included <- length(unique_sample_ids)
 		num_withheld <- length(knn_withheld_samples)
 		na_pad_col <- matrix(NA, nrow = num_included, ncol = num_withheld)
 		na_pad_row <- matrix(NA, nrow = num_withheld, ncol = num_total)

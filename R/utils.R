@@ -42,7 +42,7 @@
 #' @importFrom RANN nn2
 #' @noRd
 .knn_query = function(df_list, query, input, k){
-  knnq_dist = RANN::nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
+  knnq_dist <- RANN::nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
   return(knnq_dist)
 }
 
