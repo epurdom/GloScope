@@ -12,6 +12,7 @@
 #' @return A list containing the MDS embedding and plot of the distance matrix
 #'
 #' @examples
+#' \dontrun{
 #' data(example_data)
 #' sample_ids <- example_data$metadata$sample_id
 #' pca_embeddings <- example_data$pca_embeddings
@@ -20,9 +21,9 @@
 #'                     BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' mds_result <- plotMDS(dist_mat = dist_result, metadata_df =  unique(example_data$metadata),
 #' "sample_id", "phenotype",n=2)
-#'
 #' mds_result$plot
 #' mds_result$mds
+#' }
 #' @import ggplot2
 #' @importFrom MASS isoMDS
 #' @export
