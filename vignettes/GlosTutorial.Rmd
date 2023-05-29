@@ -1,10 +1,13 @@
 ---
-title: "scRNA-Seq Patient Analysis using GloScope"
+title: "scRNA-Seq Population-level Analysis using GloScope"
 author:
 - name: Hao Wang
   affiliation:
   - &UCB University of California, Berkeley, California, USA
   email: hao_wang@berkeley.edu
+- name: William Torous
+  affiliation:
+  - *UCB
 - name: Elizabeth Purdom
   affiliation:
   - *UCB
@@ -12,6 +15,7 @@ date: "`r Sys.Date()`"
 output: 
   BiocStyle::html_document:
     toc: true
+bibliography: gloscope.bib
 vignette: >
   %\VignetteIndexEntry{GloScope}
   %\VignetteEngine{knitr::rmarkdown}
@@ -26,118 +30,112 @@ knitr::opts_chunk$set(
 ```
 
 
-# Overview {#Intro}
+# Overview
 
-This package will go through the steps needed to implement the `GloScope`. `GloScope` is a framework for creating a global profile of a scRNA-Seq sample in order to globally compare and analyze multiple samples of scRNA-Seq. This is done by estimating for each sample the global gene expression distribution and calculating how divergent pairs of samples are from each other. The output from the package is a $n\times n$ divergence matrix with the pairwise divergences among different samples. This divergence matrix can be the input to other statistical and machine learning tools. 
+This vignette will review the steps needed to implement the `GloScope` methodology. `GloScope` is a framework for creating global profiles of scRNA-Seq samples in order to globally compare and analyze them across patients or tissue sites. First this methodology estimates a global gene expression distribution for each sample and then calculates how divergent pairs of samples are from each other. The output from the package's main function, `gloscope()`, is a $n\times n$ divergence matrix containing the pairwise statistical divergences between all samples. This divergence matrix can be the input to other downstream statistical and machine learning tools. 
 
-`GloScope` estimates the density from a low dimensional representation of the gene measurements, such as PCA or scVI. Users must provide `GloScope` with a dataframe containing each cell's low-dimensional embeddings, along with the meta data which identifies to which sample each cell belongs
+`GloScope` estimates the gene expression density from a low dimensional embedding of the UMI count measurements, such as PCA or scVI. Users must provide `GloScope` with a `data.frame` containing each cell's embedding coordinates, along with the metadata which identifies to which sample each cell belongs to.
 
-The package provides the function `plotMDS` in the package which allows the user to visualize the divergence matrix via Multi-dimensional Scaling, but the divergence matrix can also be ported to other algorithms as well.  
-
-
-A common workflow of using `GloScope` for :
-
-1. Obtain the dimension reduction embedding of the cells and specify how many dimensions. This is done outside of the `GloScope` package
-
-2. Choose a density estimation method (GMM/KNN) to estimate the distribution of each patients.
-
-3. Calculate the KL divergence of each sample pair.
-
-4. Visualize the distance matrix through MDS first two dimensions using the `plotMDS` function 
+The package provides a helper function `plotMDS` which allows the user to visualize the divergence matrix with multidimensional scaling (MDS), but the divergence matrix can also be visualized with other algorithms as well.  
 
 
-# Example implementation {# Examp}
+A standard workflow for `GloScope` consists of:
 
-In this section, we use a toy example to illustrate the input, output and visualization of `GloScope` pipeline. 
+1. Obtain the dimension reduction embedding of the cells and specify how many dimensions to keep. This is computed outside of the `GloScope` package.
+
+2. Choose a density estimation method (Gaussian mixture or k-nearest neighbours) to estimate each sample's latent distribution.
+
+3. Calculate the symmetric KL divergence between all pairs of samples.
+
+4. Visualize the distance matrix with the first two dimensions of MDS using the `plotMDS` function.
 
 
-The data was a subset from the COVID PBMC data set, retrieved from [Stephenson et al (2021)](https://doi.org/10.1038/s41591-021-01329-2), using the following link: https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-10026. There were a total of 647,366 blood mononuclear cells from 130 patients, categorized into COVID patients, healthy control donor, patients with other non-COVID respiratory disease and volunteers administered with intravenous lipopolysaccharide (IV-LPS). For computational timing consideration, we subset the data to contains the samples only from COVID and healthy control donor. We further down-sampled the data so each sample has 500 cells; this is not a recommended step for normal analysis, but done just to create a small manageable dataset for this tutorial.
+# Example
 
+In this section, we use a toy example to illustrate the input, output and visualization steps of the `GloScope` pipeline. 
+
+The data was a subset from the COVID PBMC data set, retrieved from @stephenson2021single, using [this hyperlinked URL](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-10026). The dataset has a total of 647,366 peripheral blood mononuclear cells (PBMCs) from 130 patients, whose phenotypes are COVID-infected, healthy control donor, patients with other non-COVID respiratory disease, and volunteers administered with intravenous lipopolysaccharide (IV-LPS). To enable faster computation, we subset this dataset to 20 random COVID and healthy control donors and further subsample each patient's count matrix to  500 random cells. This subsampled data is included as example data in the package. We emphasize that this subsampling procedure is only for demonstration purposes and is not a recommended step in normal analyses.
 
 ## Data Input
 
-We first load the `GloScope` package and bring in the example dataset.
+We first load the `GloScope` package and load the aforementioned example dataset.
 
 ```{r load-libs, message = FALSE,  warning = FALSE}
-library(GloScope)
+#library(GloScope) # TODO: Change me
+devtools::load_all()
 data("example_data")
 ```
 
+The example data contains the first $50$ principal components of the subsampled cells, as well as the cell sample and phenotype labels. Note that each row of both `data.frames` corresponds to a single cell.
+
 ```{r}
 head(example_data$pca_embeddings[,1:10])
+head(example_data$metadata)
 ```
-Each row of the matrix is a cell, and the data.frame has columns for meta data (`patient_id` and `Status`) as well as the PC embeddings for each cell.
 
-We can see that each sample has 500 cells, as expected (because we downsampled to only 500 cells per patient).
+The following table confirms that each donor provides $500$ cells, and that both phenotypes are represented.
 
 ```{r}
 table(example_data$metadata$sample_id, example_data$metadata$phenotype)
 ```
 
+`GloScope` expects that the user provides `GloScope` with a `data.frame` containing each cell's low-dimensional embedding, along with a vector which contains at index $i$ the ID of the sample from which the $i^{\text{th}}$ cell in the embedding matrix is drawn. Note that the each row in the embedding matrix should correspond to a single cell and each column to a dimension of latent space.
 
-`GloScope` expects that the user provides `GloScope` with a dataframe containing each cell's low-dimensional embeddings, along with the meta data which minimally identifies to which sample each cell belongs (though additional metadata can be provided).
-
-The example dataset above consists of the PCA embeddings calculated from our small example COVID dataset. These were created by performing PCA on the gene expression matrix and obtained the first 50 PC embeddings. This would be typically done within other packages, such as `Seurat`.  A example of construct the input data frame from Seurat object would be (not evaluated here):
+The PCA embeddings in the example dataset are provided by the authors of @stephenson2021single. In general users of `GloScope` can input any dimensionality reduction to the method. UMI counts are often provided as `Seurat` or `SingleCellExperiment` objects, and many dimensionality reduction strategies, including PCA and scVI (@lopez2018deep) can be computed and saved within those data structures. The following code, which is not evaluated, demonstrates how PCA embeddings and sample lables can be extracted from a `Seurat` object and formatted for input into the `gloscope` function.
 
 ```{r eval = F}
-#cbind(seurat_object@meta.data, 
-#                 seurat_object@reductions$pca@cell.embeddings)
+embedding_df <- seurat_object@reductions$pca@cell.embeddings
+sample_ids <- seurat_object@meta.data$sample_id
 ```
 
 
-## Calculating divergence matrix
+## Divergence Matrix Calculation
 
-After the input data frame is ready, we use the function `gloscope` to approximate the divergence matrix. To do so, several arguments are required to be specified:
+With the cell embeddings and the sample labels in the proper format, the `gloscope` function is simple to setup and run. The base function call is `gloscope(embedding_df, sample_ids)`.  In addition to the two required data arguments, the user can specify details of density estimation and divergence calculation. 
 
-1. The column name that identifies the sample id of each cell in the input data (`sample_id`)
+If the user chooses to fit sample-level densities with Gaussian mixture models (GMMs) implemented by `mclust`, then the optional parameter `dens` should be set to its default value `"GMM"`. The `mclust` package uses the Bayesian information criterion (BIC) to select a GMM from a family of models, and the user of `GloScope` can specify how many centroids should be considered in that family. By default GMMs with $1$ through $9$ centroids are compared, and with the `num_components` optional argument the user can specify which centroid counts to include in the optimization. We note this optimization is stochastic, and details about controlling the random seed appear later in this vignette. When GMMs are used for density fitting, a Monte-Carlo approximation is used to compute pairwise divergences. The number of draws from each fit density is $10,000$ by default, and this is controlled by the optional parameter $r$ to the `gloscope` function.
 
-2. The variable name for dimension reduction embedding (e.g, `PC` for PC_1, PC_2, etc.,)
+A non-parametric alternative for density and divergence estimation is the $k$-nearest neighbours algorithm. To use this technique, the optional argument `dens="KNN"` should be set. The number of neighbours is a hyperparameter, equal to $50$ by default, and governed by the optional argument `k`. 
 
-3. The density estimation method the user want to implement (`dens`); can be `KNN` or `GMM`. 
+The default divergence for `GloScope` is the symmetric KL divergence, and the Jensen-Shannon divergence is also implemented. This can be controlled by setting `dist_mat="KL"` or `dist_mat="JS"`. One beneficial property of the Jensen-Shannon divergence is that its square root is a proper distance metric.
 
-4. How many dimensions user want to use for dimension reductions.
-
-5. If `KNN` is chosen in Step1, `k` needs to be selected. By default, `k = 50`.
-
-Following is the illustration of using example data, with KNN density estimation, to calculate the KL divergence among samples.
+The following code demonstrates how the `gloscope` function can be called from the example data using both GMM and kNN approaches. Although the example data contains the first 50 principal components, we choose to use only the first 10 for calculations.
 
 ```{r}
-#dist_test <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = #example_data$patient_id,  dens = "KNN", dist_mat = "KL")
+embedding_matrix <- example_data$pca_embeddings[,1:10]
+sample_ids <- example_data$metadata$sample_id
 
-#dist_test[1:5,1:5]
+gmm_divergence <- gloscope(embedding_matrix, sample_ids, dens = "GMM", dist_mat = "KL",
+                      num_components = c(2,4,6),r=20000)
+gmm_divergence[1:5,1:5]
+
+knn_divergence <- gloscope(embedding_matrix, sample_ids, dens = "KNN", dist_mat = "JS",
+                           k = 25)
 ```
 
-# Visualization of the divergence matrix
+# Visualization
 
-A classical way to visualize a divergence matrix is using a heatmap. 
+The `plotMDS` function provided by this package visualizes the output divergence matrix with multidimensional scaling. The `plotMDS` function utilizes the `isoMDS` function from the package `MASS`, and then `plotMDS` creates a scatter plot with samples color-coded by a user-specified covariate such as phenotype 
+
+This function requires a `data.frame` with the relevant metadata at the sample level, rather than at the cell level. This can easily be obtained by appling the `unique` function from base R to the cell-level metadata `data.frame`. 
 
 ```{r}
-#library(NMF)
-#aheatmap(dist_test)
+pat_info <- unique(example_data$metadata)
+head(pat_info)
 ```
 
-
-The user could also choose to use the function `plotMDS` in this package to draw the MDS plots. `plotMDS` simply a wrapper to the `isoMDS` function from the package `MASS`, where `plotMDS` color-codes the samples based on other meta data. 
-
-To run `plotMDS`, we also need to create a matrix with the relevant meta data at the sample level, rather than the cell level
+Here we plot the MDS representation with each sample color-coded by the `phenotype` variable. Note the function call returns both a matrix of MDS embeddings and a `ggplot` visualization. 
 
 ```{r}
-#pat_info <- unique(example_data[, c("patient_id", "Status")])
-#head(pat_info)
+mds_result <- plotMDS(dist_mat = gmm_divergence, metadata = pat_info, "sample_id","phenotype", n = 2)
+mds_result$plot
 ```
-We can then plot the MDS representation with each sample/patient color-coded by the `Status` variable. 
+
+Another classical way to visualize a divergence matrix is with a heatmap. The following code demonstrates that the output of `gloscope` is easily used in plotting functions beyond the package.
 
 ```{r}
-#mds_result = plotMDS(dist_mat = dist_test, n = 2,
-#                     x =  pat_info, sample_id="patient_id", group_id="Status")
+heatmap(gmm_divergence)
 ```
-
-`plotMDS` returns a list with the `plot` element containing the `ggplot2` object. We can visualize the plot by calling it:
-
-```{r}
-#mds_result$plot
-```
-
 
 # Parallelization and Random Seeds
 
@@ -154,13 +152,16 @@ This is how the seed must be set, *even if there is no parallelization* chosen (
 The following is an example of how to set the random seed when running the `GMM` option, using the default of no parallelization:
 
 ```{r eval = TRUE}
-#dist_test_gmm <- gloscope(embedding_matrix=example_data[,3:12], cell_sample_ids = #example_data$patient_id, dens = "GMM", dist_mat = "KL",
-#                     BPPARAM = BiocParallel::SerialParam(RNGseed = 1))
+gmm_divergence <- gloscope(embedding_matrix, sample_ids, dens = "GMM", dist_mat = "KL",
+                           BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
 ```
 
 The same argument (`RNGseed`) can be added to other `BPPARAM` arguments to set the seed.
 
 Note that the `KNN` estimation procedure does not have any Monte-Carlo approximation steps, and thus does not need to have a random seed.
+
+# References
+
 
 # SessionInfo {-}
 
