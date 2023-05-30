@@ -60,7 +60,7 @@ The data is a subset of that presented in @stephenson2021single, and was obtaine
 We first load the `GloScope` package and the aforementioned example dataset.
 
 ```{r load-libs, message = FALSE,  warning = FALSE}
-library(GloScope) 
+library(GloScope)
 data("example_data")
 ```
 

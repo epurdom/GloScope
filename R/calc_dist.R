@@ -26,8 +26,11 @@
 #' @return The estimated statistical divergence between two GloScope
 #'   represenations
 #' @noRd
-.calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
+.calc_dist <- function(mod_list, s1, s2, df_list,
+                       dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
                       varapp = FALSE, epapp = FALSE, ep = NA){
+  dens<-match.arg(dens)
+  dist_mat<-match.arg(dist_mat)
   if(dist_mat == "KL"){
     if(dens == "KNN"){
       mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
