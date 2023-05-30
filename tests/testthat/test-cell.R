@@ -48,7 +48,7 @@ test_that("plotMDS works with output",{
   expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
   pat_info <- unique(subsample_metadata)
   expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-    pat_info, "sample_id", "phenotype", n = 2))
+    metadata_df=pat_info, sample_id="sample_id", group_id="phenotype", k = 2))
 })
 
 test_that("GMM density fitting returns `densityMclust` objects",{

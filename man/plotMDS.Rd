@@ -5,7 +5,7 @@
 \alias{paletteBig}
 \title{Plot the multidimensional scaling of the GloScope represenation}
 \usage{
-plotMDS(dist_mat, metadata_df, sample_id, group_id, n = 10)
+plotMDS(dist_mat, metadata_df, sample_id, group_id, k = 10)
 
 paletteBig()
 }
@@ -18,7 +18,7 @@ paletteBig()
 
 \item{group_id}{The column name or index in metadata_df that contains the patient condition}
 
-\item{n}{Number of MDS dimension to generate, default = 10}
+\item{k}{Number of MDS dimension to generate, default = 10}
 }
 \value{
 A list containing the MDS embedding and plot of the distance matrix
@@ -30,7 +30,8 @@ A list containing the MDS embedding and plot of the distance matrix
 \description{
 This function creates a multidimensional scaling plot for
  a set of samples using their GloScope divergence. Each sample's scatter will
-be color-coded based on their phenotype.
+be color-coded based on their phenotype. The function calls the `isoMDS` function
+from the `MASS` package.
 
 `paletteBig` is a small helper function to create a large color
   palette for plotting
@@ -48,7 +49,7 @@ dist_result <- gloscope(pca_embeddings_subset, sample_ids,
 # make a per-sample metadata
 sample_metadata <- unique(example_small_data$metadata)
 mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
-"sample_id", "phenotype",n=2)
+"sample_id", "phenotype",k=2)
 mds_result$plot
 head(mds_result$mds)
 }

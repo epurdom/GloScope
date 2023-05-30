@@ -8,7 +8,7 @@ gloscope(
   embedding_matrix,
   cell_sample_ids,
   dens = c("GMM", "KNN"),
-  dist_mat = "KL",
+  dist_mat = c("KL", "JS"),
   r = 10000,
   num_components = c(1:9),
   k = 50,
