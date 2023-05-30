@@ -50,8 +50,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
   dist_mat<-match.arg(dist_mat)
 	# Input safety check
 	if(length(cell_sample_ids)!=nrow(embedding_matrix)){
-		stop("The number of cells in the embedding matrix does not
-		     match the number of sample labels.")
+		stop("The number of cells in the embedding matrix does not match the number of sample labels.")
 	}
 
 	# Extract the unique sample IDs as characters
