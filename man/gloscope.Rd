@@ -7,7 +7,7 @@
 gloscope(
   embedding_matrix,
   cell_sample_ids,
-  dens = "GMM",
+  dens = c("GMM", "KNN"),
   dist_mat = "KL",
   r = 10000,
   num_components = c(1:9),
@@ -42,17 +42,18 @@ gloscope(
 A matrix containing the pairwise divergence or distance between all pairs of samples
 }
 \description{
-This function calculates a matrix of pairwise divergences between input GloScope representations.
+This function calculates a matrix of pairwise divergences between input samples of single cell data.
 }
 \examples{
-\dontrun{
-data(example_data)
-sample_ids <- example_data$metadata$sample_id
-pca_embeddings <- example_data$pca_embeddings
+# Bring in small example data of single cell embeddings
+data(example_small_data)
+sample_ids <- example_small_data$metadata$sample_id
+pca_embeddings <- example_small_data$pca_embeddings
+# Run gloscope on first 10 PCA embeddings
+# We use 'KNN' option for speed ('GMM' is slightly slower)
 pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
 dist_result <- gloscope(pca_embeddings_subset, sample_ids,
-                    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+         dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 dist_result
-}
 
 }

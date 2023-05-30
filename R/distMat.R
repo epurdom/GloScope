@@ -1,6 +1,6 @@
 #' @title Calculate statistical divergence between all sample pairs
 #'
-#' @description This function calculates a matrix of pairwise divergences between input GloScope representations.
+#' @description This function calculates a matrix of pairwise divergences between input samples of single cell data.
 #'
 #' @param embedding_matrix a matrix of latent embeddings with rows corresponding to cells and columns to dimensions
 #' @param cell_sample_ids a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`
@@ -15,26 +15,27 @@
 #' @return A matrix containing the pairwise divergence or distance between all pairs of samples
 #'
 #' @examples
-#' \donttest{
-#' data(example_data)
-#' sample_ids <- example_data$metadata$sample_id
-#' pca_embeddings <- example_data$pca_embeddings
+#' # Bring in small example data of single cell embeddings
+#' data(example_small_data)
+#' sample_ids <- example_small_data$metadata$sample_id
+#' pca_embeddings <- example_small_data$pca_embeddings
+#' # Run gloscope on first 10 PCA embeddings
+#' # We use 'KNN' option for speed ('GMM' is slightly slower)
 #' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
 #' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
-#'                     BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+#'          dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' dist_result
-#' }
 #'
 #' @import BiocParallel
 #' @importFrom utils combn
 #' @rdname gloscope
 #' @export
 
-gloscope <- function(embedding_matrix, cell_sample_ids, dens = "GMM", dist_mat = "KL",
+gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), dist_mat = "KL",
 		r = 10000, num_components = c(1:9), k=50,
 		BPPARAM = BiocParallel::SerialParam(),
 		prefit_density = NULL, return_density = FALSE){
-
+  dens<-match.arg(dens)
 	# Input safety check
 	if(length(cell_sample_ids)!=nrow(embedding_matrix)){
 		stop("The number of cells in the embedding matrix does not match the number of sample labels.")

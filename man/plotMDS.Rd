@@ -22,6 +22,10 @@ plotMDS(dist_mat, metadata_df, sample_id, group_id, n = 10)
 }
 \value{
 A list containing the MDS embedding and plot of the distance matrix
+\itemize{
+  \item mds - A data.frame containing the MDS embedding, with the number of rows equal to the number of samples.
+  \item plot - A ggplot object containing the plot object. `print` of the object will create a plot.
+}
 }
 \description{
 This function creates a multidimensional scaling plot for
@@ -29,16 +33,19 @@ This function creates a multidimensional scaling plot for
 be color-coded based on their phenotype.
 }
 \examples{
-\donttest{
-data(example_data)
-sample_ids <- example_data$metadata$sample_id
-pca_embeddings <- example_data$pca_embeddings
+data(example_small_data)
+sample_ids <- example_small_data$metadata$sample_id
+# Run gloscope on first 10 PCA embeddings
+# We use 'KNN' option for speed ('GMM' is slightly slower)
+pca_embeddings <- example_small_data$pca_embeddings
 pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
 dist_result <- gloscope(pca_embeddings_subset, sample_ids,
-                    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
-mds_result <- plotMDS(dist_mat = dist_result, metadata_df =  unique(example_data$metadata),
+   dens="KNN",
+   BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+# make a per-sample metadata
+sample_metadata <- unique(example_small_data$metadata)
+mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
 "sample_id", "phenotype",n=2)
 mds_result$plot
-mds_result$mds
-}
+head(mds_result$mds)
 }
