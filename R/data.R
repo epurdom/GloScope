@@ -18,6 +18,7 @@
 #' @examples
 #' # Code to make the small set of data from `example_data`
 #' # Reduce to only 5 samples for small illustration
+#' data(example_data)
 #' sample_ids <- example_data$metadata$sample_id
 #' whKeep<-which(sample_ids %in% unique(sample_ids)[1:5])
 #' example_small_data<-list(
