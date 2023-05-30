@@ -1,24 +1,31 @@
-#' @title Compute statistical divergences between GloScope representations of samples
+#' @title Compute statistical divergences between GloScope representations of
+#'   samples
 #'
-#' @description This function calculates a statistical divergences between
-#' two specified samples of an input list of sample GloScope representations. Different
-#' subroutines are called depending on the divergence specified (symmetric KL or Jensen-Shannon)
-#' and density estimation used for the GloScope representations (GMM or KNN).
+#' @description The `.calc_dist` function calculates a statistical divergences
+#'   between two specified samples of an input list of sample GloScope
+#'   representations. Different subroutines are called depending on the
+#'   divergence specified (symmetric KL or Jensen-Shannon) and density
+#'   estimation used for the GloScope representations (GMM or KNN).
 #'
 #' @param mod_list A named list with each sample's estimated density
-#' @param s1 The name or index of the first sample in a pair (must be a key in mod_list)
+#' @param s1 The name or index of the first sample in a pair (must be a key in
+#'   mod_list)
 #' @param s2 The name or index of the second sample in a pair
 #' @param df_list A named list with each sample's reduced dimension embedding
 #' @param dist_mat The distance metric to use (KL or JS)
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
-#' @param k Number of k nearest neighbours for KNN density estimation, default k = 50.
-#' @param varapp Boolean for using variation approximation of KL divergence; NOTE: Currently disabled
-#' @param epapp Boolean for applying an epsilon perturbation to MC calculated KL, default = FALSE
-#' @param ep Epsilon perturbation size to add to MC KL divergence calculation, default = NA
-#' @return The estimated statistical divergence between two GloScope represenations
-#' @rdname CalcDist
-
+#' @param k Number of k nearest neighbours for KNN density estimation, default k
+#'   = 50.
+#' @param varapp Boolean for using variation approximation of KL divergence;
+#'   NOTE: Currently disabled
+#' @param epapp Boolean for applying an epsilon perturbation to MC calculated
+#'   KL, default = FALSE
+#' @param ep Epsilon perturbation size to add to MC KL divergence calculation,
+#'   default = NA
+#' @return The estimated statistical divergence between two GloScope
+#'   represenations
+#' @noRd
 .calc_dist <- function(mod_list, s1, s2, df_list, dist_mat, dens, r, k,
                       varapp = FALSE, epapp = FALSE, ep = NA){
   if(dist_mat == "KL"){
@@ -45,25 +52,32 @@
 
 #' @title Calculate the KL divergence between a single pair of samples
 #'
-#' @description This calculates the symmetric KL divergence between two
-#' GloScope representations. This is implemented with Monte Carlo approximation
-#' (with an optional epsilon perturbation term) if GMM is used for the density
-#' estimate of each cell or a plug-in formula if KNN is used for the density.
+#' @description The `.calc_kl` function calculates the symmetric KL divergence
+#'   between two GloScope representations. This is implemented with Monte Carlo
+#'   approximation (with an optional epsilon perturbation term) if GMM is used
+#'   for the density estimate of each cell or a plug-in formula if KNN is used
+#'   for the density.
 #'
 #' @param df_list A named list with each sample's reduced dimension embedding
 #' @param mod_list A named list with each sample's estimated density
-#' @param sample1 The name or index of the first sample in a pair (must be a key in mod_list)
+#' @param sample1 The name or index of the first sample in a pair (must be a key
+#'   in mod_list)
 #' @param sample2 The name or index of the second sample in a pair
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
-#' @param k Number of k nearest neighbours for KNN density estimation, default k = 50.
-#' @param varapp Boolean for using variation approximation of KL divergence; NOTE: Currently disabled'
-#' @param epapp Boolean for applying an epsilon perturbation to MC calculated KL, default = FALSE
-#' @param ep Epsilon perturbation size to add to MC KL divergence calculation, default = NA
-#' @return a numeric value of distance between sample1 and sample2's distribution.
+#' @param k Number of k nearest neighbours for KNN density estimation, default k
+#'   = 50.
+#' @param varapp Boolean for using variation approximation of KL divergence;
+#'   NOTE: Currently disabled'
+#' @param epapp Boolean for applying an epsilon perturbation to MC calculated
+#'   KL, default = FALSE
+#' @param ep Epsilon perturbation size to add to MC KL divergence calculation,
+#'   default = NA
+#' @return a numeric value of distance between sample1 and sample2's
+#'   distribution.
 #' @importFrom FNN KL.dist
 #' @importFrom stats predict
-#' @rdname CalcDist
+#' @noRd
 .calc_kl <- function(mod_list, df_list, sample1, sample2, dens, r = 10000 ,
 			k = 50, varapp=FALSE, epapp = FALSE, ep = NA){
 	if(dens == "GMM"){
@@ -99,22 +113,25 @@
 
 #' @title Calculate the Jensen-Shannon distance between a single pair of samples
 #'
-#' @description This calculates the Jensen-Shannon distance between two
-#' GloScope representations. This is implemented with Monte Carlo approximation
-#' (with an optional epsilon perturbation term) if GMM is used for the density
-#' estimate of each cell or a plug-in formula if KNN is used for the density.
+#' @description The `.calc_JS` function calculates the Jensen-Shannon distance
+#'   between two GloScope representations. This is implemented with Monte Carlo
+#'   approximation (with an optional epsilon perturbation term) if GMM is used
+#'   for the density estimate of each cell or a plug-in formula if KNN is used
+#'   for the density.
 #'
 #' @param df_list A named list with each sample's reduced dimension embedding
 #' @param mod_list A named list with each sample's estimated density
-#' @param sample1 The name or index of the first sample in a pair (must be a key in mod_list)
+#' @param sample1 The name or index of the first sample in a pair (must be a key
+#'   in mod_list)
 #' @param sample2 The name or index of the second sample in a pair
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
-#' @param k Number of k nearest neighbours for KNN density estimation, default k = 50.
-#' @return a numeric value of distance between sample1 and sample2's distribution.
+#' @param k Number of k nearest neighbours for KNN density estimation, default k
+#'   = 50.
+#' @return a numeric value of distance between sample1 and sample2's
+#'   distribution.
 #' @importFrom stats predict
-#' @rdname CalcDist
-
+#' @noRd
 .calc_JS <- function(mod_list, df_list, sample1, sample2, dens,
                      r = 10000, k = 50){
 	if(dens == "GMM"){

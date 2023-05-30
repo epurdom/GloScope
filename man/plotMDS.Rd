@@ -2,12 +2,12 @@
 % Please edit documentation in R/plotMDS.R, R/utils.R
 \name{plotMDS}
 \alias{plotMDS}
-\alias{.paletteBig}
+\alias{paletteBig}
 \title{Plot the multidimensional scaling of the GloScope represenation}
 \usage{
 plotMDS(dist_mat, metadata_df, sample_id, group_id, n = 10)
 
-.paletteBig()
+paletteBig()
 }
 \arguments{
 \item{dist_mat}{The divergence matrix output of `gloscope()`}
@@ -31,6 +31,9 @@ A list containing the MDS embedding and plot of the distance matrix
 This function creates a multidimensional scaling plot for
  a set of samples using their GloScope divergence. Each sample's scatter will
 be color-coded based on their phenotype.
+
+`paletteBig` is a small helper function to create a large color
+  palette for plotting
 }
 \examples{
 data(example_small_data)

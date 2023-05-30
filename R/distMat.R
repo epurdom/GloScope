@@ -1,18 +1,28 @@
 #' @title Calculate statistical divergence between all sample pairs
 #'
-#' @description This function calculates a matrix of pairwise divergences between input samples of single cell data.
+#' @description This function calculates a matrix of pairwise divergences
+#'   between input samples of single cell data.
 #'
-#' @param embedding_matrix a matrix of latent embeddings with rows corresponding to cells and columns to dimensions
-#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length must match the number of rows in `embedding_matrix`
+#' @param embedding_matrix a matrix of latent embeddings with rows corresponding
+#'   to cells and columns to dimensions
+#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
+#'   must match the number of rows in `embedding_matrix`
 #' @param dens the density estimation. One of c("GMM","KNN")
-#' @param dist_mat distance metric to calculate the distance. One of c("KL","JS")
+#' @param dist_mat distance metric to calculate the distance. One of
+#'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
-#' @param num_components a vector of integers for the number of components to fit GMMS to, default is 1:9
-#' @param k number of nearest neighbours for KNN density estimation, default k = 50.
-#' @param BPPARAM BiocParallel parameters, default is running in serial. Set random seed with `RNGseed` argument
-#' @param prefit_density a named list of pre-fit `densityMclust` objects for each sample, default is NULL
-#' @param return_density return the GMM parameter list or not (if applicable), default is FALSE
-#' @return A matrix containing the pairwise divergence or distance between all pairs of samples
+#' @param num_components a vector of integers for the number of components to
+#'   fit GMMS to, default is 1:9
+#' @param k number of nearest neighbours for KNN density estimation, default k =
+#'   50.
+#' @param BPPARAM BiocParallel parameters, default is running in serial. Set
+#'   random seed with `RNGseed` argument
+#' @param prefit_density a named list of pre-fit `densityMclust` objects for
+#'   each sample, default is NULL
+#' @param return_density return the GMM parameter list or not (if applicable),
+#'   default is FALSE
+#' @return A matrix containing the pairwise divergence or distance between all
+#'   pairs of samples
 #'
 #' @examples
 #' # Bring in small example data of single cell embeddings
@@ -31,14 +41,16 @@
 #' @rdname gloscope
 #' @export
 
-gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), dist_mat = "KL",
+gloscope <- function(embedding_matrix, cell_sample_ids,
+    dens = c("GMM","KNN"), dist_mat = "KL",
 		r = 10000, num_components = c(1:9), k=50,
 		BPPARAM = BiocParallel::SerialParam(),
 		prefit_density = NULL, return_density = FALSE){
   dens<-match.arg(dens)
 	# Input safety check
 	if(length(cell_sample_ids)!=nrow(embedding_matrix)){
-		stop("The number of cells in the embedding matrix does not match the number of sample labels.")
+		stop("The number of cells in the embedding matrix does not
+		     match the number of sample labels.")
 	}
 
 	# Extract the unique sample IDs as characters
@@ -49,7 +61,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 	# Results may be unreliable for samples with less than 500 cells
 	# We raise a warning denoting samples for which this is the case
 	MIN_CELLS <- 500
-	cells_per_sample <- sapply(unique_sample_ids, function(x){nrow(embedding_matrix[cell_sample_ids==x,])})
+	cells_per_sample <- sapply(unique_sample_ids,
+	   function(x){nrow(embedding_matrix[cell_sample_ids==x,])})
 	if(sum(cells_per_sample < MIN_CELLS) > 0){
 		small_samples <- names(cells_per_sample)[cells_per_sample < MIN_CELLS]
 		warning(paste0("The following samples have fewer than ", MIN_CELLS,
@@ -75,10 +88,13 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 		names(unique_sample_ids) <- unique_sample_ids
 	}
 
-	# We create a list indexed by sample ID containing each sample's embedding matrix
-	sample_matrix_list <- lapply(unique_sample_ids,function(x){embedding_matrix[(cell_sample_ids==x),]})
-	# Saved `mclust` densities can be used instead of running the package by setting the
-	# `prefit_density` optional argument to a list indexed by sample ID containing a fit `densityMclust` object for each
+	# We create a list indexed by sample ID containing each sample's embedding
+	# matrix
+	sample_matrix_list <- lapply(unique_sample_ids,
+	     function(x){embedding_matrix[(cell_sample_ids==x),]})
+	# Saved `mclust` densities can be used instead of running the package by
+	# setting the `prefit_density` optional argument to a list indexed by sample ID
+	# containing a fit `densityMclust` object for each
 	if(is.null(prefit_density)){
 		mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
 	} else {
@@ -88,9 +104,10 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 	sample_pairs <- utils::combn(unique_sample_ids, 2)
 	# Convert patient pairs to a list for BiocParallel::bplapply
 	patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
-	# IMPORTANT: There are additional algorithms for divergence estimation implemented in this package
-	# which are not accessible from the `gloscope` function. The optional arguments
-	# `varapp`, `epapp`, and `ep` must be manually set below. See `R/.calc_dist.R` for their details.
+	# IMPORTANT: There are additional algorithms for divergence estimation
+	# implemented in this package which are not accessible from the `gloscope`
+	# function. The optional arguments `varapp`, `epapp`, and `ep` must be manually
+	# set below. See `R/.calc_dist.R` for their details.
 	divergence_list <- BiocParallel::bplapply(patient_pair_list,
 		function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
 				       df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
@@ -99,7 +116,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 
 	divergence_vec <- unlist(divergence_list)
 	# Convert pair-wise distances to a symmetric distance matrix
-	divergence_matrix <- matrix(0, ncol = length(unique_sample_ids), nrow = length(unique_sample_ids))
+	divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
+	   nrow = length(unique_sample_ids))
 	rownames(divergence_matrix) <- unique_sample_ids
 	colnames(divergence_matrix) <- unique_sample_ids
 
@@ -108,7 +126,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 	  divergence_matrix[sample_pairs[2, i], sample_pairs[1, i]] <- divergence_vec[i]
 	}
 	if(knn_na_values){
-	  # pad matrix with NA divergences if kNN density estimate cannot be run for some units
+	  # pad matrix with NA divergences if kNN density estimate cannot be run for
+	  # some units
 		full_samples <- c(unique_sample_ids, knn_withheld_samples)
 		num_total <- length(full_samples)
 		num_included <- length(unique_sample_ids)
@@ -122,7 +141,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids, dens = c("GMM","KNN"), d
 	}
 
 	if(dens == "GMM"){
-		mod_list <- lapply(mod_list, function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+		mod_list <- lapply(mod_list,
+		  function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
 	}
 	if(return_density && dens == "GMM"){
 		return(list(dist = divergence_matrix, modlist = mod_list))

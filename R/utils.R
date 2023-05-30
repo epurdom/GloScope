@@ -1,12 +1,14 @@
 #' @title Draw samples from a fit GMM for Monte Carlo approximation
 #'
-#' @description This helper function draws `r` samples from a GMM fit to a
-#' sample's latent embedding. This is used in `.calc_KL()` to compute a Monte Carlo
-#' approximation of the symmetric KL divergence between sample pairs.
+#' @description The helper function `.sample_mclust` draws `r` samples from a
+#'   GMM fit to a sample's latent embedding. This is used in `.calc_KL()` to
+#'   compute a Monte Carlo approximation of the symmetric KL divergence between
+#'   sample pairs.
 #'
 #' @param mclust_mod An `mclustDensity` object of a sample's estimated density
 #' @param r Number of Monte Carolosimulations to generate, default = 10000.
-#' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
+#' @return A matrix contains the symmetrised KL divergence value calculated for
+#'   each pair of samples.
 #'
 #' @importFrom stats rmultinom
 #' @importFrom MASS mvrnorm
@@ -29,15 +31,19 @@
 
 #' @title Helper function to query nearest neighbour distances
 #'
-#' @description This helper function gets the distance from each cell in a query matrix to
-#' its k-th nearest neighbour in a target matrix. This is used to approximate various
-#' statistical divergences in `R/calc_dist.R`.
+#' @description This helper function `.knn_query` gets the distance from each
+#'   cell in a query matrix to its k-th nearest neighbour in a target matrix.
+#'   This is used to approximate various statistical divergences in
+#'   `R/calc_dist.R`.
 #'
 #' @param df_list A named list with each sample's reduced dimension embedding
-#' @param query The name or index of the sample whose query matrix is used to compute distances from
-#' @param input The name or index of the sample whose matrix is used to find the k-th NN
+#' @param query The name or index of the sample whose query matrix is used to
+#'   compute distances from
+#' @param input The name or index of the sample whose matrix is used to find the
+#'   k-th NN
 #' @param k Number of k nearest neighbours for KNN density estimation
-#' @return A matrix contains the symmetrised KL divergence value calculated for each pair of samples.
+#' @return A matrix contains the symmetrised KL divergence value calculated for
+#'   each pair of samples.
 #'
 #' @importFrom RANN nn2
 #' @noRd
@@ -46,10 +52,11 @@
   return(knnq_dist)
 }
 
-#' @title Helper function to create a colour palette for plotting
+#' @description `paletteBig` is a small helper function to create a large color
+#'   palette for plotting
 #'
 #' @rdname plotMDS
-.paletteBig <- function(){
+paletteBig <- function(){
 	bigPalette <- c(
 		'#E31A1C',
 		'#1F78B4',

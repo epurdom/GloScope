@@ -53,7 +53,7 @@ plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, n=10){
   colnames(fit_df$points) <- paste0("Coordinate",seq_len(n))
   mds_df <- cbind(metadata_df, fit_df$points)
 
-  colour_palette <- .paletteBig()
+  colour_palette <- paletteBig()
   mds_plot <- ggplot2::ggplot(mds_df, aes(x = .data$Coordinate1, y = .data$Coordinate2,
     color = .data[[group_id]])) +
     ggplot2::geom_point() +
