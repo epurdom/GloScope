@@ -42,11 +42,12 @@
 #' @export
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
-    dens = c("GMM","KNN"), dist_mat = "KL",
+    dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
 		r = 10000, num_components = c(1:9), k=50,
 		BPPARAM = BiocParallel::SerialParam(),
 		prefit_density = NULL, return_density = FALSE){
   dens<-match.arg(dens)
+  dist_mat<-match.arg(dist_mat)
 	# Input safety check
 	if(length(cell_sample_ids)!=nrow(embedding_matrix)){
 		stop("The number of cells in the embedding matrix does not
