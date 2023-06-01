@@ -28,8 +28,8 @@ test_that("gloscope works with GMM",{
   #test dimensions
   expect_equal(dim(temp_gmm),c(3,3))
   #test distances the same as in the past
-  gmm_expected_answer<-round(c(12.996519, 10.759409, 10.517520),6) #answer got the first time
-  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),gmm_expected_answer)
+  gmm_expected_answer<-round(c(12.69894, 10.18274, 10.45779),5) #answer got the first time
+  expect_equal(round(temp_gmm[upper.tri(temp_gmm)],5),gmm_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,3))
   #test row names/colnames
@@ -77,7 +77,7 @@ test_that("JS divergences are properly implemented",{
   js_knn_1 <- .calc_JS (mod_list_knn_1, df_list_1, 1, 2, dens = "KNN")
   expect_equal(round(js_knn_1,2),js_knn_1_expected)
 
-  js_gmm_1_expected <- 0.17
+  js_gmm_1_expected <- 0.18
   mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM",
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   js_gmm_1 <- .calc_JS (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
@@ -116,7 +116,7 @@ test_that("the sKL divergences are properly implemented",{
   kl_knn_1 <- .calc_kl (mod_list_knn_1, df_list_1, 1, 2, dens = "KNN")
   expect_equal(round(kl_knn_1,2),kl_knn_1_expected)
 
-  kl_gmm_1_expected <- 1.83
+  kl_gmm_1_expected <- 1.80
   mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM",
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_1 <- .calc_kl (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
@@ -133,7 +133,7 @@ test_that("the sKL divergences are properly implemented",{
   kl_knn_2 <- .calc_kl (mod_list_knn_2, df_list_2, 1, 2, dens = "KNN")
   expect_equal(round(kl_knn_2,2),kl_knn_2_expected)
 
-  kl_gmm_2_expected <- 3.95
+  kl_gmm_2_expected <- 4.07
   mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM",
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_2 <- .calc_kl (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM")
@@ -165,10 +165,10 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
   sample_pairs <- utils::combn(unique(sample_ids), 2)
   patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
   w <- patient_pair_list[[1]] # pick one unit
-  w_div_kl_expected <- 4.89
+  w_div_kl_expected <- 5.06
   set.seed(2)
   w_div_kl <- .calc_kl(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM")
-  w_div_js_expected <- 0.49
+  w_div_js_expected <- 0.50
   set.seed(2)
   w_div_js <- .calc_JS(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM")
   expect_equal(round(w_div_kl,2),w_div_kl_expected)

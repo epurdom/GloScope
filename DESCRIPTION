@@ -25,14 +25,14 @@ Imports:
     ggplot2, 
     RANN,
     FNN,
-    BiocParallel
+    BiocParallel,
+    mvnfast
 Depends: R (>= 4.3.0)
 Suggests:
     BiocStyle,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown,
-    NMF
+    rmarkdown
 VignetteBuilder: knitr
 LazyData: false
 biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell

@@ -21,9 +21,9 @@
   z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
   samples <- list()
   for ( i in 1:length(z)){
-    samples[[i]] <- MASS::mvrnorm(z[i],
+    samples[[i]] <- mvnfast::rmvn(z[i],
                             mu = mclust_mod$parameters$mean[, i],
-                            Sigma = mclust_mod$parameters$variance$sigma[, , i])
+                            sigma = mclust_mod$parameters$variance$sigma[, , i])
   }
   samples <- do.call("rbind", samples)
   return(samples)
