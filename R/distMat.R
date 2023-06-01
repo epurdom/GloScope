@@ -139,7 +139,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 		divergence_matrix <- cbind(divergence_matrix,na_pad_col)
 		divergence_matrix <- rbind(divergence_matrix,na_pad_row)
 		rownames(divergence_matrix) <- full_samples
-		rownames(divergence_matrix) <- full_samples
+		colnames(divergence_matrix) <- full_samples
 	}
 
 	if(dens == "GMM"){
