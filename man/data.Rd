@@ -8,6 +8,9 @@
 A list containing two data.frame: `metadata` (10000 x 2) and
 `pca_embeddings` (10000 x 50)
 }
+\value{
+A list of example data
+}
 \description{
 `example_data` is a list containing PCA embeddings and metadata
   of cells from 20 COVID-infected and healthy PBMC samples. Each original
@@ -27,7 +30,7 @@ A list containing two data.frame: `metadata` (10000 x 2) and
 # Reduce to only 5 samples for small illustration
 data(example_data)
 sample_ids <- example_data$metadata$sample_id
-whKeep<-which(sample_ids \%in\% unique(sample_ids)[seq_len(5)])
+whKeep <- which(sample_ids \%in\% unique(sample_ids)[seq_len(5)])
 example_small_data<-list(
  metadata=example_data$metadata[whKeep,],
  pca_embeddings=example_data$pca_embeddings[whKeep,])

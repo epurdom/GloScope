@@ -37,29 +37,28 @@
 #' @export
 #'
 plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, k=10){
-  if(nrow(dist_mat)!= nrow(metadata_df)){
-    stop("Not consistent patient number. Make sure your
-               distance matrix and meta info have the same patient
-               number.")
-  }
-  if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
-    stop("Not consistent patient IDs. Make sure your
-               distance matrix and meta info have the same patients.")
-  }
-  if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
-    metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),]
-  }
+    if(nrow(dist_mat)!= nrow(metadata_df)){
+        stop("Not consistent patient number. Make sure your
+            distance matrix and meta info have the same patient number.")
+    }
+    if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
+        stop("Not consistent patient IDs. Make sure your
+            distance matrix and meta info have the same patients.")
+    }
+    if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
+        metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),]
+    }
 
-  fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
-  colnames(fit_df$points) <- paste0("Coordinate",seq_len(k))
-  mds_df <- cbind(metadata_df, fit_df$points)
+    fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
+    colnames(fit_df$points) <- paste0("Coordinate",seq_len(k))
+    mds_df <- cbind(metadata_df, fit_df$points)
 
-  colour_palette <- paletteBig()
-  mds_plot <- ggplot2::ggplot(mds_df, aes(x = .data$Coordinate1, y = .data$Coordinate2,
-    color = .data[[group_id]])) +
-    ggplot2::geom_point() +
-    ggplot2::scale_color_manual(values=colour_palette) +
-    ggplot2::theme_bw()
+    colour_palette <- paletteBig()
+    mds_plot <- ggplot2::ggplot(mds_df, aes(x = .data$Coordinate1, y = .data$Coordinate2,
+                                            color = .data[[group_id]])) +
+        ggplot2::geom_point() +
+        ggplot2::scale_color_manual(values=colour_palette) +
+        ggplot2::theme_bw()
 
-  return(list(mds = mds_df, plot = mds_plot))
+    return(list(mds = mds_df, plot = mds_plot))
 }

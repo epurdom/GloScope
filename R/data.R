@@ -15,6 +15,7 @@
 #'   smaller set for examples.
 #' @format A list containing two data.frame: `metadata` (10000 x 2) and
 #' `pca_embeddings` (10000 x 50)
+#' @return A list of example data
 #' @examples
 #' # Code to make the small set of data from `example_data`
 #' # Reduce to only 5 samples for small illustration

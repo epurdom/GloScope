@@ -25,17 +25,17 @@
 #' @importFrom mclust densityMclust
 #' @noRd
 .calc_dens <- function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
-                     BPPARAM = BiocParallel::bpparam()){
-  dens<-match.arg(dens)
-  if(dens == "GMM"){
-    # run (in parallel) GMM density fitting with `mclust::densityMclust`
-    mod_list <- BiocParallel::bplapply(df_list,
-      function(z) densityMclust(z, G = num_components,
-        verbose = FALSE, plot = FALSE),BPPARAM=BPPARAM)
-  }else if(dens == "KNN"){
-    # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
-    mod_list <- df_list
-  }
+                       BPPARAM = BiocParallel::bpparam()){
+    dens<-match.arg(dens)
+    if(dens == "GMM"){
+        # run (in parallel) GMM density fitting with `mclust::densityMclust`
+        mod_list <- BiocParallel::bplapply(df_list,
+                                           function(z) densityMclust(z, G = num_components,
+                                                                     verbose = FALSE, plot = FALSE),BPPARAM=BPPARAM)
+    }else if(dens == "KNN"){
+        # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
+        mod_list <- df_list
+    }
 
-  return(mod_list)
+    return(mod_list)
 }
