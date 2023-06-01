@@ -24,7 +24,7 @@
 #' @import BiocParallel
 #' @importFrom mclust densityMclust
 #' @noRd
-.calc_dens = function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
+.calc_dens <- function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
                      BPPARAM = BiocParallel::bpparam()){
   dens<-match.arg(dens)
   if(dens == "GMM"){

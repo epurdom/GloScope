@@ -43,7 +43,7 @@
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
     dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
-		r = 10000, num_components = seq_len(9), k=50,
+		r = 10000, num_components = seq_len(9), k = 50,
 		BPPARAM = BiocParallel::SerialParam(),
 		prefit_density = NULL, return_density = FALSE){
   dens<-match.arg(dens)
@@ -144,7 +144,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 
 	if(dens == "GMM"){
 		mod_list <- lapply(mod_list,
-		  function(x) x[c("data", "classification", "uncertainty", "density")] = NULL)
+		  function(x) x[c("data", "classification", "uncertainty", "density")] <- NULL)
 	}
 	if(return_density && dens == "GMM"){
 		return(list(dist = divergence_matrix, modlist = mod_list))
