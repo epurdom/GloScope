@@ -38,13 +38,13 @@
 #'
 plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, k=10){
   if(nrow(dist_mat)!= nrow(metadata_df)){
-    stop(paste("Not consistent patient number. Make sure your
+    stop("Not consistent patient number. Make sure your
                distance matrix and meta info have the same patient
-               number."))
+               number.")
   }
   if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
-    stop(paste("Not consistent patient IDs. Make sure your
-               distance matrix and meta info have the same patients."))
+    stop("Not consistent patient IDs. Make sure your
+               distance matrix and meta info have the same patients.")
   }
   if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
     metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),]

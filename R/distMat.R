@@ -65,9 +65,10 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 	   function(x){nrow(embedding_matrix[cell_sample_ids==x,])})
 	if(sum(cells_per_sample < MIN_CELLS) > 0){
 		small_samples <- names(cells_per_sample)[cells_per_sample < MIN_CELLS]
-		warning(paste0("The following samples have fewer than ", MIN_CELLS,
-			       " cells. This may lead to unreliable results.\n"),
-				paste(shQuote(small_samples, type="cmd"), collapse=", "))
+		samples_to_warn <- paste(shQuote(small_samples, type="cmd"), collapse=", ")
+		warning("The following samples have fewer than ", MIN_CELLS,
+			       " cells. This may lead to unreliable results.\n",
+		         samples_to_warn)
 	}
 
 	# If a sample has fewer cells than the `k` argument and `dens=="KNN"`,
@@ -76,10 +77,11 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 	if(dens == "KNN" && (sum(cells_per_sample < k) > 0)){
 		knn_na_values <- TRUE
 		knn_withheld_samples <- names(cells_per_sample)[cells_per_sample < k]
-		warning(paste0("The following samples have fewer than the minimum of ", k,
-			       " cells required to run k-Nearest Neighbors.
-			       Divergence pairs including these samples have value NA in the divergence matrix.\n",
-			       paste(shQuote(knn_withheld_samples, type="cmd"), collapse=", ")))
+		samples_to_warn <- paste(shQuote(knn_withheld_samples, type="cmd"), collapse=", ")
+		warning("The following samples have fewer than the minimum of ", k,
+			       " cells required to run k-Nearest Neighbors. ",
+		         "Divergence pairs including these samples have value NA in the divergence matrix.\n",
+			       samples_to_warn)
 		# Remove cells from the affected units
 		embedding_matrix <- embedding_matrix[!(cell_sample_ids %in% knn_withheld_samples),]
 		cell_sample_ids <- cell_sample_ids[!(cell_sample_ids %in% knn_withheld_samples)]

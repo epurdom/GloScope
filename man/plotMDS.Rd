@@ -42,7 +42,7 @@ sample_ids <- example_small_data$metadata$sample_id
 # Run gloscope on first 10 PCA embeddings
 # We use 'KNN' option for speed ('GMM' is slightly slower)
 pca_embeddings <- example_small_data$pca_embeddings
-pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs
 dist_result <- gloscope(pca_embeddings_subset, sample_ids,
    dens="KNN",
    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
