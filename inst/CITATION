@@ -1,0 +1,13 @@
+bibentry("Article",
+         title = "Visualizing scRNA-Seq Data at Population Scale with GloScope",
+         author = c(person("Hao", "Wang"),
+                    person("William", "Torous"),
+                    person("Boying", "Gong"),
+                    person("Elizabeth", "Purdom")),
+         year = 20203,
+         journal = "bioRxiv",
+         url = "https://doi.org/10.1101/2023.05.29.542786",
+         textVersion =
+         paste("H. Wang, W. Torous, B. Gong, and E. Purdom","(2023).",
+               "Visualizing scRNA-Seq Data at Population Scale with GloScope. bioRxiv. https://doi.org/10.1101/2023.05.29.542786")
+)

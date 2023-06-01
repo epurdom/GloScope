@@ -20,7 +20,7 @@
   z <- stats::rmultinom(1, size = r, prob = p)[,1]
   z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
   samples <- list()
-  for ( i in seq_len(z)){
+  for ( i in seq_len(length(z))){
     samples[[i]] <- mvnfast::rmvn(z[i],
                             mu = mclust_mod$parameters$mean[, i],
                             sigma = mclust_mod$parameters$variance$sigma[, , i])
