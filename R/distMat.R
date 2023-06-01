@@ -12,7 +12,7 @@
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMS to, default is 1:9
+#'   fit GMMS to, default is seq_len(9)
 #' @param k number of nearest neighbours for KNN density estimation, default k =
 #'   50.
 #' @param BPPARAM BiocParallel parameters, default is running in serial. Set
@@ -31,7 +31,7 @@
 #' pca_embeddings <- example_small_data$pca_embeddings
 #' # Run gloscope on first 10 PCA embeddings
 #' # We use 'KNN' option for speed ('GMM' is slightly slower)
-#' pca_embeddings_subset <- pca_embeddings[,1:10] # select the first 10 PCs
+#' pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs
 #' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
 #'          dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' dist_result
@@ -43,7 +43,7 @@
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
     dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
-		r = 10000, num_components = c(1:9), k=50,
+		r = 10000, num_components = seq_len(9), k=50,
 		BPPARAM = BiocParallel::SerialParam(),
 		prefit_density = NULL, return_density = FALSE){
   dens<-match.arg(dens)

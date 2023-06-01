@@ -16,7 +16,7 @@
 #' @param k number of k nearest neighbour for KNN density estimation, default k
 #'   = 50.
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMS to, default is 1:9
+#'   fit GMMS to, default is seq_len(9)
 #' @param BPPARAM BiocParallel parameters
 #' @return mod_list: a list of length number of samples, contains the estimated
 #'   density for each sample
@@ -24,7 +24,7 @@
 #' @import BiocParallel
 #' @importFrom mclust densityMclust
 #' @noRd
-.calc_dens = function(df_list, dens = c("GMM","KNN"), k = 50, num_components = c(1:9),
+.calc_dens = function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
                      BPPARAM = BiocParallel::bpparam()){
   dens<-match.arg(dens)
   if(dens == "GMM"){
