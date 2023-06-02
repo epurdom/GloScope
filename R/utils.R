@@ -11,14 +11,14 @@
 #'   each pair of samples.
 #'
 #' @importFrom stats rmultinom
-#' @importFrom MASS mvrnorm
+#' @importFrom mvnfast rmvn
 #' @noRd
 
 # Helper function to sample from a fit `mclust` GMM
 .sample_mclust <- function(mclust_mod, r){
     p <- table(mclust_mod$classification)/mclust_mod$n
     z <- stats::rmultinom(1, size = r, prob = p)[,1]
-    z <- z[z!=0] # clusters with zero samples raise an error in mvrnorm, so we drop them
+    z <- z[z!=0] # clusters with zero samples raise a sampling error
     samples <- list()
     for ( i in seq_len(length(z))){
         samples[[i]] <- mvnfast::rmvn(z[i],
@@ -58,61 +58,16 @@
 #' @rdname plotMDS
 paletteBig <- function(){
     bigPalette <- c(
-        '#E31A1C',
-        '#1F78B4',
-        '#33A02C',
-        '#FF7F00',
-        '#6A3D9A',
-        '#B15928',
-        '#A6CEE3',
-        '#bd18ea',
-        'cyan',
-        '#B2DF8A',
-        '#FB9A99',
-        "deeppink4",
-        '#00B3FFFF',
-        '#CAB2D6',
-        '#FFFF99',
-        '#05188a',
-        '#CCFF00FF',
-        'cornflowerblue',
-        '#f4cc03',
-        'black',
-        'blueviolet',
-        '#4d0776',
-        'maroon3',
-        'blue',
-        '#E5D8BD',
-        'cadetblue4',
-        '#e5a25a',
-        "lightblue1",
-        '#F781BF',
-        '#FC8D62',
-        '#8DA0CB',
-        '#E78AC3',
-        'green3',
-        '#E7298A',
-        'burlywood3',
-        '#A6D854',
-        "firebrick",
-        '#FFFFCC',
-        "mediumpurple",
-        '#1B9E77',
-        '#FFD92F',
-        'deepskyblue4',
-        "yellow3",
-        '#00FFB2FF',
-        '#FDBF6F',
-        '#FDCDAC',
-        "gold3",
-        '#F4CAE4',
-        '#E6F5C9',
-        '#FF00E6FF',
-        '#7570B3',
-        "goldenrod",
-        '#85848f',
-        "lightpink3",
-        "olivedrab",
+        '#E31A1C', '#1F78B4', '#33A02C', '#FF7F00', '#6A3D9A', '#B15928',
+        '#A6CEE3', '#bd18ea', 'cyan', '#B2DF8A', '#FB9A99', "deeppink4",
+        '#00B3FFFF', '#CAB2D6', '#FFFF99', '#05188a', '#CCFF00FF',
+        'cornflowerblue', '#f4cc03', 'black', 'blueviolet', '#4d0776',
+        'maroon3', 'blue', '#E5D8BD', 'cadetblue4', '#e5a25a', "lightblue1",
+        '#F781BF', '#FC8D62', '#8DA0CB', '#E78AC3', 'green3', '#E7298A',
+        'burlywood3', '#A6D854', "firebrick", '#FFFFCC', "mediumpurple",
+        '#1B9E77', '#FFD92F', 'deepskyblue4', "yellow3", '#00FFB2FF',
+        '#FDBF6F', '#FDCDAC', "gold3", '#F4CAE4', '#E6F5C9', '#FF00E6FF',
+        '#7570B3', "goldenrod", '#85848f', "lightpink3", "olivedrab",
         'cadetblue3')
     return(bigPalette)
 }

@@ -68,14 +68,13 @@ test_that("GMM density fitting returns `densityMclust` objects",{
 })
 
 test_that("JS divergences are properly implemented",{
-  set.seed(2)
   # From Toy Examples 1 and 2 from "On Accuracy of PDF Divergence Estimators
   # and Their Applicability to Representative Data Sampling" by Budka et al. (2011)
 
   # Example 1
   set.seed(2)
-  s1 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma=diag(2))
-  s2 <- MASS::mvrnorm(10000,mu=c(0.5,-0.5),Sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma=diag(2))
+  s2 <- mvnfast::rmvn(10000,mu=c(0.5,-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
   df_list_1 <- list(s1,s2)
 
   js_knn_1_expected <- 0.17
@@ -91,8 +90,8 @@ test_that("JS divergences are properly implemented",{
 
   # Example 2
   set.seed(2)
-  s1 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma= matrix(c(1,0,0,0.1),2,2))
-  s2 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma= matrix(c(0.1,0,0,1),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(1,0,0,0.1),2,2))
+  s2 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(0.1,0,0,1),2,2))
   df_list_2 <- list(s1,s2)
 
   js_knn_2_expected <- 0.32
@@ -113,8 +112,8 @@ test_that("the sKL divergences are properly implemented",{
 
   # Example 1
   set.seed(2)
-  s1 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma=diag(2))
-  s2 <- MASS::mvrnorm(10000,mu=c(0.5,-0.5),Sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma=diag(2))
+  s2 <- mvnfast::rmvn(10000,mu=c(0.5,-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
   df_list_1 <- list(s1,s2)
 
   kl_knn_1_expected <- 1.45
@@ -122,7 +121,7 @@ test_that("the sKL divergences are properly implemented",{
   kl_knn_1 <- .calc_kl (mod_list_knn_1, df_list_1, 1, 2, dens = "KNN")
   expect_equal(round(kl_knn_1,2),kl_knn_1_expected)
 
-  kl_gmm_1_expected <- 1.80
+  kl_gmm_1_expected <- 1.84
   mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM",
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_1 <- .calc_kl (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
@@ -130,16 +129,16 @@ test_that("the sKL divergences are properly implemented",{
 
   # Example 2
   set.seed(2)
-  s1 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma= matrix(c(1,0,0,0.1),2,2))
-  s2 <- MASS::mvrnorm(10000,mu=c(0,0),Sigma= matrix(c(0.1,0,0,1),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(1,0,0,0.1),2,2))
+  s2 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(0.1,0,0,1),2,2))
   df_list_2 <- list(s1,s2)
 
-  kl_knn_2_expected <- 3.26
+  kl_knn_2_expected <- 3.28
   mod_list_knn_2 <- .calc_dens(df_list_2, dens="KNN")
   kl_knn_2 <- .calc_kl (mod_list_knn_2, df_list_2, 1, 2, dens = "KNN")
   expect_equal(round(kl_knn_2,2),kl_knn_2_expected)
 
-  kl_gmm_2_expected <- 4.07
+  kl_gmm_2_expected <- 4.05
   mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM",
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_2 <- .calc_kl (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM")
