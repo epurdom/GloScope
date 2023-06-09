@@ -45,4 +45,4 @@ vignettes/*.pdf
 *problems.rds
 
 # .DS_Store files
-/*.DS_Store
+**/*.DS_Store
