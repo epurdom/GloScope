@@ -44,5 +44,5 @@ vignettes/*.pdf
 # R test problem
 *problems.rds
 
-# A workspace for preparing vignette code
-R/vignette_scratch.R
+# .DS_Store files
+/*.DS_Store
