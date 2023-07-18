@@ -17,17 +17,17 @@
 #' }
 #'
 #' @examples
-#' data(example_small_data)
-#' sample_ids <- example_small_data$metadata$sample_id
+#' data(example_SCE_small)
+#' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id
 #' # Run gloscope on first 10 PCA embeddings
 #' # We use 'KNN' option for speed ('GMM' is slightly slower)
-#' pca_embeddings <- example_small_data$pca_embeddings
+#' pca_embeddings <- SingleCellExperiment::reducedDim(example_SCE_small,"PCA")
 #' pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs
 #' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
 #'    dens="KNN",
 #'    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' # make a per-sample metadata
-#' sample_metadata <- unique(example_small_data$metadata)
+#' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)))
 #' mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
 #' "sample_id", "phenotype",k=2)
 #' mds_result$plot

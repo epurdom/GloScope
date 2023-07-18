@@ -26,9 +26,9 @@
 #'
 #' @examples
 #' # Bring in small example data of single cell embeddings
-#' data(example_small_data)
-#' sample_ids <- example_small_data$metadata$sample_id
-#' pca_embeddings <- example_small_data$pca_embeddings
+#' data(example_SCE_small)
+#' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
+#' pca_embeddings <- SingleCellExperiment::reducedDim(example_SCE_small,"PCA")
 #' # Run gloscope on first 10 PCA embeddings
 #' # We use 'KNN' option for speed ('GMM' is slightly slower)
 #' pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs

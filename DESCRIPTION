@@ -26,7 +26,8 @@ Imports:
     RANN,
     FNN,
     BiocParallel,
-    mvnfast
+    mvnfast,
+    SingleCellExperiment
 Depends: R (>= 4.3.0)
 Suggests:
     BiocStyle,
