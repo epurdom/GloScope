@@ -3,11 +3,12 @@ Type: Package
 Title: Population-level Representation on scRNA-Seq data
 Version: 0.99.2
 Authors@R: c(
+  person("William", "Torous", email = "wtorous@berkeley.edu",
+            role = c("aut","cre"),
+	    comment = c(ORCID="0000-0001-5668-5510")),
   person("Hao", "Wang", email = "hao_wang@berkeley.edu",
             role = c("aut"),
             comment = c(ORCID="0000-0002-0749-474X")),
-  person("William", "Torous", email = "wtorous@berkeley.edu",
-            role = "aut","cre"),
   person("Elizabeth", "Purdom", email = "epurdom@stat.berkeley.edu", role = "aut"),
   person("Boying", "Gong", email = "boyinggong@berkeley.edu", role = "aut"))
 Description: This package aims at representing and summarizing the entire single-cell profile of 
