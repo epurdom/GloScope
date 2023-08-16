@@ -63,7 +63,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # We raise a warning denoting samples for which this is the case
     MIN_CELLS <- 500
     cells_per_sample <- vapply(unique_sample_ids,
-                               function(x){nrow(embedding_matrix[cell_sample_ids==x,])},integer(1))
+                               function(x){nrow(embedding_matrix[cell_sample_ids==x,,drop=FALSE])},integer(1))
     if(sum(cells_per_sample < MIN_CELLS) > 0){
         small_samples <- names(cells_per_sample)[cells_per_sample < MIN_CELLS]
         samples_to_warn <- paste(shQuote(small_samples, type="cmd"), collapse=", ")
@@ -84,7 +84,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
                 "Divergence pairs including these samples have value NA in the divergence matrix.\n",
                 samples_to_warn)
         # Remove cells from the affected units
-        embedding_matrix <- embedding_matrix[!(cell_sample_ids %in% knn_withheld_samples),]
+        embedding_matrix <- embedding_matrix[!(cell_sample_ids %in% knn_withheld_samples),,drop=FALSE]
         cell_sample_ids <- cell_sample_ids[!(cell_sample_ids %in% knn_withheld_samples)]
         # Remove the associated sample IDs to avoid an error when running kNN
         unique_sample_ids <- unique(cell_sample_ids)
@@ -94,7 +94,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # We create a list indexed by sample ID containing each sample's embedding
     # matrix
     sample_matrix_list <- lapply(unique_sample_ids,
-                                 function(x){embedding_matrix[(cell_sample_ids==x),]})
+                                 function(x){embedding_matrix[(cell_sample_ids==x),,drop=FALSE]})
     # Saved `mclust` densities can be used instead of running the package by
     # setting the `prefit_density` optional argument to a list indexed by sample ID
     # containing a fit `densityMclust` object for each

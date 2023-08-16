@@ -46,7 +46,7 @@ plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, k=10){
             distance matrix and meta info have the same patients.")
     }
     if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
-        metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),]
+        metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),,drop=FALSE]
     }
 
     fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
