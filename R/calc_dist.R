@@ -97,7 +97,6 @@
 
         # Deprecated option for approximating KL
         if(varapp) {
-            #kl <- .KLvar(pi_1, pi_2,mu_1, mu_2, cov_1, cov_2)
             stop("A variational approximation to the KL divergence is not available at this time")
         } else {
             dens1 <- stats::predict(mclust_mod1, s, what = "dens", logarithm = TRUE)
