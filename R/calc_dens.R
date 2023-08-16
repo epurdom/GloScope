@@ -21,7 +21,8 @@
 #' @return mod_list: a list of length number of samples, contains the estimated
 #'   density for each sample
 #'
-#' @import BiocParallel
+#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel bpparam
 #' @importFrom mclust densityMclust
 #' @noRd
 .calc_dens <- function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),

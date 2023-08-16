@@ -36,7 +36,8 @@
 #'          dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' dist_result
 #'
-#' @import BiocParallel
+#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel SerialParam
 #' @importFrom utils combn
 #' @rdname gloscope
 #' @export
