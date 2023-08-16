@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# Overview
+# Introduction 
 
 This vignette will review the steps needed to implement the `GloScope` methodology. `GloScope` is a framework for creating profiles of scRNA-Seq samples in order to globally compare and analyze them across patients or tissue samples. First this methodology estimates a global gene expression distribution for each sample, and then it calculates how divergent pairs of samples are from each other. The output from the package's main function, `gloscope()`, is a $n\times n$ divergence matrix containing the pairwise statistical divergences between all samples. This divergence matrix can be the input to other downstream statistical and machine learning tools. 
 
