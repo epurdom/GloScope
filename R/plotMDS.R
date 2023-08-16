@@ -32,10 +32,7 @@
 #' "sample_id", "phenotype",k=2)
 #' mds_result$plot
 #' head(mds_result$mds)
-#' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 scale_color_manual
-#' @importFrom ggplot2 theme_bw
+#' @import ggplot2
 #' @importFrom MASS isoMDS
 #' @export
 #'
@@ -57,7 +54,7 @@ plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, k=10){
     mds_df <- cbind(metadata_df, fit_df$points)
 
     colour_palette <- paletteBig()
-    mds_plot <- ggplot2::ggplot(mds_df, aes(x = .data$Coordinate1, y = .data$Coordinate2,
+    mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2,
                                             color = .data[[group_id]])) +
         ggplot2::geom_point() +
         ggplot2::scale_color_manual(values=colour_palette) +

@@ -116,18 +116,15 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
                                                                       df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
                                                                       r = r, k = k,
                                                                       varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
-
-    divergence_vec <- unlist(divergence_list)
+    
     # Convert pair-wise distances to a symmetric distance matrix
+    divergence_vec <- unlist(divergence_list)
     divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
                                 nrow = length(unique_sample_ids))
     rownames(divergence_matrix) <- unique_sample_ids
     colnames(divergence_matrix) <- unique_sample_ids
+    divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
 
-    for (i in seq_len(ncol(sample_pairs))){
-        divergence_matrix[sample_pairs[1, i], sample_pairs[2, i]] <- divergence_vec[i]
-        divergence_matrix[sample_pairs[2, i], sample_pairs[1, i]] <- divergence_vec[i]
-    }
     if(knn_na_values){
         # pad matrix with NA divergences if kNN density estimate cannot be run for
         # some units
