@@ -169,6 +169,8 @@ To speed-up calculations of the pair-wise divergences, `GloScope` allows for par
 
 The default is no parallelization, but the iteration across sample-pairs will still via the function `bplapply`. In this case (i.e. no parallelization), the argument is simply `BPPARAM = BiocParallel::SerialParam()`. 
 
+IMPORTANT: Due to the construction of the NAMESPACE file, it is essential that any setting of the BPPARAM optional argument uses the `BiocParallel::` namespace prefix. For example, `gloscope(...,BPPARAM = MulicoreParam()` will raise an error, and `gloscope(...,BPPARAM = BiocParallel::MulicoreParam()` should be used instead.
+
 ## Random seed 
 
 The calculation of the KL divergence from the GMM density estimate uses Monte-Carlo approximation, and hence has to randomly sample from the estimated density. To set the seed for the pseudo-random number generator used in the simulation, the seed needs to be set within the argument to `BPPARAM` and **not** by a call to `set.seed` (see https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Random_Numbers.html for more information). 
