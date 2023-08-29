@@ -28,7 +28,8 @@ Imports:
     FNN,
     BiocParallel,
     mvnfast,
-    SingleCellExperiment
+    SingleCellExperiment,
+    rlang
 Depends: R (>= 4.3.0)
 Suggests:
     BiocStyle,

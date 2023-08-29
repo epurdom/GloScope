@@ -32,8 +32,13 @@
 #' "sample_id", "phenotype",k=2)
 #' mds_result$plot
 #' head(mds_result$mds)
-#' @import ggplot2
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 theme_bw
 #' @importFrom MASS isoMDS
+#' @importFrom rlang .data
 #' @export
 #'
 plotMDS <- function(dist_mat, metadata_df, sample_id, group_id, k=10){
