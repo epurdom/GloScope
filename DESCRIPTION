@@ -37,6 +37,6 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 LazyData: false
-biocViews: DataRepresentation, RNASeq, Sequencing, Software, SingleCell
+biocViews: DataRepresentation, QualityControl, RNASeq, Sequencing, Software, SingleCell
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
