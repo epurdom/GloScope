@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 # Introduction 
 
-This vignette will review the steps needed to implement the `GloScope` methodology. `GloScope` is a framework for creating profiles of scRNA-Seq samples in order to globally compare and analyze them across patients or tissue samples. First this methodology estimates a global gene expression distribution for each sample, and then it calculates how divergent pairs of samples are from each other. The output from the package's main function, `gloscope()`, is a $n\times n$ divergence matrix containing the pairwise statistical divergences between all samples. This divergence matrix can be the input to other downstream statistical and machine learning tools. 
+This vignette will review the steps needed to implement the `GloScope` methodology. `GloScope` is a framework for creating profiles of scRNA-Seq samples in order to globally compare and analyze them across patients or tissue samples. First this methodology estimates a global gene expression distribution for each sample, and then it calculates how divergent pairs of samples are from each other. The output from the package's main function, `gloscope()`, is a $n\times n$ divergence matrix containing the pairwise statistical divergences between all samples. This divergence matrix can be the input to other downstream statistical and machine learning tools. This package has been submitted to Bioconductor because we believe it may be of particular interest to the bioinformatic community and because it depends on other packages from Bioconductor.
 
 `GloScope` estimates the gene expression density from a low dimensional embedding of the UMI count measurements, such as PCA or scVI embeddings. Users must provide `GloScope` with a `data.frame` containing each cell's embedding coordinates, along with the metadata which identifies to which sample each cell belongs to.
 
@@ -48,6 +48,16 @@ A standard workflow for `GloScope` consists of:
 
 4. Visualize the distance matrix with the first two dimensions of MDS using the `plotMDS` function.
 
+## Installation
+
+You can install the latest stable release of `GloScope` from Bioconductor. Make sure that you have the `BiocManager` package installed to proceed.
+
+```{r install_bioc, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+BiocManager::install("GloScope")
+```
 
 # Example
 
