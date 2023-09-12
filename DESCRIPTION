@@ -35,7 +35,8 @@ Suggests:
     BiocStyle,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    zellkonverter
 VignetteBuilder: knitr
 LazyData: false
 biocViews: DataRepresentation, QualityControl, RNASeq, Sequencing, Software, SingleCell

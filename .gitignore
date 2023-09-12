@@ -47,3 +47,7 @@ vignettes/*.pdf
 
 # .DS_Store files
 *.DS_Store
+
+# Data to generate example SCE
+*.h5ad
+inst/extdata/*.rda
