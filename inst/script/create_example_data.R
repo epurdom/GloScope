@@ -5,18 +5,19 @@
 # by Stephenson et al. (2021) [doi: 10.1038/s41591-021-01329-2]. This 
 # script recreates the two .Rda files found in the `data/` folder.
 
-#\dontrun{
+run_script <- FALSE
+if(run_script){
 # An `.h5ad` file containing the processed counts in Seurat format is
 # downloaded from the European Bioinformatics Institute with
 # Accession E-MTAB-10026. Note that this file is on the order of 8 GB
 # and can take several hours to download via FTP.
 
-here::i_am("inst/extdata/create_example_data.R")
+here::i_am("inst/script/create_example_data.R")
 library(SingleCellExperiment)
 library(zellkonverter)
 
 # Execute a shell script provided by the European Bioinformatics Institute
-system("bash inst/extdata/ftp_data.sh")
+system("bash inst/script/ftp_data.sh")
 
 # Load .h5ad file as SingleCellExperiment
 full_sce <- zellkonverter::readH5AD(here::here("inst","extdata","covid_portal_210320_with_raw.h5ad"))
@@ -41,4 +42,4 @@ colData(example_SCE) <- subset_metadata
 example_SCE@assays@data@listData <- list() # Remove zero count matrix
 
 save(example_SCE,file=here::here("inst","extdata","example_SCE.rda"))
-#}
+}
