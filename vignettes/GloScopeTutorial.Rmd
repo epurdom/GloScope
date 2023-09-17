@@ -146,7 +146,7 @@ knn_divergence_alt <- gloscope(embedding_matrix, sample_ids,
 
 ## More on the divergence method
 
-The default divergence for `GloScope` is the symmetric KL divergence, but the Jensen-Shannon divergence is also implemented. This can be controlled by setting the argument `dist_mat="KL"` or `dist_mat="JS"`, respectively. One beneficial property of the Jensen-Shannon divergence is that its square root is a proper distance metric.
+The default divergence for `GloScope` is the symmetric KL divergence, but the Jensen-Shannon divergence is also implemented. This can be controlled by setting the argument `dist_mat="KL"` or `dist_mat="JS"`, respectively. One beneficial property of the Jensen-Shannon divergence is that its square root is a proper distance metric. Note that `gloscope` returns a matrix of untransformed divergences, and the user must take the square root of matrix entries themselves if this is desired.
 
 
 # Visualization
