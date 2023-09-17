@@ -43,10 +43,10 @@
 #' @export
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
-                     dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
-                     r = 10000, num_components = seq_len(9), k = 50,
-                     BPPARAM = BiocParallel::SerialParam(),
-                     prefit_density = NULL, return_density = FALSE){
+                dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
+                r = 10000, num_components = seq_len(9), k = 50,
+                BPPARAM = BiocParallel::SerialParam(),
+                prefit_density = NULL, return_density = FALSE){
     dens<-match.arg(dens)
     dist_mat<-match.arg(dist_mat)
     # Input safety check
@@ -63,7 +63,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # We raise a warning denoting samples for which this is the case
     MIN_CELLS <- 500
     cells_per_sample <- vapply(unique_sample_ids,
-                               function(x){nrow(embedding_matrix[cell_sample_ids==x,,drop=FALSE])},integer(1))
+        function(x){nrow(embedding_matrix[cell_sample_ids==x,,drop=FALSE])},integer(1))
     if(sum(cells_per_sample < MIN_CELLS) > 0){
         small_samples <- names(cells_per_sample)[cells_per_sample < MIN_CELLS]
         samples_to_warn <- paste(shQuote(small_samples, type="cmd"), collapse=", ")
@@ -94,7 +94,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # We create a list indexed by sample ID containing each sample's embedding
     # matrix
     sample_matrix_list <- lapply(unique_sample_ids,
-                                 function(x){embedding_matrix[(cell_sample_ids==x),,drop=FALSE]})
+        function(x){embedding_matrix[(cell_sample_ids==x),,drop=FALSE]})
     # Saved `mclust` densities can be used instead of running the package by
     # setting the `prefit_density` optional argument to a list indexed by sample ID
     # containing a fit `densityMclust` object for each
@@ -112,10 +112,10 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # function. The optional arguments `varapp`, `epapp`, and `ep` must be manually
     # set below. See `R/.calc_dist.R` for their details.
     divergence_list <- BiocParallel::bplapply(patient_pair_list,
-                                              function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
-                                                                      df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
-                                                                      r = r, k = k,
-                                                                      varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
+        function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
+            df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
+            r = r, k = k,
+            varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
     
     # Convert pair-wise distances to a symmetric distance matrix
     divergence_vec <- unlist(divergence_list)
@@ -142,7 +142,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 
     if(dens == "GMM"){
         mod_list <- lapply(mod_list,
-                           function(x) x[c("data", "classification", "uncertainty", "density")] <- NULL)
+            function(x) x[c("data", "classification", "uncertainty", "density")] <- NULL)
     }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))

@@ -32,8 +32,8 @@
         # run (in parallel) GMM density fitting with `mclust::densityMclust`
         mod_list <- BiocParallel::bplapply(df_list, function(z){
         mclust::densityMclust(z,
-                  G = get_gmm_num_components_vec(nrow(z),num_components),
-                  verbose = FALSE, plot = FALSE)},BPPARAM=BPPARAM)
+            G = get_gmm_num_components_vec(nrow(z),num_components),
+            verbose = FALSE, plot = FALSE)},BPPARAM=BPPARAM)
     }else if(dens == "KNN"){
         # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
         mod_list <- df_list

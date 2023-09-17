@@ -27,27 +27,27 @@
 #'   represenations
 #' @noRd
 .calc_dist <- function(mod_list, s1, s2, df_list,
-                       dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
-                       varapp = FALSE, epapp = FALSE, ep = NA){
+                dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
+                varapp = FALSE, epapp = FALSE, ep = NA){
     dens<-match.arg(dens)
     dist_mat<-match.arg(dist_mat)
     if(dist_mat == "KL"){
         if(dens == "KNN"){
             mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                               dens = dens, r = r, k = k, varapp = varapp,
-                               epapp = epapp, ep = ep)
+                dens = dens, r = r, k = k, varapp = varapp,
+                epapp = epapp, ep = ep)
         } else{
             # symmeterize by hand
             mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                               dens = dens, r = r, k = k, varapp = varapp,
-                               epapp = epapp, ep = ep) +
+                dens = dens, r = r, k = k, varapp = varapp,
+                epapp = epapp, ep = ep) +
                 .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s2, sample2 = s1,
-                         dens = dens, r = r, k = k, varapp = varapp,
-                         epapp = epapp, ep = ep)
+                    dens = dens, r = r, k = k, varapp = varapp,
+                    epapp = epapp, ep = ep)
         }
     }  else if(dist_mat == "JS"){
         mydist <- .calc_JS(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                           dens = dens, r = r, k = k)
+            dens = dens, r = r, k = k)
     }
 
     return(mydist)
@@ -82,7 +82,7 @@
 #' @importFrom stats predict
 #' @noRd
 .calc_kl <- function(mod_list, df_list, sample1, sample2, dens, r = 10000 ,
-                     k = 50, varapp=FALSE, epapp = FALSE, ep = NA){
+            k = 50, varapp=FALSE, epapp = FALSE, ep = NA){
     if(dens == "GMM"){
         mclust_mod1 <- mod_list[[sample1]]
         mclust_mod2 <- mod_list[[sample2]]
@@ -135,7 +135,7 @@
 #' @importFrom stats predict
 #' @noRd
 .calc_JS <- function(mod_list, df_list, sample1, sample2, dens,
-                     r = 10000, k = 50){
+            r = 10000, k = 50){
     if(dens == "GMM"){
         mclust_mod1 <- mod_list[[sample1]]
         mclust_mod2 <- mod_list[[sample2]]
@@ -159,9 +159,9 @@
         if(dim(knn1)[2] != dim(knn2)[2]){stop("This method assumes both densities are of equal dimension.")}
         ndim <- dim(knn1)[2]
         js <- 1/(2*dim(knn1)[1])*sum(log(2*dim(knn2)[1] * knn2_1^ndim/(dim(knn2)[1] * knn2_1^ndim +
-                                                                           (dim(knn1)[1]-1) * knn1_1^ndim))) +
+                (dim(knn1)[1]-1) * knn1_1^ndim))) +
             1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
-                                                                         (dim(knn2)[1]-1) * knn2_2^ndim)))
+                (dim(knn2)[1]-1) * knn2_2^ndim)))
     }
 
     return(js)
