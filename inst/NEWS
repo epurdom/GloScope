@@ -1,3 +1,8 @@
+Version 0.99.3 (2023-09-17)
+
+- Address feedback from Bioconductor review
+- Catch edge case where more GMM components specified by user than cells
+
 Version 0.99.2 (2023-08-09)
 =====================================
 
