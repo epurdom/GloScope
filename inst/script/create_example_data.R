@@ -17,7 +17,7 @@ library(SingleCellExperiment)
 library(zellkonverter)
 
 # Execute a shell script provided by the European Bioinformatics Institute
-system("bash inst/script/ftp_data.sh")
+system2(command="bash", args="inst/script/ftp_data.sh")
 
 # Load .h5ad file as SingleCellExperiment
 full_sce <- zellkonverter::readH5AD(here::here("inst","extdata","covid_portal_210320_with_raw.h5ad"))
