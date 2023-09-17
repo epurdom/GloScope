@@ -13,8 +13,14 @@ test_that("gloscope warnings for small cell counts", {
 	expect_equal(all(is.na(na_div_matrix[,"CV0234"])),TRUE)
 	
 	# confirm a warning when the user requests more GMM components than cells
-	num_component_warnings <- capture_warnings(div_matrix <- gloscope(undersized_data_subset,undersized_metadata$sample_id,dens="GMM",num_components=c(50)))
-	expect_match(num_component_warnings,"^Unable to fit more GMM components than cells.*",all = FALSE)
+	# Case when there are some valid component numbers specified
+	num_component_warnings1 <- capture_warnings(updated_clusters <- get_gmm_num_components_vec(49,c(1, 49)))
+	expect_match(num_component_warnings1,"^Unable to fit a GMM with 49 components to a sample with 49 cells. Replacing those parameters with 48 components instead.*",all = FALSE)
+	expect_equal(updated_clusters,c(1,48))
+	# Case when no valid component numbers specified
+	num_component_warnings2 <- capture_warnings(small_gloscope <- gloscope(undersized_data_subset,undersized_metadata$sample_id,dens="GMM",num_components=c(50)))
+	expect_match(num_component_warnings2,"^Unable to fit a GMM with 50 components to a sample with 49 cells. Replacing those parameters with 48 components instead.*",all = FALSE)
+	expect_equal(dim(small_gloscope),c(3,3)) # Confirm a matrix is returned
 })
 
 test_that("gloscope works with KNN",{

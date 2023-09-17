@@ -69,3 +69,27 @@ paletteBig <- function(){
         'cadetblue3')
     return(bigPalette)
 }
+
+#' @title Helper function to pick number of GMM components
+#'
+#' @description `mclust::densityMclust` will raise an error if the 
+#'   number of components vector `G` contains values at least as 
+#'   large as the number of samples. If the user sets `num_components`
+#'   with invalid entries, this function replaces them with n-1 and
+#'   raises a warning.
+#'
+#' @param num_obs The number of observations to fit
+#' @param num_components The user's requested vector of components
+#' @return A valid vector of GMM number of components to fit
+#'                                                                           
+#' @noRd  
+get_gmm_num_components_vec <- function(num_obs, num_components){
+    if(any(num_components > (num_obs - 1))){
+    warning(paste0("Unable to fit a GMM with ",
+            paste(num_components[num_components > (num_obs - 1)], collapse = ", "),
+        " components to a sample with ", num_obs, " cells.",
+        " Replacing those parameters with ", num_obs - 1, " components instead."))
+    }
+    num_components[num_components > (num_obs - 1)] <- (num_obs - 1)
+    return(unique(num_components)) # avoid duplicates
+}
