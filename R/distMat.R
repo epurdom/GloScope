@@ -173,19 +173,16 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #' # Bring in small example data of single cell embeddings
 #' data(example_SCE_small)
 #' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
-#' pca_embeddings <- SingleCellExperiment::reducedDim(example_SCE_small,"PCA")
-#' # Run gloscope on first 10 PCA embeddings
-#' # We use 'KNN' option for speed ('GMM' is slightly slower)
-#' pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs
-#' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
-#'          dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
-#' dist_result#' @importFrom utils combn
+#' celltype <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
+#' dist_result <- cluster_distance(sample_id, cluster_id)
+#' dist_result
+#' @importFrom utils combn
 #' @rdname gloscope
 #' @export
 
-cluster_distance <- function(cell_sample_id_table, celltype){
-  if(length(cell_sample_id_table)!=length(celltype)){stop("Lengths of cell id and cell type are not equal!")}
-  cluster_table <- table(clustercell_sample_id_table, celltype)
+cluster_distance <- function(cell_sample_id, celltype){
+  if(length(cell_sample_id)!=length(celltype)){stop("Lengths of cell id and cell type are not equal!")}
+  cluster_table <- table(cell_sample_id, celltype)
   clusprop = matrix(cluster_table, ncol = ncol(cluster_table), 
                     dimnames = dimnames(cluster_table))
   clusprop[which(clusprop==0)] <- 0.5
@@ -199,7 +196,7 @@ cluster_distance <- function(cell_sample_id_table, celltype){
     s1 <- all_combn[i, 1]
     s2 <- all_combn[i, 2]
     KL <- .clus_KL(prop1 = clusprop[s1,], prop2 = clusprop[s2,]) +
-      clus_KL(prop1 = clusprop[s2,], prop2 = clusprop[s1,])
+      .clus_KL(prop1 = clusprop[s2,], prop2 = clusprop[s1,])
     dist_vec <- c(dist_vec, KL)
   }
   
