@@ -189,3 +189,10 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
   expect_equal(round(w_div_kl,2),w_div_kl_expected)
   expect_equal(round(w_div_js,2),w_div_js_expected)
 })
+
+test_that("Divergens using cell type works properly",{
+  sample_ids <- subsample_metadata$sample_id
+  sample_ids <- sample_ids[1:100]
+  celltype <- subsample_metadata$cluster_id
+  expect_error(cluster_distance(sample_ids, celltype),
+               regexp="Lengths of cell id and cell type are not equal!",fixed=TRUE)})

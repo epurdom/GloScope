@@ -148,6 +148,13 @@ knn_divergence_alt <- gloscope(embedding_matrix, sample_ids,
 
 The default divergence for `GloScope` is the symmetric KL divergence, but the Jensen-Shannon divergence is also implemented. This can be controlled by setting the argument `dist_mat="KL"` or `dist_mat="JS"`, respectively. One beneficial property of the Jensen-Shannon divergence is that its square root is a proper distance metric. Note that `gloscope` returns a matrix of untransformed divergences, and the user must take the square root of matrix entries themselves if this is desired.
 
+We also offer a function to calculate the symmetric Kl divergence between each sample pair's cell type proportion. This requires the user to provide the pre-defined cell type vector, which has the same length of cell id.
+
+```{r}
+celltype <- SingleCellExperiment::colData(example_SCE)$cluster_id
+celltype_divergence <- cluster_distance(sample_ids, celltype)
+```
+
 
 # Visualization
 

@@ -7,7 +7,7 @@
 #'   to cells and columns to dimensions
 #' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
 #'   must match the number of rows in `embedding_matrix`
-#' @param dens the density estimation. One of c("GMM","KNN")
+#' @param dens the density estimation. One of c("GMM","KNN", "Prop)
 #' @param dist_mat distance metric to calculate the distance. One of
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
@@ -111,19 +111,28 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # implemented in this package which are not accessible from the `gloscope`
     # function. The optional arguments `varapp`, `epapp`, and `ep` must be manually
     # set below. See `R/.calc_dist.R` for their details.
-    divergence_list <- BiocParallel::bplapply(patient_pair_list,
-        function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
-            df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
-            r = r, k = k,
-            varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
     
-    # Convert pair-wise distances to a symmetric distance matrix
-    divergence_vec <- unlist(divergence_list)
-    divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
-                                nrow = length(unique_sample_ids))
-    rownames(divergence_matrix) <- unique_sample_ids
-    colnames(divergence_matrix) <- unique_sample_ids
-    divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
+    if(useprop){
+      if(is.null(cell_type)){
+        stop("You need to provide the cell type vector.")
+      }
+      celltype_table <- table(cell_sample_ids, celltype)
+      divergence_matrix <- .cluster_function(celltype_table)
+    }else{
+      divergence_list <- BiocParallel::bplapply(patient_pair_list,
+          function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
+              df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
+              r = r, k = k,
+              varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
+    
+      # Convert pair-wise distances to a symmetric distance matrix
+      divergence_vec <- unlist(divergence_list)
+      divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
+                                  nrow = length(unique_sample_ids))
+      rownames(divergence_matrix) <- unique_sample_ids
+      colnames(divergence_matrix) <- unique_sample_ids
+      divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
+    }
 
     if(knn_na_values){
         # pad matrix with NA divergences if kNN density estimate cannot be run for
@@ -142,7 +151,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 
     if(dens == "GMM"){
         mod_list <- lapply(mod_list,
-            function(x) x[c("data", "classification", "uncertainty", "density")] <- NULL)
+            function(x) x[-which(names(x) %in% c("data", "classification", 
+                                                 "uncertainty", "density"))])
     }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))
@@ -150,3 +160,62 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
         return(divergence_matrix)
     }
 }
+
+#' @title Calculate KL divergence between all sample pairs' cell type proportion
+#'
+#' @description This function calculates a matrix of pairwise divergences
+#'   between input samples' cell type proportion.
+#'
+#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
+#'   must match the number of element in `celltype`
+#' @param celltype a vector of use defined cell type
+#' @examples
+#' # Bring in small example data of single cell embeddings
+#' data(example_SCE_small)
+#' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
+#' pca_embeddings <- SingleCellExperiment::reducedDim(example_SCE_small,"PCA")
+#' # Run gloscope on first 10 PCA embeddings
+#' # We use 'KNN' option for speed ('GMM' is slightly slower)
+#' pca_embeddings_subset <- pca_embeddings[,seq_len(10)] # select the first 10 PCs
+#' dist_result <- gloscope(pca_embeddings_subset, sample_ids,
+#'          dens="KNN", BPPARAM = BiocParallel::SerialParam(RNGseed=2))
+#' dist_result#' @importFrom utils combn
+#' @rdname gloscope
+#' @export
+
+cluster_distance <- function(cell_sample_id_table, celltype){
+  if(length(cell_sample_id_table)!=length(celltype)){stop("Lengths of cell id and cell type are not equal!")}
+  cluster_table <- table(clustercell_sample_id_table, celltype)
+  clusprop = matrix(cluster_table, ncol = ncol(cluster_table), 
+                    dimnames = dimnames(cluster_table))
+  clusprop[which(clusprop==0)] <- 0.5
+  clusprop <- t(apply(clusprop, 1, function(x) x/sum(x)))
+  
+  sample_names <- rownames(clusprop)
+  all_combn <- t(combn(sample_names, 2))
+  dist_vec <- c()
+  
+  for (i in 1:nrow(all_combn)){
+    s1 <- all_combn[i, 1]
+    s2 <- all_combn[i, 2]
+    KL <- .clus_KL(prop1 = clusprop[s1,], prop2 = clusprop[s2,]) +
+      clus_KL(prop1 = clusprop[s2,], prop2 = clusprop[s1,])
+    dist_vec <- c(dist_vec, KL)
+  }
+  
+  
+  clusprop_diss <- matrix(0, ncol = length(sample_names), 
+                          nrow = length(sample_names))
+  
+  rownames(clusprop_diss) <- sample_names
+  colnames(clusprop_diss) <-  sample_names
+  
+  for (i in 1:nrow(all_combn)){
+    clusprop_diss[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
+    clusprop_diss[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
+  }
+  
+  return(clusprop_diss)
+  
+}
+
