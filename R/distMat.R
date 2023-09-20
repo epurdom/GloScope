@@ -182,6 +182,9 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 
 cluster_distance <- function(cell_sample_id, celltype){
   if(length(cell_sample_id)!=length(celltype)){stop("Lengths of cell id and cell type are not equal!")}
+  cell_sample_ids <- as.character(cell_sample_ids)
+  celltype <- as.character(celltype)
+  
   cluster_table <- table(cell_sample_id, celltype)
   clusprop = matrix(cluster_table, ncol = ncol(cluster_table), 
                     dimnames = dimnames(cluster_table))
