@@ -111,28 +111,19 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # implemented in this package which are not accessible from the `gloscope`
     # function. The optional arguments `varapp`, `epapp`, and `ep` must be manually
     # set below. See `R/.calc_dist.R` for their details.
+    divergence_list <- BiocParallel::bplapply(patient_pair_list,
+        function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
+            df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
+            r = r, k = k,
+            varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
     
-    if(useprop){
-      if(is.null(cell_type)){
-        stop("You need to provide the cell type vector.")
-      }
-      celltype_table <- table(cell_sample_ids, celltype)
-      divergence_matrix <- .cluster_function(celltype_table)
-    }else{
-      divergence_list <- BiocParallel::bplapply(patient_pair_list,
-          function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
-              df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
-              r = r, k = k,
-              varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
-    
-      # Convert pair-wise distances to a symmetric distance matrix
-      divergence_vec <- unlist(divergence_list)
-      divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
-                                  nrow = length(unique_sample_ids))
-      rownames(divergence_matrix) <- unique_sample_ids
-      colnames(divergence_matrix) <- unique_sample_ids
-      divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
-    }
+    # Convert pair-wise distances to a symmetric distance matrix
+    divergence_vec <- unlist(divergence_list)
+    divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
+                                nrow = length(unique_sample_ids))
+    rownames(divergence_matrix) <- unique_sample_ids
+    colnames(divergence_matrix) <- unique_sample_ids
+    divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
 
     if(knn_na_values){
         # pad matrix with NA divergences if kNN density estimate cannot be run for
