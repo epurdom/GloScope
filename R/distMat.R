@@ -144,7 +144,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     if(dens == "GMM"){
         mod_list <- lapply(mod_list,
             function(x) x[-which(names(x) %in% c("data", "classification", 
-                                                 "uncertainty", "density"))])
+                "uncertainty", "density"))])
     }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))
@@ -161,53 +161,53 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
 #'   must match the number of element in `celltype`
 #' @param celltype a vector of use defined cell type
+#' @return clusprop_dist a symmetric matrix of divergences 
 #' @examples
 #' # Bring in small example data of single cell embeddings
 #' data(example_SCE_small)
-#' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
-#' celltype <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
+#' sample_id <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
+#' cluster_id <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
 #' dist_result <- cluster_distance(sample_id, cluster_id)
 #' dist_result
 #' @importFrom utils combn
-#' @rdname gloscope
+#' @rdname cluster_distance
 #' @export
 
-cluster_distance <- function(cell_sample_id, celltype){
-  if(length(cell_sample_id)!=length(celltype)){stop("Lengths of cell id and cell type are not equal!")}
-  cell_sample_ids <- as.character(cell_sample_ids)
-  celltype <- as.character(celltype)
-  
-  cluster_table <- table(cell_sample_id, celltype)
-  clusprop = matrix(cluster_table, ncol = ncol(cluster_table), 
-                    dimnames = dimnames(cluster_table))
-  clusprop[which(clusprop==0)] <- 0.5
-  clusprop <- t(apply(clusprop, 1, function(x) x/sum(x)))
-  
-  sample_names <- rownames(clusprop)
-  all_combn <- t(combn(sample_names, 2))
-  dist_vec <- c()
-  
-  for (i in 1:nrow(all_combn)){
-    s1 <- all_combn[i, 1]
-    s2 <- all_combn[i, 2]
-    KL <- .clus_KL(prop1 = clusprop[s1,], prop2 = clusprop[s2,]) +
-      .clus_KL(prop1 = clusprop[s2,], prop2 = clusprop[s1,])
-    dist_vec <- c(dist_vec, KL)
-  }
-  
-  
-  clusprop_diss <- matrix(0, ncol = length(sample_names), 
-                          nrow = length(sample_names))
-  
-  rownames(clusprop_diss) <- sample_names
-  colnames(clusprop_diss) <-  sample_names
-  
-  for (i in 1:nrow(all_combn)){
-    clusprop_diss[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
-    clusprop_diss[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
-  }
-  
-  return(clusprop_diss)
-  
-}
+cluster_distance <- function(cell_sample_ids, celltype){
+    if(length(cell_sample_ids)!=length(celltype)){
+        stop("Lengths of cell id and cell type are not equal!")
+    }
+    cell_sample_ids <- as.character(cell_sample_ids)
+    celltype <- as.character(celltype)
 
+    cluster_table <- table(cell_sample_ids, celltype)
+    clusprop <- matrix(cluster_table, ncol = ncol(cluster_table), 
+        dimnames = dimnames(cluster_table))
+    clusprop[which(clusprop==0)] <- 0.5
+    clusprop <- t(apply(clusprop, 1, function(x) x/sum(x)))
+
+    sample_names <- rownames(clusprop)
+    all_combn <- t(utils::combn(sample_names, 2))
+    dist_vec <- c()
+
+    for (i in seq_len(nrow(all_combn))){
+        s1 <- all_combn[i, 1]
+        s2 <- all_combn[i, 2]
+        KL <- .clus_KL(prop1 = clusprop[s1,], prop2 = clusprop[s2,]) +
+            .clus_KL(prop1 = clusprop[s2,], prop2 = clusprop[s1,])
+        dist_vec <- c(dist_vec, KL)
+    }
+
+    clusprop_dist <- matrix(0, ncol = length(sample_names), nrow = length(sample_names))
+
+    rownames(clusprop_dist) <- sample_names
+    colnames(clusprop_dist) <- sample_names
+
+    for (i in seq_len(nrow(all_combn))){
+        clusprop_dist[all_combn[i, 1], all_combn[i, 2]] <- dist_vec[i]
+        clusprop_dist[all_combn[i, 2], all_combn[i, 1]] <- dist_vec[i]
+    }
+
+    return(clusprop_dist)
+
+}

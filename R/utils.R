@@ -42,14 +42,12 @@
 
 # Helper function to obtain KL divergence using cell type proportion
 .clus_KL <- function(prop1, prop2){
-  KLdist <- 0
-  for(i in 1:length(prop1)){
-    KLdist <- KLdist + prop1[i]*(log(prop1[i]) - log(prop2[i]))
-  }
-  return(KLdist)
+    KLdist <- 0
+    for(i in seq_len(length(prop1))){
+        KLdist <- KLdist + prop1[i]*(log(prop1[i]) - log(prop2[i]))
+    }
+    return(KLdist)
 }
-
-
 
 
 #' @title Helper function to query nearest neighbour distances
