@@ -1,4 +1,11 @@
+Version 0.99.4 (2023-10-03)
+=====================================
+
+- Add functionality to compute divergence from cell-type labels
+- Improve example data and test cases
+
 Version 0.99.3 (2023-09-17)
+=====================================
 
 - Address feedback from Bioconductor review
 - Catch edge case where more GMM components specified by user than cells
