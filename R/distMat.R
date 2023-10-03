@@ -123,7 +123,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
                                 nrow = length(unique_sample_ids))
     rownames(divergence_matrix) <- unique_sample_ids
     colnames(divergence_matrix) <- unique_sample_ids
-    divergence_matrix[upper.tri(divergence_matrix)] <- divergence_vec
+    divergence_matrix[lower.tri(divergence_matrix, diag=FALSE)] <- divergence_vec
+    divergence_matrix[upper.tri(divergence_matrix)] <- t(divergence_matrix)[upper.tri(divergence_matrix)]
 
     if(knn_na_values){
         # pad matrix with NA divergences if kNN density estimate cannot be run for

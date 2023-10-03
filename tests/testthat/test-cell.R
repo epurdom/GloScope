@@ -36,6 +36,8 @@ test_that("gloscope works with KNN",{
   #test row names/colnames
   expect_equal(unname(sort(colnames(temp_knn))),sort(unique(subsample_metadata$sample_id)))
   expect_equal(unname(sort(rownames(temp_knn))),sort(unique(subsample_metadata$sample_id)))
+  # test symmetry
+  expect_equal(isSymmetric(temp_knn),TRUE)
 })
 
 test_that("gloscope works with GMM",{
@@ -51,6 +53,8 @@ test_that("gloscope works with GMM",{
   #test row names/colnames
   expect_equal(unname(sort(colnames(temp_gmm))),sort(unique(subsample_metadata$sample_id)))
   expect_equal(unname(sort(rownames(temp_gmm))),sort(unique(subsample_metadata$sample_id)))
+  # test symmetry
+  expect_equal(isSymmetric(temp_gmm),TRUE)
 })
 
 test_that("different random seeds give different GMM results",{
