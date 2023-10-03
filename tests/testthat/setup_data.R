@@ -9,7 +9,7 @@ subsample_data_subset <- subsample_data[,1:10] # Pick the first 10 PCs
 
 undersized_patient <- subsample_patients[1]
 set.seed(2)
-sample_drop_indices <- sample(which(subsample_metadata==undersized_patient),(500-49),replace=FALSE)
+sample_drop_indices <- sample(which(subsample_metadata$sample_id==undersized_patient),(500-49),replace=FALSE)
 undersized_metadata <- subsample_metadata[-sample_drop_indices,]
 undersized_data <- subsample_data[-sample_drop_indices,]
 undersized_data_subset <- undersized_data[,1:10]
