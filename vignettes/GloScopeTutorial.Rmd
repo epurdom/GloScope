@@ -163,7 +163,7 @@ The `plotMDS` function provided by this package visualizes the output divergence
 This function requires a `data.frame` with the relevant metadata at the sample level, rather than at the cell level. This can easily be obtained by applying the `unique` function from base R to the cell-level metadata `data.frame`. 
 
 ```{r}
-pat_info <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE)))
+pat_info <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE)[,-c(3)]))
 head(pat_info)
 ```
 
