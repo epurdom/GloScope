@@ -27,7 +27,7 @@
 #'    dens="KNN",
 #'    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' # make a per-sample metadata
-#' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
+#' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)))
 #' mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
 #' "sample_id", "phenotype",k=2)
 #' mds_result$plot
