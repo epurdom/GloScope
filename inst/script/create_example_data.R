@@ -27,9 +27,9 @@ subset_cell_labels <- readRDS(here::here("inst","extdata","subset_cell_labels.Rd
 subset_sce <- full_sce[,subset_cell_labels]
 
 # Create a minimal SCE with only metadata and PCA embeddings
-subset_metadata <- SingleCellExperiment::colData(subset_sce)[,c("patient_id","Status","initial_clustering")]
-colnames(subset_metadata) <- c("sample_id","phenotype","cluster_id")
-subset_metadata[] <- lapply(subset_metadata, as.factor)
+subset_metadata <- colData(subset_sce)[,c("patient_id","Status")]
+colnames(subset_metadata) <- c("sample_id","phenotype")
+subset_metadata[] <- lapply(subset_metadata, as.character)
 
 subset_pca <- SingleCellExperiment::reducedDim(subset_sce,"X_pca")
 pca_colnames <- paste0(rep("PC_",50),1:50)
