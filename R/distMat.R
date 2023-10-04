@@ -5,7 +5,7 @@
 #'
 #' @param embedding_matrix a matrix of latent embeddings with rows corresponding
 #'   to cells and columns to dimensions
-#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
+#' @param cell_sample_ids a vector of the samples IDs each cell comes from. Length
 #'   must match the number of rows in `embedding_matrix`
 #' @param dens the density estimation. One of c("GMM","KNN")
 #' @param dist_mat distance metric to calculate the distance. One of
