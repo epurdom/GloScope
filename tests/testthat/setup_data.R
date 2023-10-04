@@ -2,7 +2,7 @@ data(example_SCE)
 
 sample_ids <- SingleCellExperiment::colData(example_SCE)$sample_id
 set.seed(2)
-subsample_patients <- sample(unique(sample_ids),4)
+subsample_patients <- sample(unique(sample_ids),3)
 subsample_metadata <- as.data.frame(SingleCellExperiment::colData(example_SCE)[sample_ids %in% subsample_patients,])
 subsample_data <- SingleCellExperiment::reducedDim(example_SCE,"PCA")[sample_ids %in% subsample_patients,]
 subsample_data_subset <- subsample_data[,1:10] # Pick the first 10 PCs
