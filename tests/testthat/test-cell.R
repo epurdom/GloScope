@@ -197,9 +197,14 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
 test_that("Divergences using cell type works properly",{
   sample_ids <- subsample_metadata$sample_id
   celltype <- subsample_metadata$cluster_id
-  expect_silent(prop_mat <- cluster_distance(sample_ids,celltype))
-  expect_equal(isSymmetric(prop_mat),TRUE)
+  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscope_proportion(sample_ids,celltype, dist_mat= "KL"))
+  expect_match(zero_prop_warnings,"There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.",all = FALSE)
+
+  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscope_proportion(sample_ids,celltype, ep = 0.5, dist_mat= "KL"))
+  expect_match(set_ep_warnings,"There are elements haing 0 proportion! ep has been set to be 0.5.",all = FALSE)
+  
+  expect_equal(isSymmetric(fix_div_matrix),TRUE)
   short_sample_ids <- sample_ids[1:100]
-  expect_error(cluster_distance(short_sample_ids, celltype),
+  expect_error(gloscope_proportion(short_sample_ids, celltype),
                regexp="Lengths of cell id and cell type are not equal!",fixed=TRUE)
 })

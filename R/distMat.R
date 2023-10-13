@@ -189,7 +189,7 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0,
     clusprop <- matrix(cluster_table, ncol = ncol(cluster_table), 
         dimnames = dimnames(cluster_table))
     if(sum(clusprop==0)>0 & ep == 0){
-      warning("There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5")
+      warning("There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.")
     }else if (sum(clusprop==0)>0 & ep != 0){
       warning(paste0("There are elements haing 0 proportion! ep has been set to be ", ep, "."))
     }
