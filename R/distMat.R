@@ -153,7 +153,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     }
 }
 
-#' @title Calculate KL divergence between all sample pairs' cell type proportion
+#' @title Calculate divergence between all sample pairs' cell type proportion
 #'
 #' @description This function calculates a matrix of pairwise divergences
 #'   between input samples' cell type proportion.
@@ -170,13 +170,14 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #' data(example_SCE_small)
 #' sample_id <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
 #' cluster_id <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
-#' dist_result <- cluster_distance(sample_id, cluster_id)
+#' dist_result <- gloscope_proportion(sample_id, cluster_id, ep = 0.5, 
+#'                                    dist_mat = "KL")
 #' dist_result
 #' @importFrom utils combn
 #' @rdname cluster_distance
 #' @export
 
-cluster_distance <- function(cell_sample_ids, cell_type_ids, ep = 0, 
+gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0, 
                              dist_mat = c("KL", "JS")){
     if(length(cell_sample_ids)!=length(cell_type_ids)){
         stop("Lengths of cell id and cell type are not equal!")
