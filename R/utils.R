@@ -35,16 +35,21 @@
 #'
 #' @param prop1 sample1's cluster proportion
 #' @param prop2 sample2's cluster proportion
+#' @param dist_mat distance metric to calculate the distance. One of
+#'   c("KL","JS")
 #' @return A single value contains the  KL divergence value calculated for the 
 #'    2 samples' cluster proportion.
 #'
 #' @noRd
 
 # Helper function to obtain KL divergence using cell type proportion
-.clus_KL <- function(prop1, prop2){
-    KLdist <- 0
-    for(i in seq_len(length(prop1))){
-        KLdist <- KLdist + prop1[i]*(log(prop1[i]) - log(prop2[i]))
+.clus_KL <- function(prop1, prop2, dist_mat){
+    if(dist_mat == "KL"){
+        KLdist <-  sum(prop1*(log(prop1) - log(prop2))) +
+            sum(prop2*(log(prop2) - log(prop1)))
+    }else if(dist_mat == "JS"){
+        KLdist <-  1/2* sum(prop1*(log(prop1) - log(1/2*prop1 + 1/2*prop2))) +
+            1/2* sum(prop2*(log(prop2) - log(1/2*prop1 + 1/2*prop2)))
     }
     return(KLdist)
 }
