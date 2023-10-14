@@ -141,11 +141,14 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
         colnames(divergence_matrix) <- full_samples
     }
 
-    if(dens == "GMM"){
-        mod_list <- lapply(mod_list,
-            function(x) x[-which(names(x) %in% c("data", "classification", 
-                "uncertainty", "density"))])
-    }
+#   if(dens == "GMM"){
+#        mod_list <- lapply(mod_list,
+#            function(x) {
+#              x[which(names(x) %in% c("data", "classification", 
+#                "uncertainty", "density"))] = NULL
+#              return(x)
+#              })
+#    }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))
     } else{
