@@ -18,8 +18,8 @@
 .sample_mclust <- function(mclust_mod, r){
     p <- table(mclust_mod$classification)/mclust_mod$n
     z <- stats::rmultinom(1, size = r, prob = p)[,1]
-    z <- z[z!=0] # clusters with zero samples raise a sampling error
-    samples <- lapply(seq_len(length(z)), function(i){
+    non_zero <- which(z!=0) # clusters with zero samples raise a sampling error
+    samples <- lapply(non_zero, function(i){
         mvnfast::rmvn(z[i], mu = mclust_mod$parameters$mean[, i],
         sigma = mclust_mod$parameters$variance$sigma[, , i])
     })
