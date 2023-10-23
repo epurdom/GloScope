@@ -143,7 +143,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 
     if(dens == "GMM"){
         mod_list <- lapply(mod_list,
-            function(x) x[c("data", "classification", "uncertainty", "density")] <- NULL)
+            function(x){x[-which(names(x) %in% c("data", "classification","uncertainty", "density"))]})
     }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))
