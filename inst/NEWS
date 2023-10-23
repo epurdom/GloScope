@@ -1,4 +1,11 @@
+Version 0.99.4 (2023-10-03)
+
+- Improve example data and test cases
+- Update documentation
+- Fix Monte Carlo sampling edge case bug
+
 Version 0.99.3 (2023-09-17)
+=====================================
 
 - Address feedback from Bioconductor review
 - Catch edge case where more GMM components specified by user than cells
