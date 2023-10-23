@@ -137,7 +137,7 @@ When GMMs are used for density fitting, a Monte-Carlo approximation is then used
 gmm_divergence_alt<-gloscope(embedding_matrix, sample_ids, dens = "GMM",  num_components = c(2,4,6),r=20000)
 ```
 
-A non-parametric alternative for density and divergence estimation is the $k$-nearest neighbours algorithm. To use this technique, the optional argument `dens="KNN"` should be set. The number of neighbors is a hyperparameter, equal to $50$ by default, and governed by the optional argument `k`. 
+A non-parametric alternative for density and divergence estimation is the $k$-nearest neighbours algorithm. To use this technique, the optional argument `dens="KNN"` should be set. The number of neighbors is a hyperparameter, equal to $50$ by default, and governed by the optional argument `k`. It is important to note that negative divergences between similar samples are possible with this density estimation choice. The `gloscope` function does not censor or round any negative values in the output matrix, leaving that decision to the user. 
 
 ```{r}
 knn_divergence_alt <- gloscope(embedding_matrix, sample_ids, 
