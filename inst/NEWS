@@ -1,4 +1,10 @@
+Version 0.99.5 (2023-10-23)
+=====================================
+
+- Fix typos in README and CITATION files
+
 Version 0.99.4 (2023-10-03)
+=====================================
 
 - Improve example data and test cases
 - Update documentation
