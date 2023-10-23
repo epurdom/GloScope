@@ -4,7 +4,7 @@ bibentry("Article",
                     person("William", "Torous"),
                     person("Boying", "Gong"),
                     person("Elizabeth", "Purdom")),
-         year = 20203,
+         year = 2023,
          journal = "bioRxiv",
          url = "https://doi.org/10.1101/2023.05.29.542786",
          textVersion =

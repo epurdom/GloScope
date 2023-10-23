@@ -17,4 +17,3 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("GloScope")
 ```
-We expect this package to be available on BioConductor shortly.
