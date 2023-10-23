@@ -9,10 +9,12 @@ A vignette demonstrating the basic usage of this package can be found in the [vi
 
 ## Installation
 
-At present, please install the development version from GitHub.
+This package is available on Bioconductor, and the following R code can be used to install it.
 
 ```{r}
-library(devtools)
-devtools::install_github("epurdom/GloScope")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("GloScope")
 ```
 We expect this package to be available on BioConductor shortly.

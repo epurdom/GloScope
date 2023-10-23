@@ -21,7 +21,7 @@ gloscope(
 \item{embedding_matrix}{a matrix of latent embeddings with rows corresponding
 to cells and columns to dimensions}
 
-\item{cell_sample_ids}{a list of the samples IDs each cell comes from. Length
+\item{cell_sample_ids}{a vector of the samples IDs each cell comes from. Length
 must match the number of rows in `embedding_matrix`}
 
 \item{dens}{the density estimation. One of c("GMM","KNN")}
