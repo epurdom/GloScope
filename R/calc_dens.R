@@ -17,6 +17,8 @@
 #'   = 50.
 #' @param num_components a vector of integers for the number of components to
 #'   fit GMMS to, default is seq_len(9)
+#' @param GMMmodel a vector of possible model users to specify models to fit 
+#'   GMMs to. Details see mclust modelNames, default is NULL.
 #' @param BPPARAM BiocParallel parameters
 #' @return mod_list: a list of length number of samples, contains the estimated
 #'   density for each sample
@@ -26,13 +28,14 @@
 #' @importFrom mclust densityMclust
 #' @noRd
 .calc_dens <- function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
-                BPPARAM = BiocParallel::bpparam()){
+                       GMMmodel = NULL, BPPARAM = BiocParallel::bpparam()){
     dens<-match.arg(dens)
     if(dens == "GMM"){
         # run (in parallel) GMM density fitting with `mclust::densityMclust`
         mod_list <- BiocParallel::bplapply(df_list, function(z){
         mclust::densityMclust(z,
             G = get_gmm_num_components_vec(nrow(z),num_components),
+            modelNames = GMMmodel,
             verbose = FALSE, plot = FALSE)},BPPARAM=BPPARAM)
     }else if(dens == "KNN"){
         # The KNN algorithm takes the embedding coordinates as input and does not require density estimation

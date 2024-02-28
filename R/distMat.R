@@ -13,6 +13,8 @@
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
 #'   fit GMMS to, default is seq_len(9)
+#' @param GMMmodel a vector of possible model users to specify models to fit 
+#'   GMMs to. Details see mclust modelNames, default is NULL.
 #' @param k number of nearest neighbours for KNN density estimation, default k =
 #'   50.
 #' @param BPPARAM BiocParallel parameters, default is running in serial. Set
@@ -45,6 +47,7 @@
 gloscope <- function(embedding_matrix, cell_sample_ids,
                 dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
                 r = 10000, num_components = seq_len(9), k = 50,
+                modelNames = NULL,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
     dens<-match.arg(dens)
@@ -99,7 +102,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # setting the `prefit_density` optional argument to a list indexed by sample ID
     # containing a fit `densityMclust` object for each
     if(is.null(prefit_density)){
-        mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
+        mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, 
+                               num_components = num_components, GMMmodel = GMMmodel)
     } else {
         mod_list <- prefit_density
     }
