@@ -46,7 +46,7 @@ test_that("gloscope works with GMM",{
   #test dimensions
   expect_equal(dim(temp_gmm),c(4,4))
   #test distances the same as in the past
-  gmm_expected_answer <- c(14.220048,13.089617,18.073184,10.097857,11.156613,10.425697) #answer got the first time
+  gmm_expected_answer<-round(c(14.220048,13.089617,18.073184,10.097857,11.156613,10.425697),6) #answer got the first time
   expect_equal(round(temp_gmm[upper.tri(temp_gmm)],6),gmm_expected_answer)
   #test diag zero
   expect_equal(unname(diag(temp_gmm)),rep(0,4))

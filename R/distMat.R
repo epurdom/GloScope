@@ -5,9 +5,9 @@
 #'
 #' @param embedding_matrix a matrix of latent embeddings with rows corresponding
 #'   to cells and columns to dimensions
-#' @param cell_sample_ids a list of the samples IDs each cell comes from. Length
+#' @param cell_sample_ids a vector of the samples IDs each cell comes from. Length
 #'   must match the number of rows in `embedding_matrix`
-#' @param dens the density estimation. One of c("GMM","KNN", "Prop)
+#' @param dens the density estimation. One of c("GMM","KNN")
 #' @param dist_mat distance metric to calculate the distance. One of
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
@@ -141,14 +141,10 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
         colnames(divergence_matrix) <- full_samples
     }
 
-#   if(dens == "GMM"){
-#        mod_list <- lapply(mod_list,
-#            function(x) {
-#              x[which(names(x) %in% c("data", "classification", 
-#                "uncertainty", "density"))] = NULL
-#              return(x)
-#              })
-#    }
+    if(dens == "GMM"){
+        mod_list <- lapply(mod_list,
+            function(x){x[-which(names(x) %in% c("data", "classification","uncertainty", "density"))]})
+    }
     if(return_density && dens == "GMM"){
         return(list(dist = divergence_matrix, modlist = mod_list))
     } else{
@@ -221,3 +217,5 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0,
     return(divergence_matrix)
 
 }
+=======
+>>>>>>> origin/main
