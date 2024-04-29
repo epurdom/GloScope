@@ -217,5 +217,3 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0,
     return(divergence_matrix)
 
 }
-=======
->>>>>>> origin/main
