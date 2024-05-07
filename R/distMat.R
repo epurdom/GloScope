@@ -43,7 +43,7 @@
 #' @export
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
-                dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
+                dens = c("GMM","KNN"), dist_mat = c("KL","JS","TV"),
                 r = 10000, num_components = seq_len(9), k = 50,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
@@ -162,7 +162,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #' @param cell_type_ids a vector of use defined cell type
 #' @param ep an integer of error term added to 0 proportion. Default ep = 0.
 #' @param dist_mat distance metric to calculate the distance. One of
-#'   c("KL","JS")
+#'   c("KL","JS", "TV")
 #' @return clusprop_dist a symmetric matrix of divergences 
 #' @examples
 #' # Bring in small example data of single cell embeddings
@@ -177,7 +177,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #' @export
 
 gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0, 
-                             dist_mat = c("KL", "JS")){
+                             dist_mat = c("KL", "JS", "TV")){
     if(length(cell_sample_ids)!=length(cell_type_ids)){
         stop("Lengths of cell id and cell type are not equal!")
     }

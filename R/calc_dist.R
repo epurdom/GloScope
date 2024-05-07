@@ -12,7 +12,7 @@
 #'   mod_list)
 #' @param s2 The name or index of the second sample in a pair
 #' @param df_list A named list with each sample's reduced dimension embedding
-#' @param dist_mat The distance metric to use (KL or JS)
+#' @param dist_mat The distance metric to use (KL, JS or TV)
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k
@@ -27,7 +27,7 @@
 #'   represenations
 #' @noRd
 .calc_dist <- function(mod_list, s1, s2, df_list,
-                dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
+                dist_mat = c("KL","JS", "TV"), dens = c("GMM","KNN"), r, k,
                 varapp = FALSE, epapp = FALSE, ep = NA){
     dens<-match.arg(dens)
     dist_mat<-match.arg(dist_mat)
@@ -48,6 +48,10 @@
     }  else if(dist_mat == "JS"){
         mydist <- .calc_JS(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
             dens = dens, r = r, k = k)
+        else if(dist_mat == "TV"){
+          mydist <- .calc_TV(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
+                             dens = dens, r = r, k = k)
+        }
     }
 
     return(mydist)
@@ -165,4 +169,54 @@
     }
 
     return(js)
+}
+
+
+#' @title Calculate the total variation distance between a single pair of samples
+#'
+#' @description The `.calc_TV` function calculates the total variation distance
+#'   between two GloScope representations. This is implemented with Monte Carlo
+#'   approximation (with an optional epsilon perturbation term) if GMM is used
+#'   for the density estimate of each cell or a plug-in formula if KNN is used
+#'   for the density.
+#'
+#' @param df_list A named list with each sample's reduced dimension embedding
+#' @param mod_list A named list with each sample's estimated density
+#' @param sample1 The name or index of the first sample in a pair (must be a key
+#'   in mod_list)
+#' @param sample2 The name or index of the second sample in a pair
+#' @param dens The density estimation method (GMM or KNN)
+#' @param r Number of Monte Carlo simulations to generate
+#' @param k Number of k nearest neighbours for KNN density estimation, default k
+#'   = 50.
+#' @return a numeric value of distance between sample1 and sample2's
+#'   distribution.
+#' @importFrom stats predict
+#' @noRd
+.calc_TV <- function(mod_list, df_list, sample1, sample2, dens,
+                     r = 10000, k = 50){
+  if(dens == "GMM"){
+    mclust_mod1 <- mod_list[[sample1]]
+    mclust_mod2 <- mod_list[[sample2]]
+    s1 <- .sample_mclust(mclust_mod1, r=r)
+    s2 <- .sample_mclust(mclust_mod2, r=r)
+    dens1_1 <- stats::predict(mclust_mod1, s1, what = "dens", logarithm = TRUE)
+    dens2_1 <- stats::predict(mclust_mod2, s1, what = "dens", logarithm = TRUE)
+    mixture_1 <- log(1/2*exp(dens1_1) + 1/2*exp(dens2_1))
+    dens1_2 <- stats::predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
+    dens2_2 <- stats::predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
+    mixture_2 <- log(1/2*exp(dens1_2) + 1/2*exp(dens2_2))
+    
+    # Calculate empirical CDFs
+    ecdf1 <- ecdf(s1)
+    ecdf2 <- ecdf(s2)
+
+    points <- seq(min(s1, s2), max(s1, s2), length.out = r)
+    abs_diffs <- abs(ecdf1(points) - ecdf2(points))
+    tv <- max(abs_diffs)
+  }else if(dens == "KNN"){
+    stop("Total variation distance calculation for KNN densities not available at this time.")
+  }
+  
+  return(tv)
 }
