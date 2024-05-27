@@ -179,7 +179,7 @@ To speed-up calculations of the pair-wise divergences, `GloScope` allows for par
 
 The default is no parallelization, but the iteration across sample-pairs will still via the function `bplapply`. In this case (i.e. no parallelization), the argument is simply `BPPARAM = BiocParallel::SerialParam()`. 
 
-IMPORTANT: Due to the construction of the NAMESPACE file, it is essential that any setting of the BPPARAM optional argument uses the `BiocParallel::` namespace prefix. For example, `gloscope(...,BPPARAM = MulicoreParam()` will raise an error, and `gloscope(...,BPPARAM = BiocParallel::MulicoreParam()` should be used instead.
+IMPORTANT: Due to the construction of the NAMESPACE file, it is essential that any setting of the BPPARAM optional argument uses the `BiocParallel::` namespace prefix. For example, `gloscope(...,BPPARAM = MulticoreParam()` will raise an error, and `gloscope(...,BPPARAM = BiocParallel::MulticoreParam()` should be used instead.
 
 ## Random seed 
 
