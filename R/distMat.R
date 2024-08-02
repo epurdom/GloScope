@@ -173,11 +173,11 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
 #'                                    dist_mat = "KL")
 #' dist_result
 #' @importFrom utils combn
-#' @rdname cluster_distance
+#' @rdname gloscope_proportion
 #' @export
 
-gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0, 
-                             dist_mat = c("KL", "JS")){
+gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
+    ep = 0, dist_mat = c("KL", "JS")){
     if(length(cell_sample_ids)!=length(cell_type_ids)){
         stop("Lengths of cell id and cell type are not equal!")
     }
@@ -188,9 +188,9 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0,
     clusprop <- matrix(cluster_table, ncol = ncol(cluster_table), 
         dimnames = dimnames(cluster_table))
     if(sum(clusprop==0)>0 & ep == 0){
-      warning("There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.")
+        warning("There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.")
     }else if (sum(clusprop==0)>0 & ep != 0){
-      warning(paste0("There are elements haing 0 proportion! ep has been set to be ", ep, "."))
+        warning(paste0("There are elements haing 0 proportion! ep has been set to be ", ep, "."))
     }
     clusprop[which(clusprop==0)] <- ep
     clusprop <- t(apply(clusprop, 1, function(x) x/sum(x)))
@@ -200,10 +200,10 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids, ep = 0,
     # Convert patient pairs to a list for BiocParallel::bplapply
     patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
     divergence_list <- lapply(patient_pair_list,
-                                              function(w){ .clus_KL(prop1 = clusprop[w[1],], 
-                                                                    prop2 = clusprop[w[2],], 
-                                                                    dist_mat = dist_mat)})
-    
+        function(w){ .clus_KL(prop1 = clusprop[w[1],], 
+            prop2 = clusprop[w[2],], 
+            dist_mat = dist_mat)})
+
     # Convert pair-wise distances to a symmetric distance matrix
     divergence_vec <- unlist(divergence_list)
     divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
