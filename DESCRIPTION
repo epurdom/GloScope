@@ -30,7 +30,7 @@ Imports:
     mvnfast,
     SingleCellExperiment,
     rlang
-Depends: R (>= 4.3.0)
+Depends: R (>= 4.4.0)
 Suggests:
     BiocStyle,
     testthat (>= 3.0.0),
@@ -40,5 +40,5 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: false
 biocViews: DataRepresentation, QualityControl, RNASeq, Sequencing, Software, SingleCell
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Config/testthat/edition: 3
