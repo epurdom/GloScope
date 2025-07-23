@@ -10,7 +10,7 @@ gloscope(
   dens = c("GMM", "KNN"),
   dist_mat = c("KL", "JS"),
   r = 10000,
-  num_components = seq_len(9),
+  num_components = seq(6, 24, by = 2),
   k = 50,
   BPPARAM = BiocParallel::SerialParam(),
   prefit_density = NULL,
@@ -32,7 +32,7 @@ c("KL","JS")}
 \item{r}{number of Monte Carlo simulations to generate}
 
 \item{num_components}{a vector of integers for the number of components to
-fit GMMS to, default is seq_len(9)}
+fit GMMS to, default is seq(6,24,by=2)}
 
 \item{k}{number of nearest neighbours for KNN density estimation, default k =
 50.}

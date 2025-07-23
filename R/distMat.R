@@ -12,7 +12,7 @@
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMS to, default is seq_len(9)
+#'   fit GMMS to, default is seq(6,24,by=2)
 #' @param k number of nearest neighbours for KNN density estimation, default k =
 #'   50.
 #' @param BPPARAM BiocParallel parameters, default is running in serial. Set
@@ -44,7 +44,7 @@
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
                 dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
-                r = 10000, num_components = seq_len(9), k = 50,
+                r = 10000, num_components = seq(6,24,by=2), k = 50,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
     dens<-match.arg(dens)

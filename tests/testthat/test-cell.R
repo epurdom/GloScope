@@ -42,7 +42,7 @@ test_that("gloscope works with KNN",{
 
 test_that("gloscope works with GMM",{
   expect_silent(temp_gmm<-gloscope(subsample_data_subset,subsample_metadata$sample_id,
-      dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+      dens = "GMM", num_components = seq_len(9), dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
   #test dimensions
   expect_equal(dim(temp_gmm),c(4,4))
   #test distances the same as in the past
@@ -97,7 +97,7 @@ test_that("JS divergences are properly implemented",{
   expect_equal(round(js_knn_1,2),js_knn_1_expected)
 
   js_gmm_1_expected <- 0.18
-  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM",
+  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   js_gmm_1 <- .calc_JS (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
   expect_equal(round(js_gmm_1,2),js_gmm_1_expected)
@@ -114,7 +114,7 @@ test_that("JS divergences are properly implemented",{
   expect_equal(round(js_knn_2,2),js_knn_2_expected)
 
   js_gmm_2_expected <- 0.33
-  mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM",
+  mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM", num_components = seq_len(9),
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   js_gmm_2 <- .calc_JS (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM")
   expect_equal(round(js_gmm_2,2),js_gmm_2_expected)
@@ -136,7 +136,7 @@ test_that("the sKL divergences are properly implemented",{
   expect_equal(round(kl_knn_1,2),kl_knn_1_expected)
 
   kl_gmm_1_expected <- 1.84
-  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM",
+  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_1 <- .calc_kl (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
   expect_equal(round(kl_gmm_1,2),kl_gmm_1_expected)
@@ -153,7 +153,7 @@ test_that("the sKL divergences are properly implemented",{
   expect_equal(round(kl_knn_2,2),kl_knn_2_expected)
 
   kl_gmm_2_expected <- 4.05
-  mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM",
+  mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM", num_components = seq_len(9),
                                BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   kl_gmm_2 <- .calc_kl (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM")
   expect_equal(round(kl_gmm_2,2),kl_gmm_2_expected)
@@ -180,7 +180,7 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
   sample_ids <- subsample_metadata$sample_id
   embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
   names(embeddings_list) <- unique(sample_ids)
-  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", num_components = seq_len(9), BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
   sample_pairs <- utils::combn(unique(sample_ids), 2)
   patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
   w <- as.character(patient_pair_list[[2]]) # pick one unit
