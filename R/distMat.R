@@ -48,7 +48,7 @@
 gloscope <- function(embedding_matrix, cell_sample_ids,
                 dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
                 r = 10000, num_components = seq(6,24,by=2), k = 50,
-		GMM_params = list(modelNames = c("VVE"),verbose=F,plot=F),
+                GMM_params = list(modelNames = c("VVE"),verbose=FALSE,plot=FALSE),
                 KNN_params = NULL,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
@@ -105,8 +105,8 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # containing a fit `densityMclust` object for each
     if(is.null(prefit_density)){
         mod_list <- .calc_dens(sample_matrix_list, dens = dens, 
-		k = k, num_components = num_components,
-		GMM_params = GMM_params, BPPARAM = BPPARAM)
+        k = k, num_components = num_components,
+        GMM_params = GMM_params, BPPARAM = BPPARAM)
     } else {
         mod_list <- prefit_density
     }
@@ -214,13 +214,11 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
     # Convert pair-wise distances to a symmetric distance matrix
     divergence_vec <- unlist(divergence_list)
     divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
-                                nrow = length(unique_sample_ids))
+        nrow = length(unique_sample_ids))
     rownames(divergence_matrix) <- unique_sample_ids
     colnames(divergence_matrix) <- unique_sample_ids
     divergence_matrix[lower.tri(divergence_matrix, diag=FALSE)] <- divergence_vec
     divergence_matrix[upper.tri(divergence_matrix)] <- t(divergence_matrix)[upper.tri(divergence_matrix)]
-    
 
     return(divergence_matrix)
-
 }

@@ -34,10 +34,10 @@
     dist_mat<-match.arg(dist_mat)
     if(dist_mat == "KL"){
         if(dens == "KNN"){
-	    if (typeof(KNN_params) == "list" & "k" %in% names(KNN_params)){
-	        stop("k cannot be specified in `KNN_params`. This is specified by `k` instead.")
-	    }
-	    KNN_params <- c(list(k=k),KNN_params)
+        if (typeof(KNN_params) == "list" & "k" %in% names(KNN_params)){
+            stop("k cannot be specified in `KNN_params`. This is specified by `k` instead.")
+        }
+        KNN_params <- c(list(k=k),KNN_params)
             mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
                 dens = dens, KNN_params = KNN_params)
         } else{
@@ -109,8 +109,8 @@
             }
         }
     } else if(dens == "KNN"){
-	KNN_params$X <- as.matrix(mod_list[[sample1]])
-	KNN_params$Y <- as.matrix(mod_list[[sample2]])
+        KNN_params$X <- as.matrix(mod_list[[sample1]])
+        KNN_params$Y <- as.matrix(mod_list[[sample2]])
         kl <- do.call(FNN::KL.dist,KNN_params)[KNN_params$k]
     }
     return(kl)
@@ -149,10 +149,9 @@
         dens1_2 <- stats::predict(mclust_mod1, s2, what = "dens", logarithm = TRUE)
         dens2_2 <- stats::predict(mclust_mod2, s2, what = "dens", logarithm = TRUE)
         mixture_2 <- log(1/2*exp(dens1_2) + 1/2*exp(dens2_2))
-
         js <- sum(dens1_1 - mixture_1)/(2*r) + sum(dens2_2 - mixture_2)/(2*r)
     }else if(dens == "KNN"){
-	k <- KNN_params$k
+        k <- KNN_params$k
         knn1_1 <- .knn_query(df_list, input = sample1, query = sample1, KNN_params = KNN_params)
         knn2_2 <- .knn_query(df_list, input = sample2, query = sample2, KNN_params = KNN_params)
         knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, KNN_params = KNN_params)
@@ -166,7 +165,5 @@
             1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
                 (dim(knn2)[1]-1) * knn2_2^ndim)))
     }
-
-
     return(js)
 }
