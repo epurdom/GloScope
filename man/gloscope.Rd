@@ -12,6 +12,8 @@ gloscope(
   r = 10000,
   num_components = seq(6, 24, by = 2),
   k = 50,
+  GMM_params = list(modelNames = c("VVE"), verbose = F, plot = F),
+  KNN_params = NULL,
   BPPARAM = BiocParallel::SerialParam(),
   prefit_density = NULL,
   return_density = FALSE
@@ -32,10 +34,15 @@ c("KL","JS")}
 \item{r}{number of Monte Carlo simulations to generate}
 
 \item{num_components}{a vector of integers for the number of components to
-fit GMMS to, default is seq(6,24,by=2)}
+fit GMMs to, default is seq(6,24,by=2)}
 
 \item{k}{number of nearest neighbours for KNN density estimation, default k =
 50.}
+
+\item{GMM_params}{optional mclust parameters, default is to restrict the fit
+model to only VVE}
+
+\item{KNN_params}{optional arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS), default is NULL}
 
 \item{BPPARAM}{BiocParallel parameters, default is running in serial. Set
 random seed with `RNGseed` argument}

@@ -17,6 +17,7 @@
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k
 #'   = 50.
+#' @param KNN_params a list of arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS)
 #' @param varapp Boolean for using variation approximation of KL divergence;
 #'   NOTE: Currently disabled
 #' @param epapp Boolean for applying an epsilon perturbation to MC calculated
@@ -28,26 +29,27 @@
 #' @noRd
 .calc_dist <- function(mod_list, s1, s2, df_list,
                 dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
-                varapp = FALSE, epapp = FALSE, ep = NA){
+                KNN_params, varapp = FALSE, epapp = FALSE, ep = NA){
     dens<-match.arg(dens)
     dist_mat<-match.arg(dist_mat)
     if(dist_mat == "KL"){
         if(dens == "KNN"){
+	    if (typeof(KNN_params) == "list" & "k" %in% names(KNN_params)){
+	        stop("k cannot be specified in `KNN_params`. This is specified by `k` instead.")
+	    }
+	    KNN_params <- c(list(k=k),KNN_params)
             mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                dens = dens, r = r, k = k, varapp = varapp,
-                epapp = epapp, ep = ep)
+                dens = dens, KNN_params = KNN_params)
         } else{
             # symmeterize by hand
             mydist <- .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-                dens = dens, r = r, k = k, varapp = varapp,
-                epapp = epapp, ep = ep) +
+                dens = dens, r = r, varapp = varapp, epapp = epapp, ep = ep) +
                 .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s2, sample2 = s1,
-                    dens = dens, r = r, k = k, varapp = varapp,
-                    epapp = epapp, ep = ep)
+                    dens = dens, r = r, varapp = varapp, epapp = epapp, ep = ep)
         }
     }  else if(dist_mat == "JS"){
         mydist <- .calc_JS(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
-            dens = dens, r = r, k = k)
+            dens = dens, r = r, KNN_params = KNN_params)
     }
 
     return(mydist)
@@ -68,8 +70,7 @@
 #' @param sample2 The name or index of the second sample in a pair
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
-#' @param k Number of k nearest neighbours for KNN density estimation, default k
-#'   = 50.
+#' @param KNN_params a list of arguments to the FNN:KL.dist function
 #' @param varapp Boolean for using variation approximation of KL divergence;
 #'   NOTE: Currently disabled'
 #' @param epapp Boolean for applying an epsilon perturbation to MC calculated
@@ -82,7 +83,7 @@
 #' @importFrom stats predict
 #' @noRd
 .calc_kl <- function(mod_list, df_list, sample1, sample2, dens, r = 10000 ,
-            k = 50, varapp=FALSE, epapp = FALSE, ep = NA){
+            KNN_params = NULL, varapp=FALSE, epapp = FALSE, ep = NA){
     if(dens == "GMM"){
         mclust_mod1 <- mod_list[[sample1]]
         mclust_mod2 <- mod_list[[sample2]]
@@ -108,7 +109,9 @@
             }
         }
     } else if(dens == "KNN"){
-        kl <- FNN::KL.dist(as.matrix(mod_list[[sample1]]), as.matrix(mod_list[[sample2]]), k = k)[k]
+	KNN_params$X <- as.matrix(mod_list[[sample1]])
+	KNN_params$Y <- as.matrix(mod_list[[sample2]])
+        kl <- do.call(FNN::KL.dist,KNN_params)[KNN_params$k]
     }
     return(kl)
 }
@@ -128,14 +131,13 @@
 #' @param sample2 The name or index of the second sample in a pair
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
-#' @param k Number of k nearest neighbours for KNN density estimation, default k
-#'   = 50.
+#' @param KNN_params a list of arguments for the `RANN::nn2` function
 #' @return a numeric value of distance between sample1 and sample2's
 #'   distribution.
 #' @importFrom stats predict
 #' @noRd
 .calc_JS <- function(mod_list, df_list, sample1, sample2, dens,
-            r = 10000, k = 50){
+            r , KNN_params){
     if(dens == "GMM"){
         mclust_mod1 <- mod_list[[sample1]]
         mclust_mod2 <- mod_list[[sample2]]
@@ -150,10 +152,11 @@
 
         js <- sum(dens1_1 - mixture_1)/(2*r) + sum(dens2_2 - mixture_2)/(2*r)
     }else if(dens == "KNN"){
-        knn1_1 <- .knn_query(df_list, input = sample1, query = sample1, k = k)
-        knn2_2 <- .knn_query(df_list, input = sample2, query = sample2, k = k)
-        knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, k = k)
-        knn1_2 <- .knn_query(df_list, input = sample1, query = sample2, k = k)
+	k <- KNN_params$k
+        knn1_1 <- .knn_query(df_list, input = sample1, query = sample1, KNN_params = KNN_params)
+        knn2_2 <- .knn_query(df_list, input = sample2, query = sample2, KNN_params = KNN_params)
+        knn2_1 <- .knn_query(df_list, input = sample2, query = sample1, KNN_params = KNN_params)
+        knn1_2 <- .knn_query(df_list, input = sample1, query = sample2, KNN_params = KNN_params)
         knn1 <- mod_list[[sample1]]
         knn2 <- mod_list[[sample2]]
         if(dim(knn1)[2] != dim(knn2)[2]){stop("This method assumes both densities are of equal dimension.")}
@@ -163,6 +166,7 @@
             1/(2*dim(knn2)[1])*sum(log(2*dim(knn1)[1] * knn1_2^ndim/(dim(knn1)[1] * knn1_2^ndim +
                 (dim(knn2)[1]-1) * knn2_2^ndim)))
     }
+
 
     return(js)
 }

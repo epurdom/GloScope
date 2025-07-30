@@ -66,14 +66,16 @@
 #'   compute distances from
 #' @param input The name or index of the sample whose matrix is used to find the
 #'   k-th NN
-#' @param k Number of k nearest neighbours for KNN density estimation
+#' @param KNN_params a list of arguments for the RANN::nn2 funciton, including `k`
 #' @return A matrix contains the symmetrised KL divergence value calculated for
 #'   each pair of samples.
 #'
 #' @importFrom RANN nn2
 #' @noRd
-.knn_query <- function(df_list, query, input, k){
-    knnq_dist <- RANN::nn2(df_list[[input]], df_list[[query]], k = k)$nn.dists[,k]
+.knn_query <- function(df_list, query, input, KNN_params){
+    KNN_params$data <- df_list[[input]]
+    KNN_params$query <- df_list[[query]]
+    knnq_dist <- do.call(RANN::nn2,KNN_params)$nn.dists[,KNN_params$k]
     return(knnq_dist)
 }
 
