@@ -96,6 +96,8 @@ test_that("plotHeatmap works with output",{
   expect_silent(plotHeatmap(dist_mat = dist_mat,
                             metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
                             color_which="both"))
+  expect_silent(plotHeatmap(dist_mat = dist_mat,
+                            metadata_df=pat_info, sample_id="sample_id", color_by=c("phenotype","phenotype")))
   
 })
 
