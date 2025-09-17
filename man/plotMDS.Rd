@@ -5,20 +5,30 @@
 \alias{paletteBig}
 \title{Plot the multidimensional scaling of the GloScope represenation}
 \usage{
-plotMDS(dist_mat, metadata_df, sample_id, group_id, k = 10)
+plotMDS(dist_mat, metadata_df, sample_id, k = 10, color_by, shape_by)
 
 paletteBig()
 }
 \arguments{
-\item{dist_mat}{The divergence matrix output of `gloscope()`}
+\item{dist_mat}{The divergence matrix output of `gloscope()`. Should be a
+symmetric, square matrix.}
 
-\item{metadata_df}{A data frame contains each sample's metadata. Note this is NOT at the cell-level.}
+\item{metadata_df}{A data frame contains each sample's metadata. Note this is
+NOT at the cell-level, and should have the same number of rows as dist_mat.}
 
-\item{sample_id}{The column name or index in metadata_df that contains the sample ID}
-
-\item{group_id}{The column name or index in metadata_df that contains the patient condition}
+\item{sample_id}{The column name or index in metadata_df that contains the
+sample ID. This is for ensuring alignment between the dist_mat and the
+metadata_df. The rownames of dist_mat are expected to match the sample_id
+values.}
 
 \item{k}{Number of MDS dimension to generate, default = 10}
+
+\item{color_by}{The column name or index in metadata_df that should be used
+to color the points by. If missing all points will be the same color.}
+
+\item{shape_by}{The column name or index in metadata_df that should be used
+to determine the shape of the points. If missing all points will be the
+same shape.}
 }
 \value{
 A list containing the MDS embedding and plot of the distance matrix
@@ -28,13 +38,19 @@ A list containing the MDS embedding and plot of the distance matrix
 }
 }
 \description{
-This function creates a multidimensional scaling plot for
- a set of samples using their GloScope divergence. Each sample's scatter will
-be color-coded based on their phenotype. The function calls the `isoMDS` function
-from the `MASS` package.
+This function creates a multidimensional scaling plot for a set
+  of samples using their GloScope divergence. Each sample's scatter will be
+  color-coded based on their phenotype. The function calls the `isoMDS`
+  function from the `MASS` package.
 
 `paletteBig` is a small helper function to create a large color
   palette for plotting
+}
+\details{
+The function calls \code{\link[MASS]{isoMDS}} from the MASS package,
+  calculates the requested k coordinates of the MDS plot. It also creates a
+  ggplot object that will plot the first two dimensions color or shape coded
+  by the given variables in the metadata data frame.
 }
 \examples{
 data(example_SCE_small)
@@ -49,7 +65,10 @@ dist_result <- gloscope(pca_embeddings_subset, sample_ids,
 # make a per-sample metadata
 sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
 mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
-"sample_id", "phenotype",k=2)
-mds_result$plot
+sample_id="sample_id", color_by="phenotype",k=2)
 head(mds_result$mds)
+require(ggplot2)
+mds_result$plot
+# Add additional ggplot2 components to adapt figure
+mds_result$plot + theme_bw()  + scale_color_manual(values=paletteBig())
 }
