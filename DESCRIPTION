@@ -29,7 +29,9 @@ Imports:
     BiocParallel,
     mvnfast,
     SingleCellExperiment,
-    rlang
+    rlang,
+    RColorBrewer,
+    pheatmap
 Depends: R (>= 4.4.0)
 Suggests:
     BiocStyle,

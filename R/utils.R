@@ -81,6 +81,7 @@
 #'   palette for plotting
 #'
 #' @rdname plotMDS
+#' @export
 paletteBig <- function(){
     bigPalette <- c(
         '#E31A1C', '#1F78B4', '#33A02C', '#FF7F00', '#6A3D9A', '#B15928',

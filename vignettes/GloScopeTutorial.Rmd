@@ -163,7 +163,7 @@ head(pat_info)
 Here we plot the MDS representation with each sample color-coded by the `phenotype` variable. Note the function call returns both a matrix of MDS embeddings and a `ggplot` visualization of the first two dimensions. 
 
 ```{r}
-mds_result <- plotMDS(dist_mat = knn_divergence, metadata = pat_info, "sample_id","phenotype", k = 2)
+mds_result <- plotMDS(dist_mat = knn_divergence, metadata = pat_info, "sample_id",color_by="phenotype", k = 2)
 mds_result$plot
 ```
 
@@ -171,6 +171,12 @@ Another classical way to visualize a divergence matrix is with a heatmap. The fo
 
 ```{r}
 heatmap(knn_divergence)
+```
+
+We also provide a simple wrapper to the more powerful `pheatmap` function in the `pheatmap` package that can also plot additional annotation information with the heatmap:
+
+```{r}
+plotHeatmap(knn_divergence, metadata = pat_info, "sample_id",color_by="phenotype")
 ```
 
 # Parallelization and Random Seeds
