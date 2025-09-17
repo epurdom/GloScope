@@ -9,7 +9,7 @@ plotHeatmap(
   metadata_df,
   sample_id,
   color_by,
-  color_which = c("columns", "rows", "both"),
+  which_side = c("columns", "rows", "both"),
   ...
 )
 }
@@ -28,7 +28,7 @@ values.}
 \item{color_by}{A vector of column names or indices in metadata_df that should be used
 to color/annotate the samples.}
 
-\item{color_which}{One of "columns","rows", or "both", indicating whether the
+\item{which_side}{One of "columns","rows", or "both", indicating whether the
 annotation of the samples in `color_by` should be on the rows, columns, or
 on both.}
 
@@ -44,8 +44,8 @@ This function creates a heatmap of the given GloScope divergence
 \details{
 The function is a wrapper function to \code{\link[pheatmap]{pheatmap}}.
   `color_by` is used to create subset of the `metadata_df` to pass to
-  `annotation_col` (if `color_which="columns"`) or `annotation_row` (if
-  `color_which="rows"`). If `color_which="both"`, then it is passed to both,
+  `annotation_col` (if `which_side="columns"`) or `annotation_row` (if
+  `which_side="rows"`). If `which_side="both"`, then it is passed to both,
   and `annotation_names_row` argument is set to `FALSE`, suppressing labeling
   both the columns and rows (which user can thus not override). All other
   arguments to \code{\link[pheatmap]{pheatmap}} can be passed directly by the user
@@ -67,7 +67,7 @@ sample_id="sample_id", color_by="phenotype")
 # Pass additional options to pheatmap to control colors of groups
 library(RColorBrewer)
 plotHeatmap(dist_mat = dist_result, metadata_df = sample_metadata ,
-sample_id="sample_id", color_by="phenotype", color_which="both", 
+sample_id="sample_id", color_by="phenotype", which_side="both", 
 annotation_colors=list(phenotype = c(Covid = "magenta", Healthy = "white")), 
 color = colorRampPalette(brewer.pal(9, "PuBuGn"))(100))
 }

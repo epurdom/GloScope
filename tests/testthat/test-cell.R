@@ -92,12 +92,14 @@ test_that("plotHeatmap works with output",{
         metadata_df=pat_info, sample_id="sample_id", color_by="phenotype"))
   expect_silent(plotHeatmap(dist_mat = dist_mat,
         metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
-        color_which="rows"))
+        which_side="rows"))
   expect_silent(plotHeatmap(dist_mat = dist_mat,
                             metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
-                            color_which="both"))
-  expect_silent(plotHeatmap(dist_mat = dist_mat,
-                            metadata_df=pat_info, sample_id="sample_id", color_by=c("phenotype","phenotype")))
+                            which_side="both"))
+  ## Check passing other args to pheatmap
+  expect_silent(plotHeatmap(dist_mat = dist_mat,metadata_df=pat_info, sample_id="sample_id", 
+                            color_by=c("phenotype","phenotype"),
+                            color = colorRampPalette(rev(brewer.pal(9, "RdYlBu")))(100)))
   
 })
 

@@ -13,7 +13,7 @@
 #'   values.
 #' @param color_by A vector of column names or indices in metadata_df that should be used
 #'   to color/annotate the samples. 
-#' @param color_which One of "columns","rows", or "both", indicating whether the
+#' @param which_side One of "columns","rows", or "both", indicating whether the
 #'   annotation of the samples in `color_by` should be on the rows, columns, or
 #'   on both.
 #' @param ... parameters passed to \code{\link[pheatmap]{pheatmap}}.
@@ -21,8 +21,8 @@
 #'
 #' @details The function is a wrapper function to \code{\link[pheatmap]{pheatmap}}.
 #'   `color_by` is used to create subset of the `metadata_df` to pass to
-#'   `annotation_col` (if `color_which="columns"`) or `annotation_row` (if
-#'   `color_which="rows"`). If `color_which="both"`, then it is passed to both,
+#'   `annotation_col` (if `which_side="columns"`) or `annotation_row` (if
+#'   `which_side="rows"`). If `which_side="both"`, then it is passed to both,
 #'   and `annotation_names_row` argument is set to `FALSE`, suppressing labeling
 #'   both the columns and rows (which user can thus not override). All other
 #'   arguments to \code{\link[pheatmap]{pheatmap}} can be passed directly by the user
@@ -44,7 +44,7 @@
 #' # Pass additional options to pheatmap to control colors of groups
 #' library(RColorBrewer)
 #' plotHeatmap(dist_mat = dist_result, metadata_df = sample_metadata ,
-#' sample_id="sample_id", color_by="phenotype", color_which="both", 
+#' sample_id="sample_id", color_by="phenotype", which_side="both", 
 #' annotation_colors=list(phenotype = c(Covid = "magenta", Healthy = "white")), 
 #' color = colorRampPalette(brewer.pal(9, "PuBuGn"))(100))
 
@@ -54,8 +54,8 @@
 #' @importFrom stats as.dist
 #' @export
 #'
-plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, color_which=c("columns","rows","both"),...){
-    color_which<-match.arg(color_which)
+plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, which_side=c("columns","rows","both"),...){
+    which_side<-match.arg(which_side)
     if(nrow(dist_mat)!= nrow(metadata_df)){
     stop("Not consistent patient number. Make sure your
             distance matrix and meta info have the same patient number.")
@@ -71,21 +71,21 @@ plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, color_which=
   if(!missing(color_by)){
     rownames(metadata_df)<-metadata_df[,sample_id]
     annotcol <- metadata_df[,color_by,drop=FALSE]
-    if(color_which=="columns"){
+    if(which_side=="columns"){
       invisible(pheatmap(
         mat = as.dist(dist_mat),
         annotation_col = annotcol,
         ...)
       )
     }
-    else if(color_which=="rows"){
+    else if(which_side=="rows"){
       invisible(pheatmap(
         mat = as.dist(dist_mat),
         annotation_row = annotcol,
         ...)
       )
     }
-    else if(color_which=="both"){
+    else if(which_side=="both"){
       invisible(pheatmap(
         mat = as.dist(dist_mat),
         annotation_row = annotcol,
