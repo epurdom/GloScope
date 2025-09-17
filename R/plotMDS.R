@@ -1,9 +1,7 @@
 #' @title Plot the multidimensional scaling of the GloScope represenation
 #'
-#' @description This function creates a multidimensional scaling plot for a set
-#'   of samples using their GloScope divergence. Each sample's scatter will be
-#'   color-coded based on their phenotype. The function calls the `isoMDS`
-#'   function from the `MASS` package.
+#' @description This function calculates the multidimensional scaling for a
+#'   GloScope divergence matrix and returns a ggplot object that plots it.
 #'
 #' @param dist_mat The divergence matrix output of `gloscope()`. Should be a
 #'   symmetric, square matrix.

@@ -38,10 +38,8 @@ A list containing the MDS embedding and plot of the distance matrix
 }
 }
 \description{
-This function creates a multidimensional scaling plot for a set
-  of samples using their GloScope divergence. Each sample's scatter will be
-  color-coded based on their phenotype. The function calls the `isoMDS`
-  function from the `MASS` package.
+This function calculates the multidimensional scaling for a
+  GloScope divergence matrix and returns a ggplot object that plots it.
 
 `paletteBig` is a small helper function to create a large color
   palette for plotting
