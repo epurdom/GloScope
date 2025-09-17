@@ -45,7 +45,7 @@
 #' require(ggplot2)
 #' mds_result$plot
 #' # Add additional ggplot2 components to adapt figure
-#' mds_result$plot + theme_bw()  + scale_color_manual(values=paletteBig())
+#' mds_result$plot + theme_bw()  + scale_color_manual(values=c("red","blue"))
 
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point

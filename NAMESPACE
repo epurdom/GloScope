@@ -2,7 +2,6 @@
 
 export(gloscope)
 export(gloscope_proportion)
-export(paletteBig)
 export(plotHeatmap)
 export(plotMDS)
 importFrom(BiocParallel,SerialParam)
