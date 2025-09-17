@@ -26,7 +26,11 @@ metadata_df. The rownames of dist_mat are expected to match the sample_id
 values.}
 
 \item{color_by}{A vector of column names or indices in metadata_df that should be used
-to color the samples.}
+to color/annotate the samples.}
+
+\item{color_which}{One of "columns","rows", or "both", indicating whether the
+annotation of the samples in `color_by` should be on the rows, columns, or
+on both.}
 
 \item{...}{parameters passed to \code{\link[pheatmap]{pheatmap}}.}
 }
@@ -38,13 +42,13 @@ This function creates a heatmap of the given GloScope divergence
   matrix.
 }
 \details{
-The function is a wrapper function to \code{\link[MASS]{pheatmap}}.
+The function is a wrapper function to \code{\link[pheatmap]{pheatmap}}.
   `color_by` is used to create subset of the `metadata_df` to pass to
   `annotation_col` (if `color_which="columns"`) or `annotation_row` (if
   `color_which="rows"`). If `color_which="both"`, then it is passed to both,
   and `annotation_names_row` argument is set to `FALSE`, suppressing labeling
   both the columns and rows (which user can thus not override). All other
-  arguments to \code{\link[MASS]{pheatmap}} can be passed directly by the user
+  arguments to \code{\link[pheatmap]{pheatmap}} can be passed directly by the user
 }
 \examples{
 data(example_SCE_small)
