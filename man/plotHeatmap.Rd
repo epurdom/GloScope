@@ -10,6 +10,7 @@ plotHeatmap(
   sample_id,
   color_by,
   which_side = c("columns", "rows", "both"),
+  annotation_colors = NA,
   ...
 )
 }

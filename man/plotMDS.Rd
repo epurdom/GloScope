@@ -4,7 +4,7 @@
 \alias{plotMDS}
 \title{Plot the multidimensional scaling of the GloScope represenation}
 \usage{
-plotMDS(dist_mat, metadata_df, sample_id, k = 10, color_by, shape_by)
+plotMDS(dist_mat, metadata_df, sample_id, k = 10, color_by, shape_by, ...)
 }
 \arguments{
 \item{dist_mat}{The divergence matrix output of `gloscope()`. Should be a
@@ -26,6 +26,8 @@ to color the points by. If missing all points will be the same color.}
 \item{shape_by}{The column name or index in metadata_df that should be used
 to determine the shape of the points. If missing all points will be the
 same shape.}
+
+\item{...}{Arguments passed to \code{\link[ggplot2]{geom_point}} to control the plotting of points.}
 }
 \value{
 A list containing the MDS embedding and plot of the distance matrix
@@ -62,5 +64,7 @@ head(mds_result$mds)
 require(ggplot2)
 mds_result$plot
 # Add additional ggplot2 components to adapt figure
+mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
+sample_id="sample_id", color_by="phenotype",k=2, alpha=0.5)
 mds_result$plot + theme_bw()  + scale_color_manual(values=c("red","blue"))
 }
