@@ -57,7 +57,9 @@
 #' @export
 #'
 plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by){
-    if(nrow(dist_mat)!= nrow(metadata_df)){
+  if(!c(sample_id) %in% names(metadata_df)) stop("sample_id does not define a variable in metadata_df")
+  
+  if(nrow(dist_mat)!= nrow(metadata_df)){
         stop("Not consistent patient number. Make sure your
             distance matrix and meta info have the same patient number.")
     }
@@ -69,22 +71,26 @@ plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by){
         metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),,drop=FALSE]
     }
 
-    fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
+  fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
     colnames(fit_df$points) <- paste0("Coordinate",seq_len(k))
     mds_df <- cbind(metadata_df, fit_df$points)
     if(missing(color_by) & missing(shape_by)){
       mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2))
     }
     else if(missing(shape_by) & !missing(color_by)){
+      if(!c(color_by) %in% names(metadata_df)) stop("color_by does not define a variable in metadata_df")
       mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2,
                                                        color = .data[[color_by]]))
       
     }
     else if(!missing(shape_by) & missing(color_by)){
+      if(!c(shape_by) %in% names(metadata_df)) stop("shape_by does not define a variable in metadata_df")
       mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2,
                                                        shape = .data[[shape_by]]))
     } 
     else{
+      if(!c(shape_by) %in% names(metadata_df)) stop("shape_by does not define a variable in metadata_df")
+      if(!c(color_by) %in% names(metadata_df)) stop("color_by does not define a variable in metadata_df")
       mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2,
                                                        color = .data[[color_by]],shape = .data[[shape_by]]))
     }

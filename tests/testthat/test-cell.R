@@ -67,6 +67,17 @@ test_that("different random seeds give different GMM results",{
                           dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
 })
 
+test_that("get_metrics works",{
+  expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
+  pat_info <- unique(subsample_metadata[,c(1,2)])
+  pat_info$group <- c("A","A","B","B")
+  get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype")
+  get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group"))
+  get_metrics(dist_mat,metadata_df=pat_info, metrics="anosim",sample_id="sample_id", group_vars="phenotype")
+  
+})
+  
+
 test_that("plotMDS works with output",{
   expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
   pat_info <- unique(subsample_metadata[,c(1,2)])
