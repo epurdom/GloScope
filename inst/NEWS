@@ -1,3 +1,9 @@
+Version 1.7.2 (2025-09-17)
+===================================
+
+- Added functionality for custom GMM and kNN parameters in fitting
+- Add aditional test cases and update documentation
+
 Version 1.7.1 (2025-07-23)
 ====================================
 
