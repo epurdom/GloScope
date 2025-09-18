@@ -144,9 +144,11 @@ get_metrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","sil
   
   combs<-expand.grid(metric=metrics,grouping=group_vars)
   out<-apply(as.matrix(combs),1,function(x){
-    if(x[[1]]=="anosim") return(getanosim(x[[2]]))
-    if(x[[1]]=="adonis2") return(getadonis2(x[[2]]))
-    if(x[[1]]=="silhouette") return(getsil(x[[2]]))
+    metric_x<-as.character(x[[1]])
+    var_x<-as.character(x[[2]])
+    if(metric_x=="anosim") return(getanosim(var_x))
+    if(metric_x=="adonis2") return(getadonis2(var_x))
+    if(metric_x=="silhouette") return(getsil(var_x))
   })
   if(!permuteTest) combs$statistic<-out
   else combs<-cbind(combs,t(out))
