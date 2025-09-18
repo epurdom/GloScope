@@ -12,9 +12,12 @@
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMS to, default is seq_len(9)
+#'   fit GMMs to, default is seq(6,24,by=2)
 #' @param k number of nearest neighbours for KNN density estimation, default k =
 #'   50.
+#' @param GMM_params optional mclust parameters, default is to restrict the fit
+#'   model to only VVE
+#' @param KNN_params optional arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS), default is NULL
 #' @param BPPARAM BiocParallel parameters, default is running in serial. Set
 #'   random seed with `RNGseed` argument
 #' @param prefit_density a named list of pre-fit `densityMclust` objects for
@@ -44,7 +47,9 @@
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
                 dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
-                r = 10000, num_components = seq_len(9), k = 50,
+                r = 10000, num_components = seq(6,24,by=2), k = 50,
+                GMM_params = list(modelNames = c("VVE"),verbose=FALSE,plot=FALSE),
+                KNN_params = NULL,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
     dens<-match.arg(dens)
@@ -99,7 +104,9 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # setting the `prefit_density` optional argument to a list indexed by sample ID
     # containing a fit `densityMclust` object for each
     if(is.null(prefit_density)){
-        mod_list <- .calc_dens(sample_matrix_list, dens = dens, k = k, BPPARAM = BPPARAM, num_components = num_components)
+        mod_list <- .calc_dens(sample_matrix_list, dens = dens, 
+        k = k, num_components = num_components,
+        GMM_params = GMM_params, BPPARAM = BPPARAM)
     } else {
         mod_list <- prefit_density
     }
@@ -114,7 +121,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     divergence_list <- BiocParallel::bplapply(patient_pair_list,
         function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
             df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
-            r = r, k = k,
+            r = r, k = k, KNN_params = KNN_params,
             varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
     
     # Convert pair-wise distances to a symmetric distance matrix
@@ -207,13 +214,11 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
     # Convert pair-wise distances to a symmetric distance matrix
     divergence_vec <- unlist(divergence_list)
     divergence_matrix <- matrix(0, ncol = length(unique_sample_ids),
-                                nrow = length(unique_sample_ids))
+        nrow = length(unique_sample_ids))
     rownames(divergence_matrix) <- unique_sample_ids
     colnames(divergence_matrix) <- unique_sample_ids
     divergence_matrix[lower.tri(divergence_matrix, diag=FALSE)] <- divergence_vec
     divergence_matrix[upper.tri(divergence_matrix)] <- t(divergence_matrix)[upper.tri(divergence_matrix)]
-    
 
     return(divergence_matrix)
-
 }

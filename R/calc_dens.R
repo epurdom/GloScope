@@ -13,10 +13,10 @@
 #' @param df_list A list containing each samples' dimension reduction embedding
 #' @param dens method used to estimate density, options are GMM (Gaussian
 #'   mixture model) and KNN (k-nearest Neighbor)
-#' @param k number of k nearest neighbour for KNN density estimation, default k
-#'   = 50.
+#' @param k number of k nearest neighbour for KNN density estimation
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMS to, default is seq_len(9)
+#'   fit GMMS to
+#' @param GMM_params optional GMM parameters
 #' @param BPPARAM BiocParallel parameters
 #' @return mod_list: a list of length number of samples, contains the estimated
 #'   density for each sample
@@ -25,15 +25,20 @@
 #' @importFrom BiocParallel bpparam
 #' @importFrom mclust densityMclust
 #' @noRd
-.calc_dens <- function(df_list, dens = c("GMM","KNN"), k = 50, num_components = seq_len(9),
-                BPPARAM = BiocParallel::bpparam()){
+.calc_dens <- function(df_list, dens = c("GMM","KNN"), k, num_components,
+                GMM_params, BPPARAM){
     dens<-match.arg(dens)
     if(dens == "GMM"){
         # run (in parallel) GMM density fitting with `mclust::densityMclust`
+    if ("G" %in% names(GMM_params)){
+        stop("G cannot be specified in `GMM_params`. This is specified by `num_components` instead.")
+    }
         mod_list <- BiocParallel::bplapply(df_list, function(z){
-        mclust::densityMclust(z,
-            G = get_gmm_num_components_vec(nrow(z),num_components),
-            verbose = FALSE, plot = FALSE)},BPPARAM=BPPARAM)
+            GMM_params$data <- z
+            GMM_params$G <- get_gmm_num_components_vec(nrow(z),num_components)
+            fit_model <- do.call(mclust::densityMclust,GMM_params)
+            return(fit_model)
+        }, BPPARAM=BPPARAM)
     }else if(dens == "KNN"){
         # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
         mod_list <- df_list
