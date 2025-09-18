@@ -1,7 +1,7 @@
 Package: GloScope
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
-Version: 1.7.2
+Version: 1.7.3
 Authors@R: c(
   person("William", "Torous", email = "wtorous@berkeley.edu",
             role = c("aut","cre"),
@@ -29,7 +29,9 @@ Imports:
     BiocParallel,
     mvnfast,
     SingleCellExperiment,
-    rlang
+    rlang,
+    RColorBrewer,
+    pheatmap
 Depends: R (>= 4.4.0)
 Suggests:
     BiocStyle,
@@ -40,5 +42,5 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: false
 biocViews: DataRepresentation, QualityControl, RNASeq, Sequencing, Software, SingleCell
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3

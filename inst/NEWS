@@ -1,3 +1,9 @@
+Version 1.7.3 (2025-09-20)
+=====================================
+
+- Changed `plotMDS` to be more versatile. ARGUMENTS HAVE CHANGED to `plotMDS`. Instead of `group_id`, user can now give any combination of `color_by` and `shape_by` to indicate variables to use for the ggplot. The function has also removed unnecessary ggplot commands, leaving those to the user to chose.
+- Added function `plotHeatmap` as a wrapper to `pheatmap` function for plotting a heatmap of the GloScope divergence matrix
+
 Version 1.7.2 (2025-09-17)
 ===================================
 
