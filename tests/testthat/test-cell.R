@@ -232,7 +232,7 @@ test_that("get_metrics works",{
   result<-c("anosim"=0.25,"adonis2"=1.53,"silhouette"=0.07)
   expect_silent(test1<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype"))
   expect_equal(dim(test1),c(nmetrics_possible,3))
-  expect_equal(round(test1$statistics,2),unname(result))
+  expect_equal(round(test1$statistic,2),unname(result))
   
   expect_silent(test2<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group")))
   expect_equal(dim(test2),c(nmetrics_possible*2,3))
