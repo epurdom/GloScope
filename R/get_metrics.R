@@ -81,6 +81,7 @@
 get_metrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","silhouette"),
                         sample_id, group_vars, checkData=TRUE, permuteTest=FALSE,
                         permutations=100) {
+  metrics<-match.arg(metrics,several.ok = TRUE)
   if(any(!c(sample_id,group_vars) %in% names(metadata_df))) stop("sample_id or group_vars does not define a variable in metadata_df")
   # test that at least 2 levels of each factor
   testnlevels<-sapply(group_vars,function(x){nlevels(factor(x))>1})
