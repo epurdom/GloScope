@@ -17,7 +17,7 @@
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k
 #'   = 50.
-#' @param KNN_params a list of arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS)
+#' @param KNN_params a list of arguments for either `FNN::KL.dist` (KL) or `RANN::nn2` (JS)
 #' @param varapp Boolean for using variation approximation of KL divergence;
 #'   NOTE: Currently disabled
 #' @param epapp Boolean for applying an epsilon perturbation to MC calculated

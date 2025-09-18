@@ -12,7 +12,7 @@ gloscope(
   r = 10000,
   num_components = seq(6, 24, by = 2),
   k = 50,
-  GMM_params = list(modelNames = c("VVE"), verbose = F, plot = F),
+  GMM_params = list(modelNames = c("VVE"), verbose = FALSE, plot = FALSE),
   KNN_params = NULL,
   BPPARAM = BiocParallel::SerialParam(),
   prefit_density = NULL,
