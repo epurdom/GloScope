@@ -104,3 +104,28 @@ get_gmm_num_components_vec <- function(num_obs, num_components){
     num_components[num_components > (num_obs - 1)] <- (num_obs - 1)
     return(unique(num_components)) # avoid duplicates
 }
+
+.as_full_matrix <- function(x) {
+  m <- as.matrix(x)
+  # ensure square, named, and symmetric indexability
+  if (is.null(rownames(m)) && !is.null(colnames(m))) rownames(m) <- colnames(m)
+  if (is.null(colnames(m)) && !is.null(rownames(m))) colnames(m) <- rownames(m)
+  m
+}
+
+.testDistMeta<-function(dist_mat,metadata_df,sample_id){
+  if(!c(sample_id) %in% names(metadata_df)) stop("sample_id does not define a variable in metadata_df")
+  if(nrow(dist_mat)!= nrow(metadata_df)){
+    stop("Not consistent patient number. Make sure your
+            distance matrix and meta info have the same patient number.")
+  }
+  if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
+    stop("Not consistent patient IDs. Make sure your
+            distance matrix and meta info have the same patients.")
+  }
+  if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
+    metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),,drop=FALSE]
+  }
+  return(metadata_df)
+  
+}

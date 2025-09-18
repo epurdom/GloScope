@@ -31,7 +31,11 @@ Imports:
     SingleCellExperiment,
     rlang,
     RColorBrewer,
-    pheatmap
+    pheatmap,
+    vegan,
+    cluster,
+    boot,
+    permute
 Depends: R (>= 4.4.0)
 Suggests:
     BiocStyle,

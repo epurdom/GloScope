@@ -56,19 +56,10 @@
 #'
 plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, 
                         which_side=c("columns","rows","both"),
-                        annotation_colors = NA,...){
+                        ...){
     which_side<-match.arg(which_side)
-    if(nrow(dist_mat)!= nrow(metadata_df)){
-    stop("Not consistent patient number. Make sure your
-            distance matrix and meta info have the same patient number.")
-  }
-  if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
-    stop("Not consistent patient IDs. Make sure your
-            distance matrix and meta info have the same patients.")
-  }
-  if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
-    metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),,drop=FALSE]
-  }
+    metadata_df<-.testDistMeta(dist_mat,metadata_df,sample_id)
+    
   # Create a data frame for the annotations
   if(!missing(color_by)){
     rownames(metadata_df)<-metadata_df[,sample_id]

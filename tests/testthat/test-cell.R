@@ -67,55 +67,6 @@ test_that("different random seeds give different GMM results",{
                           dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
 })
 
-test_that("get_metrics works",{
-  expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
-  pat_info <- unique(subsample_metadata[,c(1,2)])
-  pat_info$group <- c("A","A","B","B")
-  get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype")
-  get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group"))
-  get_metrics(dist_mat,metadata_df=pat_info, metrics="anosim",sample_id="sample_id", group_vars="phenotype")
-  
-})
-  
-
-test_that("plotMDS works with output",{
-  expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
-  pat_info <- unique(subsample_metadata[,c(1,2)])
-  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-    metadata_df=pat_info, sample_id="sample_id", color_by="phenotype", k = 2))
-  expect_silent(print(mds_result$plot))
-
-  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-                                      metadata_df=pat_info, sample_id="sample_id", shape_by="phenotype", k = 2))
-  expect_silent(print(mds_result$plot))
-  
-  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-                                      metadata_df=pat_info, sample_id="sample_id", shape_by="phenotype", color_by="phenotype", k = 2))
-  expect_silent(print(mds_result$plot))
-
-  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
-                                      metadata_df=pat_info, sample_id="sample_id", k = 2))
-  expect_silent(print(mds_result$plot))
-  
-  })
-
-test_that("plotHeatmap works with output",{
-  expect_silent(dist_mat <- gloscope(embedding_matrix=subsample_data_subset, cell_sample_ids=subsample_metadata$sample_id,dens="KNN"))
-  pat_info <- unique(subsample_metadata[,c(1,2)])
-  expect_silent(plotHeatmap(dist_mat = dist_mat,
-        metadata_df=pat_info, sample_id="sample_id", color_by="phenotype"))
-  expect_silent(plotHeatmap(dist_mat = dist_mat,
-        metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
-        which_side="rows"))
-  expect_silent(plotHeatmap(dist_mat = dist_mat,
-                            metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
-                            which_side="both"))
-  ## Check passing other args to pheatmap
-  expect_silent(plotHeatmap(dist_mat = dist_mat,metadata_df=pat_info, sample_id="sample_id", 
-                            color_by=c("phenotype","phenotype"),
-                            color = colorRampPalette(rev(brewer.pal(9, "RdYlBu")))(100)))
-  
-})
 
 
 test_that("GMM density fitting returns `densityMclust` objects",{
@@ -271,4 +222,61 @@ test_that("gloscope warnings for user-specified models", {
                           subsample_metadata$sample_id,dens="KNN",k=50,
         KNN_params = list(k=50)),
             regexp="k cannot be specified in `KNN_params`. This is specified by `k` instead.",fixed=TRUE)
+})
+
+
+
+test_that("get_metrics works",{
+  ## if add new metrics, this has to change
+  nmetrics_possible<-3
+  result<-c("anosim"=0.25,"adonis2"=1.53,"silhouette"=0.07)
+  expect_silent(test1<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype"))
+  expect_equal(dim(test1),c(nmetrics_possible,3))
+  expect_equal(round(test1$statistics,2),unname(result))
+  
+  expect_silent(test2<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group")))
+  expect_equal(dim(test2),c(nmetrics_possible*2,3))
+  expect_silent(test3<-get_metrics(dist_mat,metadata_df=pat_info, metrics="anosim",sample_id="sample_id", group_vars="phenotype"))
+  expect_equal(dim(test3),c(1,3))
+
+  #test permutations
+  expect_no_error(test4<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype",permuteTest=TRUE))
+  expect_equal(dim(test4),c(nmetrics_possible,4))
+  expect_equal(round(test4$statistic,2),unname(result))
+  #test bootstrap
+  expect_silent(bootout<-boot_gloscope(dist_mat_full,metadata_df=pat_info_full,sample_id="sample_id", group_var=c("group")))
+})
+test_that("plotMDS works with output",{
+  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
+                                      metadata_df=pat_info, sample_id="sample_id", color_by="phenotype", k = 2))
+  expect_silent(print(mds_result$plot))
+  
+  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
+                                      metadata_df=pat_info, sample_id="sample_id", shape_by="phenotype", k = 2))
+  expect_silent(print(mds_result$plot))
+  
+  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
+                                      metadata_df=pat_info, sample_id="sample_id", shape_by="phenotype", color_by="phenotype", k = 2))
+  expect_silent(print(mds_result$plot))
+  
+  expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,
+                                      metadata_df=pat_info, sample_id="sample_id", k = 2))
+  expect_silent(print(mds_result$plot))
+  
+})
+
+test_that("plotHeatmap works with output",{
+  expect_silent(plotHeatmap(dist_mat = dist_mat,
+                            metadata_df=pat_info, sample_id="sample_id", color_by="phenotype"))
+  expect_silent(plotHeatmap(dist_mat = dist_mat,
+                            metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
+                            which_side="rows"))
+  expect_silent(plotHeatmap(dist_mat = dist_mat,
+                            metadata_df=pat_info, sample_id="sample_id", color_by="phenotype",
+                            which_side="both"))
+  ## Check passing other args to pheatmap
+  expect_silent(plotHeatmap(dist_mat = dist_mat,metadata_df=pat_info, sample_id="sample_id", 
+                            color_by=c("phenotype","phenotype"),
+                            color = colorRampPalette(rev(brewer.pal(9, "RdYlBu")))(100)))
+  
 })

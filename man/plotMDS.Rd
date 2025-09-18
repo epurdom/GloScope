@@ -64,3 +64,6 @@ mds_result$plot
 # Add additional ggplot2 components to adapt figure
 mds_result$plot + theme_bw()  + scale_color_manual(values=alpha(c("red","blue"),0.5))
 }
+\seealso{
+\code{\link[MASS]{isoMDS}}
+}

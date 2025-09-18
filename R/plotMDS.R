@@ -27,6 +27,7 @@
 #'   calculates the requested k coordinates of the MDS plot. It also creates a
 #'   ggplot object that will plot the first two dimensions color or shape coded
 #'   by the given variables in the metadata data frame.
+#' @seealso \code{\link[MASS]{isoMDS}}
 #' @examples
 #' data(example_SCE_small)
 #' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id
@@ -57,19 +58,7 @@
 #' @export
 #'
 plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by){
-  if(!c(sample_id) %in% names(metadata_df)) stop("sample_id does not define a variable in metadata_df")
-  
-  if(nrow(dist_mat)!= nrow(metadata_df)){
-        stop("Not consistent patient number. Make sure your
-            distance matrix and meta info have the same patient number.")
-    }
-    if(length(intersect(rownames(dist_mat), metadata_df[, sample_id]))!= nrow(dist_mat)){
-        stop("Not consistent patient IDs. Make sure your
-            distance matrix and meta info have the same patients.")
-    }
-    if(!(identical(rownames(dist_mat), metadata_df[, sample_id]))){
-        metadata_df <- metadata_df[match(rownames(dist_mat), metadata_df[,sample_id]),,drop=FALSE]
-    }
+  metadata_df<-.testDistMeta(dist_mat,metadata_df,sample_id)
 
   fit_df <- MASS::isoMDS(dist_mat, k = k, trace = FALSE)
     colnames(fit_df$points) <- paste0("Coordinate",seq_len(k))
