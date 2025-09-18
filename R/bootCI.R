@@ -13,7 +13,8 @@
 #'   metric="anosim",group_var="phenotype")
 #' print(bootout)
 #' boot.ci(bootout)
-#' 
+#' manyboot<-bootCI_gloscope(dist_result,sample_metadata,"sample_id",
+#'   metric=c("anosim","silhouette"),group_var="phenotype")
 #' @importFrom boot boot
 #' @export
 #' 
@@ -34,4 +35,25 @@ boot_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group
     
 }
 
-
+bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,ci_type="percent",ci_conf=0.95,...){
+  if(!inherits(dist_mat,"list")){
+    dist_mat<-list(dist_mat)
+  }
+  if(inherits(dist_mat,"list") & is.null(names(dist_mat))){
+    names(dist_mat)<-paste("Distance",1:length(dist_mat),sep="")
+  }
+  if(length(ci_type)!=1) stop("only a single type of confidence interval can be done with this wrapper function")
+  comb<-expand.grid(distName=names(dist_mat),g=group_vars,m=metrics)
+  perComboFunction<-function(distName,g,m){
+    distName<-as.character(distName)
+    g<-as.character(g)
+    m<-as.character(m)
+    out<-boot_gloscope(dist_mat[[distName]],metadata_df,sample_id, metric=m,group_var=g,...)
+    out.ci<-boot.ci(out,type=ci_type,conf=ci_conf)
+    ci_type<-match.arg(ci_type,names(out.ci)) #make sure have the full name
+    nCols<-ncol(out.ci[[ci_type]])
+    return(data.frame(distance=distName,grouping=g,metric=m,statistic=out.ci$t0,lower=out.ci[[ci_type]][,nCols-1],upper=out.ci[[ci_type]][,nCols]))
+    
+  }
+  do.call("rbind",do.call("mapply",c(list(FUN=perComboFunction,SIMPLIFY=FALSE),comb)))
+}
