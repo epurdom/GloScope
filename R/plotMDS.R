@@ -17,7 +17,6 @@
 #'   to determine the shape of the points. If missing all points will be the
 #'   same shape.
 #' @param k Number of MDS dimension to generate, default = 10
-#' @param ... Arguments passed to \code{\link[ggplot2]{geom_point}} to control the plotting of points.
 #' @return A list containing the MDS embedding and plot of the distance matrix
 #' \itemize{
 #'   \item mds - A data.frame containing the MDS embedding, with the number of rows equal to the number of samples.
@@ -46,9 +45,7 @@
 #' require(ggplot2)
 #' mds_result$plot
 #' # Add additional ggplot2 components to adapt figure
-#' mds_result <- plotMDS(dist_mat = dist_result, metadata_df = sample_metadata ,
-#' sample_id="sample_id", color_by="phenotype",k=2, alpha=0.5)
-#' mds_result$plot + theme_bw()  + scale_color_manual(values=c("red","blue"))
+#' mds_result$plot + theme_bw()  + scale_color_manual(values=alpha(c("red","blue"),0.5))
 
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
@@ -59,7 +56,7 @@
 #' @importFrom rlang .data
 #' @export
 #'
-plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by,...){
+plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by){
     if(nrow(dist_mat)!= nrow(metadata_df)){
         stop("Not consistent patient number. Make sure your
             distance matrix and meta info have the same patient number.")
@@ -91,6 +88,6 @@ plotMDS <- function(dist_mat, metadata_df, sample_id, k=10, color_by, shape_by,.
       mds_plot <- ggplot2::ggplot(mds_df, ggplot2::aes(x = .data$Coordinate1, y = .data$Coordinate2,
                                                        color = .data[[color_by]],shape = .data[[shape_by]]))
     }
-    mds_plot <- mds_plot+ ggplot2::geom_point(...) 
+    mds_plot <- mds_plot+ ggplot2::geom_point() 
     return(list(mds = mds_df, plot = mds_plot))
 }
