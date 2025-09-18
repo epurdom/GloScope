@@ -54,7 +54,9 @@
 #' @importFrom stats as.dist
 #' @export
 #'
-plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, which_side=c("columns","rows","both"),...){
+plotHeatmap <- function(dist_mat, metadata_df, sample_id, color_by, 
+                        which_side=c("columns","rows","both"),
+                        annotation_colors = NA,...){
     which_side<-match.arg(which_side)
     if(nrow(dist_mat)!= nrow(metadata_df)){
     stop("Not consistent patient number. Make sure your
