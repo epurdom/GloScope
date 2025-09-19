@@ -1,20 +1,20 @@
 #' @rdname get_metrics
 #' @details The function `boot_gloscope` is a wrapper to the
 #'   \code{\link[boot]{boot}} function for creating bootstraps of one of the
-#'   metrics calculated by `get_metrics`.
+#'   metrics calculated by `get_metrics`. Most users will probably prefer `bootCI_gloscope`
 #' @param R number of bootstrap replicates. See \code{\link[boot]{boot}}.
 #' @param ... arguments passed to \code{\link[boot]{boot}}
-#' @return `boot_gloscope` returns an object created by \code{\link[boot]{boot}}.
+#' @return `boot_gloscope` returns an object of class `boot` created by \code{\link[boot]{boot}}.
 #' @seealso \code{\link[boot]{boot}}
 #' @examples
-#' # bootstrap anosim (nonsensical for only 5 samples!) 
-#' library(boot)
+#' # single bootstrap of anosim
 #' bootout<-boot_gloscope(dist_result,sample_metadata,"sample_id",
 #'   metric="anosim",group_var="phenotype")
+#' #work with the boot object using functions in boot package:
+#' library(boot)
 #' print(bootout)
 #' boot.ci(bootout)
-#' manyboot<-bootCI_gloscope(dist_result,sample_metadata,"sample_id",
-#'   metric=c("anosim","silhouette"),group_var="phenotype")
+#' 
 #' @importFrom boot boot
 #' @export
 #' 
@@ -35,7 +35,42 @@ boot_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group
     
 }
 
-bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,ci_type="percent",ci_conf=0.95,...){
+#' @rdname get_metrics
+#' @order 2
+#' @param ci_type Single character value. The type of confidence interval to
+#'   compute. Passed to argument `type` in \code{\link[boot]{boot.ci}}
+#' @param ci_conf Scalar value between 0 and 1. The confidence level requested.
+#'   Passed to argument `conf` in \code{\link[boot]{boot.ci}}.
+#' @details `bootCI_gloscope` is a wrapper function to
+#'   \code{\link[boot]{boot.ci}}. `boot.ci` can be called directly on the output
+#'   of `boot_gloscope`. The main advantage of `bootCI_gloscope` is to calculate
+#'   bootstrap CI over multiple choices of metrics, variables, and/or distance
+#'   matrices. Unlike `boot.ci`, `bootCI_gloscope` does not allow different
+#'   choices of confidence interval types or levels, so `ci_type` and `ci_level`
+#'   must be of length 1. For this kind of multiplicity, call `boot.ci` directly
+#'   on the output of `boot_gloscope`.
+#' @return `bootCI_gloscope` creates a data frame containing the statistic for
+#'   each combination of metric and grouping variable with columns with the
+#'   upper and lower bounds of the requested confidence intervals
+#' \itemize{
+#'   \item metric 
+#'   \item grouping
+#'   \item statistic
+#'   \item lower
+#'   \item upper
+#' }
+#' @seealso \code{\link[boot]{boot.ci}}
+#' @examples
+#' # calculate many bootstraps -- for speed up we set R ridiculously low
+#' manyboot<-bootCI_gloscope(list("Distance 1"=dist_result,"Another distance"=dist_result),
+#'   sample_metadata,"sample_id",
+#'   metrics=c("anosim","silhouette"),group_vars=c("phenotype","grouping"),R=20)
+#' 
+#' @importFrom boot boot.ci
+#' @export
+bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,ci_type=c("perc","norm","basic", "stud",  "bca"),ci_conf=0.95,...){
+  ci_type=match.arg(ci_type)
+  if(length(ci_conf)!=1) stop("only single value of ci_conf is allowed")
   if(!inherits(dist_mat,"list")){
     dist_mat<-list(dist_mat)
   }

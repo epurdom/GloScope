@@ -244,7 +244,29 @@ test_that("get_metrics works",{
   expect_equal(dim(test4),c(nmetrics_possible,4))
   expect_equal(round(test4$statistic,2),unname(result))
   #test bootstrap
-  expect_silent(bootout<-boot_gloscope(dist_mat_full,metadata_df=pat_info_full,sample_id="sample_id", group_var=c("group")))
+  expect_silent(bootout<-boot_gloscope(dist_mat_full,metadata_df=pat_info_full,R=50,sample_id="sample_id", group_var=c("group")))
+  expect_silent(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+                              metric=c("anosim","silhouette"),group_var="phenotype",R=50,ci_type = "perc")
+  )
+  expect_silent(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+                                          metric=c("anosim"),group_var="phenotype",R=50,ci_type = "norm")
+  )
+  expect_silent(bootCIout<-bootCI_gloscope(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat_full),pat_info_full,sample_id="sample_id",
+                               metric=c("anosim","silhouette"),group_var="phenotype",R=50,ci_type = "perc"))
+  expect_error(bootCI_gloscope(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat),pat_info_full,sample_id="sample_id",
+                                metric=c("anosim"),group_var="phenotype",R=50,ci_type = "perc"), "Not consistent patient number")
+  expect_error(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+                                          metric=c("anosim"),group_var="phenotype",R=50,ci_type = "normal")
+  )
+  expect_silent(ggci<-plotCI(bootCIout))
+  expect_silent(print(ggci))
+  expect_silent(ggci<-plotCI(bootCIout,group_by="distance",color_by="metric"))
+  expect_silent(print(ggci))
+  expect_silent(ggci<-plotCI(bootCIout,group_by="metric",color_by="distance"))
+  expect_silent(print(ggci))
+  expect_error(plotCI(bootCIout,group_by="metric",color_by="grouping"),"color_by must have more than one distinct value")
+  expect_error(plotCI(bootCIout,group_by="grouping",color_by="metric"),"group_by must have more than one distinct value")
+  
 })
 test_that("plotMDS works with output",{
   expect_silent(mds_result <- plotMDS(dist_mat = dist_mat,

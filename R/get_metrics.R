@@ -9,7 +9,8 @@
 #' @order 1
 #' 
 #' @param dist_mat The divergence matrix output of `gloscope()`. Should be a
-#'   symmetric, square matrix.
+#'   symmetric, square matrix. For `bootCI_gloscope` the argument can be a list
+#'   of distance matrices.
 #' @param metadata_df A data frame contains each sample's metadata. Note this is
 #'   NOT at the cell-level, and should have the same number of rows as dist_mat.
 #' @param sample_id The column name or index in metadata_df that contains the
@@ -34,6 +35,7 @@
 #'   \item metric 
 #'   \item grouping
 #'   \item statistic
+#'   \item pval (if `permuteTest=TRUE`)
 #' }
 #'
 #' @details The function `get_metrics` is a simple wrapper for calculating statistics that
@@ -53,7 +55,7 @@
 #'   of the package `permute`, similar to `vegan`, so that control of the
 #'   permutation mechanism is possible in the same way.
 #' @seealso \code{\link[vegan]{anosim}}, \code{\link[vegan]{adonis2}}, 
-#'  \code{\link[cluster]{silhouette}},\code{\link[permute]{how}}
+#'  \code{\link[cluster]{silhouette}}, \code{\link[permute]{how}}
 #' @examples
 #' data(example_SCE_small)
 #' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id
@@ -66,11 +68,14 @@
 #'    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 #' # make a per-sample metadata
 #' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
+#' # make another variable
+#' sample_metadata$grouping<-c(rep(c("A","B"),each=2),"A")
 #' get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
 #'   group_vars="phenotype")
 #' # run permutation tests:
 #' get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
-#'   group_vars="phenotype", permuteTest=TRUE)
+#'   group_vars=c("phenotype","grouping"), permuteTest=TRUE)
+#'   
 #' @importFrom cluster silhouette
 #' @importFrom vegan anosim
 #' @importFrom permute how 

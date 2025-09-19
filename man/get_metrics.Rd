@@ -2,6 +2,7 @@
 % Please edit documentation in R/get_metrics.R, R/bootCI.R
 \name{get_metrics}
 \alias{get_metrics}
+\alias{bootCI_gloscope}
 \alias{boot_gloscope}
 \title{Calculate metrics on separation in distance matrix due to grouping variable}
 \usage{
@@ -16,6 +17,18 @@ get_metrics(
   permutations = 100
 )
 
+bootCI_gloscope(
+  dist_mat,
+  metadata_df,
+  metrics = "anosim",
+  sample_id,
+  group_vars,
+  R = 1000,
+  ci_type = c("perc", "norm", "basic", "stud", "bca"),
+  ci_conf = 0.95,
+  ...
+)
+
 boot_gloscope(
   dist_mat,
   metadata_df,
@@ -28,7 +41,8 @@ boot_gloscope(
 }
 \arguments{
 \item{dist_mat}{The divergence matrix output of `gloscope()`. Should be a
-symmetric, square matrix.}
+symmetric, square matrix. For `bootCI_gloscope` the argument can be a list
+of distance matrices.}
 
 \item{metadata_df}{A data frame contains each sample's metadata. Note this is
 NOT at the cell-level, and should have the same number of rows as dist_mat.}
@@ -57,6 +71,12 @@ mechanisms.}
 
 \item{R}{number of bootstrap replicates. See \code{\link[boot]{boot}}.}
 
+\item{ci_type}{Single character value. The type of confidence interval to
+compute. Passed to argument `type` in \code{\link[boot]{boot.ci}}}
+
+\item{ci_conf}{Scalar value between 0 and 1. The confidence level requested.
+Passed to argument `conf` in \code{\link[boot]{boot.ci}}.}
+
 \item{...}{arguments passed to \code{\link[boot]{boot}}}
 }
 \value{
@@ -66,9 +86,21 @@ mechanisms.}
   \item metric 
   \item grouping
   \item statistic
+  \item pval (if `permuteTest=TRUE`)
 }
 
-`boot_gloscope` returns an object created by \code{\link[boot]{boot}}.
+`bootCI_gloscope` creates a data frame containing the statistic for
+  each combination of metric and grouping variable with columns with the
+  upper and lower bounds of the requested confidence intervals
+\itemize{
+  \item metric 
+  \item grouping
+  \item statistic
+  \item lower
+  \item upper
+}
+
+`boot_gloscope` returns an object of class `boot` created by \code{\link[boot]{boot}}.
 }
 \description{
 These functions are wrappers for calculating common metrics for
@@ -95,9 +127,18 @@ The option "silhouette" calls the function of that name from the
   of the package `permute`, similar to `vegan`, so that control of the
   permutation mechanism is possible in the same way.
 
+`bootCI_gloscope` is a wrapper function to
+  \code{\link[boot]{boot.ci}}. `boot.ci` can be called directly on the output
+  of `boot_gloscope`. The main advantage of `bootCI_gloscope` is to calculate
+  bootstrap CI over multiple choices of metrics, variables, and/or distance
+  matrices. Unlike `boot.ci`, `bootCI_gloscope` does not allow different
+  choices of confidence interval types or levels, so `ci_type` and `ci_level`
+  must be of length 1. For this kind of multiplicity, call `boot.ci` directly
+  on the output of `boot_gloscope`.
+
 The function `boot_gloscope` is a wrapper to the
   \code{\link[boot]{boot}} function for creating bootstraps of one of the
-  metrics calculated by `get_metrics`.
+  metrics calculated by `get_metrics`. Most users will probably prefer `bootCI_gloscope`
 }
 \examples{
 data(example_SCE_small)
@@ -111,22 +152,33 @@ dist_result <- gloscope(pca_embeddings_subset, sample_ids,
    BPPARAM = BiocParallel::SerialParam(RNGseed=2))
 # make a per-sample metadata
 sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
+# make another variable
+sample_metadata$grouping<-c(rep(c("A","B"),each=2),"A")
 get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
   group_vars="phenotype")
 # run permutation tests:
 get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
-  group_vars="phenotype", permuteTest=TRUE)
-# bootstrap anosim (nonsensical for only 5 samples!) 
-library(boot)
+  group_vars=c("phenotype","grouping"), permuteTest=TRUE)
+  
+# calculate many bootstraps -- for speed up we set R ridiculously low
+manyboot<-bootCI_gloscope(list("Distance 1"=dist_result,"Another distance"=dist_result),
+  sample_metadata,"sample_id",
+  metrics=c("anosim","silhouette"),group_vars=c("phenotype","grouping"),R=20)
+
+# single bootstrap of anosim
 bootout<-boot_gloscope(dist_result,sample_metadata,"sample_id",
   metric="anosim",group_var="phenotype")
+#work with the boot object using functions in boot package:
+library(boot)
 print(bootout)
 boot.ci(bootout)
 
 }
 \seealso{
 \code{\link[vegan]{anosim}}, \code{\link[vegan]{adonis2}}, 
- \code{\link[cluster]{silhouette}},\code{\link[permute]{how}}
+ \code{\link[cluster]{silhouette}}, \code{\link[permute]{how}}
+
+\code{\link[boot]{boot.ci}}
 
 \code{\link[boot]{boot}}
 }
