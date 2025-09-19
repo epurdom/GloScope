@@ -83,7 +83,7 @@ bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, gro
     distName<-as.character(distName)
     g<-as.character(g)
     m<-as.character(m)
-    out<-boot_gloscope(dist_mat[[distName]],metadata_df,sample_id, metric=m,group_var=g,...)
+    out<-boot_gloscope(dist_mat[[distName]],metadata_df,sample_id, metrics=m,group_vars=g,...)
     out.ci<-boot.ci(out,type=ci_type,conf=ci_conf)
     ci_type<-match.arg(ci_type,names(out.ci)) #make sure have the full name
     nCols<-ncol(out.ci[[ci_type]])

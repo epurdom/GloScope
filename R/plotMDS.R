@@ -51,8 +51,6 @@
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 scale_color_manual
-#' @importFrom ggplot2 theme_bw
 #' @importFrom MASS isoMDS
 #' @importFrom rlang .data
 #' @export
