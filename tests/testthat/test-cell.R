@@ -201,15 +201,15 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
 test_that("Divergences using cell type works properly",{
   sample_ids <- subsample_metadata$sample_id
   celltype <- subsample_metadata$cluster_id
-  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscope_proportion(sample_ids,celltype, dist_metric= "KL"))
+  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscopeProp(sample_ids,celltype, dist_metric= "KL"))
   expect_match(zero_prop_warnings,"There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.",all = FALSE)
 
-  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscope_proportion(sample_ids,celltype, ep = 0.5, dist_metric= "KL"))
+  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscopeProp(sample_ids,celltype, ep = 0.5, dist_metric= "KL"))
   expect_match(set_ep_warnings,"There are elements haing 0 proportion! ep has been set to be 0.5.",all = FALSE)
   
   expect_equal(isSymmetric(fix_div_matrix),TRUE)
   short_sample_ids <- sample_ids[1:100]
-  expect_error(gloscope_proportion(short_sample_ids, celltype),
+  expect_error(gloscopeProp(short_sample_ids, celltype),
                regexp="Lengths of cell id and cell type are not equal!",fixed=TRUE)
 })
 
@@ -226,36 +226,36 @@ test_that("gloscope warnings for user-specified models", {
 
 
 
-test_that("get_metrics works",{
+test_that("getMetrics works",{
   ## if add new metrics, this has to change
   nmetrics_possible<-3
   result<-c("anosim"=0.25,"adonis2"=1.53,"silhouette"=0.07)
-  expect_silent(test1<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype"))
+  expect_silent(test1<-getMetrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype"))
   expect_equal(dim(test1),c(nmetrics_possible,3))
   expect_equal(round(test1$statistic,2),unname(result))
   
-  expect_silent(test2<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group")))
+  expect_silent(test2<-getMetrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars=c("phenotype","group")))
   expect_equal(dim(test2),c(nmetrics_possible*2,3))
-  expect_silent(test3<-get_metrics(dist_mat,metadata_df=pat_info, metrics="anosim",sample_id="sample_id", group_vars="phenotype"))
+  expect_silent(test3<-getMetrics(dist_mat,metadata_df=pat_info, metrics="anosim",sample_id="sample_id", group_vars="phenotype"))
   expect_equal(dim(test3),c(1,3))
 
   #test permutations
-  expect_no_error(test4<-get_metrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype",permuteTest=TRUE))
+  expect_no_error(test4<-getMetrics(dist_mat,metadata_df=pat_info, sample_id="sample_id", group_vars="phenotype",permuteTest=TRUE))
   expect_equal(dim(test4),c(nmetrics_possible,4))
   expect_equal(round(test4$statistic,2),unname(result))
   #test bootstrap
-  expect_silent(bootout<-boot_gloscope(dist_mat_full,metadata_df=pat_info_full,R=50,sample_id="sample_id", group_var=c("group")))
-  expect_silent(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+  expect_silent(bootout<-bootGloscope(dist_mat_full,metadata_df=pat_info_full,R=50,sample_id="sample_id", group_var=c("group")))
+  expect_silent(bootCI(dist_mat_full,pat_info_full,sample_id="sample_id",
                               metric=c("anosim","silhouette"),group_var="phenotype",R=50,ci_type = "perc")
   )
-  expect_silent(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+  expect_silent(bootCI(dist_mat_full,pat_info_full,sample_id="sample_id",
                                           metric=c("anosim"),group_var="phenotype",R=50,ci_type = "norm")
   )
-  expect_silent(bootCIout<-bootCI_gloscope(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat_full),pat_info_full,sample_id="sample_id",
+  expect_silent(bootCIout<-bootCI(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat_full),pat_info_full,sample_id="sample_id",
                                metric=c("anosim","silhouette"),group_var="phenotype",R=50,ci_type = "perc"))
-  expect_error(bootCI_gloscope(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat),pat_info_full,sample_id="sample_id",
+  expect_error(bootCI(list("Dist 1"=dist_mat_full, "New Dist"=dist_mat),pat_info_full,sample_id="sample_id",
                                 metric=c("anosim"),group_var="phenotype",R=50,ci_type = "perc"), "Not consistent patient number")
-  expect_error(bootCI_gloscope(dist_mat_full,pat_info_full,sample_id="sample_id",
+  expect_error(bootCI(dist_mat_full,pat_info_full,sample_id="sample_id",
                                           metric=c("anosim"),group_var="phenotype",R=50,ci_type = "normal")
   )
   expect_silent(ggci<-plotCI(bootCIout))

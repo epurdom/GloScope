@@ -24,7 +24,7 @@ value.}
 }
 \description{
 This function creates a `ggplot` object that plots the
-  confidence intervals created by `bootCI_gloscope`
+  confidence intervals created by `bootCI`
 }
 \examples{
 data(example_SCE_small)
@@ -40,7 +40,7 @@ dist_result <- gloscope(pca_embeddings_subset, sample_ids,
 sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
 # make another variable
 sample_metadata$fakeGroup<-c(rep(c("A","B"),each=2),"A")
-manyboot<-bootCI_gloscope(dist_result,
+manyboot<-bootCI(dist_result,
   sample_metadata,"sample_id",
   metrics=c("anosim","silhouette"),group_vars=c("phenotype","fakeGroup"),R=20)
 plotCI(manyboot,group_by="metric",color_by="grouping")

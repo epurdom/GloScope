@@ -1,9 +1,9 @@
 #' @title Plot confidence intervals
 #'
 #' @description This function creates a `ggplot` object that plots the
-#'   confidence intervals created by `bootCI_gloscope`
+#'   confidence intervals created by `bootCI`
 #'
-#' @param ci_df A data.frame that is the output of \code{\link{bootCI_gloscope}}
+#' @param ci_df A data.frame that is the output of \code{\link{bootCI}}
 #' @param ci_df A data frame contains each sample's metadata. Note this is
 #'   NOT at the cell-level.
 #' @param color_by The column name or index in ci_df that should be used
@@ -29,7 +29,7 @@
 #' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
 #' # make another variable
 #' sample_metadata$fakeGroup<-c(rep(c("A","B"),each=2),"A")
-#' manyboot<-bootCI_gloscope(dist_result,
+#' manyboot<-bootCI(dist_result,
 #'   sample_metadata,"sample_id",
 #'   metrics=c("anosim","silhouette"),group_vars=c("phenotype","fakeGroup"),R=20)
 #' plotCI(manyboot,group_by="metric",color_by="grouping")
@@ -43,7 +43,7 @@
 plotCI<-function(ci_df,color_by,group_by,dodge_width=.5){
 
   if(!all(c('distance','grouping','metric','statistic','lower','upper') %in% names(ci_df)))
-    stop("names of ci_df must match the expected output of bootCI_gloscope")
+    stop("names of ci_df must match the expected output of bootCI")
   whCols<-c("metric","distance","grouping")
   listCols<-paste(whCols,collapse=",")
   whMulti<-sapply(ci_df[,whCols,drop=FALSE],function(x){nlevels(factor(x))>1})

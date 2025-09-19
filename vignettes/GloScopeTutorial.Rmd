@@ -184,20 +184,20 @@ plotHeatmap(knn_divergence, metadata = pat_info, "sample_id",color_by="phenotype
 # Testing and Confidence intervals
 The `GloScope` package also provides functions to do simple inference on the resulting distance matrices, both permutation tests and bootstrap confidence intervals. There are currently three different test statistics we calculate: `anosim` and `adonis2` implemented in the `vegan` package, and `silhouette` implemented in the `cluster` package. Our functions are only applicable for testing differences between a simple grouping factor and provided for the convenience of the user. The `vegan` package provides greater options for more complex inference for distance matrices. 
 
-The function `get_metrics` calculates any combination of these three statistics and optionally performs a permutation test (if `permuteTest=TRUE`). We would note that for permutation tests, `adonis2` is recommended by the authors over `anosim` (see their accompanying help files). 
+The function `getMetrics` calculates any combination of these three statistics and optionally performs a permutation test (if `permuteTest=TRUE`). We would note that for permutation tests, `adonis2` is recommended by the authors over `anosim` (see their accompanying help files). 
 
 ```{r}
-permResults <- get_metrics(dist_mat = knn_divergence, metadata = pat_info, sample_id="sample_id", group_vars="phenotype", permuteTest = TRUE)
+permResults <- getMetrics(dist_mat = knn_divergence, metadata = pat_info, sample_id="sample_id", group_vars="phenotype", permuteTest = TRUE)
 permResults
 ```
 
-We also provide a wrapper function for bootstrap confidence intervals of these statistics with the function `bootCI_gloscope` which has the same input arguments. We only recommend using `anosim` and `silhouette` since the statistic from `adonis2` is a F statistic, and less interpretable for confidence intervals. 
+We also provide a wrapper function for bootstrap confidence intervals of these statistics with the function `bootCI` which has the same input arguments. We only recommend using `anosim` and `silhouette` since the statistic from `adonis2` is a F statistic, and less interpretable for confidence intervals. 
 
 ```{r}
-bootCIResults <- bootCI_gloscope(dist_mat = list("KNN k=50"=knn_divergence, "KNN k=25"=knn_divergence_alt), metadata = pat_info, metrics=c("anosim","silhouette"), sample_id="sample_id", group_vars="phenotype")
+bootCIResults <- bootCI(dist_mat = list("KNN k=50"=knn_divergence, "KNN k=25"=knn_divergence_alt), metadata = pat_info, metrics=c("anosim","silhouette"), sample_id="sample_id", group_vars="phenotype")
 bootCIResults
 ```
-`bootCI_gloscope` allows the user to give a list of multiple distance matrices to make it easy to plot comparative confidence intervals. (This option of looping over multiple distances is not available for `get_metrics`). `plotCI` gives a function that will create a `ggplot` object for plotting the confidence intervals
+`bootCI` allows the user to give a list of multiple distance matrices to make it easy to plot comparative confidence intervals. (This option of looping over multiple distances is not available for `getMetrics`). `plotCI` gives a function that will create a `ggplot` object for plotting the confidence intervals
 
 ```{r}
 ppg<-plotCI(bootCIResults,color_by="distance",group_by="metric")

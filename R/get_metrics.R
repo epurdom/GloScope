@@ -9,7 +9,7 @@
 #' @order 1
 #' 
 #' @param dist_mat The divergence matrix output of `gloscope()`. Should be a
-#'   symmetric, square matrix. For `bootCI_gloscope` the argument can be a list
+#'   symmetric, square matrix. For `bootCI` the argument can be a list
 #'   of distance matrices.
 #' @param metadata_df A data frame contains each sample's metadata. Note this is
 #'   NOT at the cell-level, and should have the same number of rows as dist_mat.
@@ -29,7 +29,7 @@
 #'   number of permutations. Can also except output of
 #'   \code{\link[permute]{how}} for more fine control of the permutation
 #'   mechanisms.
-#' @return `get_metrics` creates a data frame containing the statistic for each
+#' @return `getMetrics` creates a data frame containing the statistic for each
 #'   combination of metric and grouping variable with columns
 #' \itemize{
 #'   \item metric 
@@ -38,7 +38,7 @@
 #'   \item pval (if `permuteTest=TRUE`)
 #' }
 #'
-#' @details The function `get_metrics` is a simple wrapper for calculating statistics that
+#' @details The function `getMetrics` is a simple wrapper for calculating statistics that
 #'   summarize the difference between distances within and between groupings. If
 #'   the variable defined by group_var does not have at least two groupings, the
 #'   function will return a NA. 
@@ -70,10 +70,10 @@
 #' sample_metadata <- as.data.frame(unique(SingleCellExperiment::colData(example_SCE_small)[,c(1,2)]))
 #' # make another variable
 #' sample_metadata$grouping<-c(rep(c("A","B"),each=2),"A")
-#' get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
+#' getMetrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
 #'   group_vars="phenotype")
 #' # run permutation tests:
-#' get_metrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
+#' getMetrics(dist_result,metadata_df=sample_metadata, sample_id="sample_id", 
 #'   group_vars=c("phenotype","grouping"), permuteTest=TRUE)
 #'   
 #' @importFrom cluster silhouette
@@ -83,7 +83,7 @@
 #' @importFrom vegan adonis2
 #' @export
 #'
-get_metrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","silhouette"),
+getMetrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","silhouette"),
                         sample_id, group_vars, checkData=TRUE, permuteTest=FALSE,
                         permutations=100) {
   metrics<-match.arg(metrics,several.ok = TRUE)

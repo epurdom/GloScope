@@ -15,14 +15,14 @@
 #' data(example_SCE_small)
 #' sample_id <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
 #' cluster_id <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
-#' dist_result <- gloscope_proportion(sample_id, cluster_id, ep = 0.5, 
+#' dist_result <- gloscopeProp(sample_id, cluster_id, ep = 0.5, 
 #'                                    dist_metric = "KL")
 #' dist_result
 #' @importFrom utils combn
-#' @rdname gloscope_proportion
+#' @rdname gloscopeProp
 #' @export
 
-gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
+gloscopeProp <- function(cell_sample_ids, cell_type_ids,
                                 ep = 0, dist_metric = c("KL", "JS")){
   if(length(cell_sample_ids)!=length(cell_type_ids)){
     stop("Lengths of cell id and cell type are not equal!")

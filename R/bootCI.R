@@ -1,14 +1,14 @@
-#' @rdname get_metrics
-#' @details The function `boot_gloscope` is a wrapper to the
+#' @rdname getMetrics
+#' @details The function `bootGloscope` is a wrapper to the
 #'   \code{\link[boot]{boot}} function for creating bootstraps of one of the
-#'   metrics calculated by `get_metrics`. Most users will probably prefer `bootCI_gloscope`
+#'   metrics calculated by `getMetrics`. Most users will probably prefer `bootCI`
 #' @param R number of bootstrap replicates. See \code{\link[boot]{boot}}.
 #' @param ... arguments passed to \code{\link[boot]{boot}}
-#' @return `boot_gloscope` returns an object of class `boot` created by \code{\link[boot]{boot}}.
+#' @return `bootGloscope` returns an object of class `boot` created by \code{\link[boot]{boot}}.
 #' @seealso \code{\link[boot]{boot}}
 #' @examples
 #' # single bootstrap of anosim
-#' bootout<-boot_gloscope(dist_result,sample_metadata,"sample_id",
+#' bootout<-bootGloscope(dist_result,sample_metadata,"sample_id",
 #'   metric="anosim",group_var="phenotype")
 #' #work with the boot object using functions in boot package:
 #' library(boot)
@@ -18,7 +18,7 @@
 #' @importFrom boot boot
 #' @export
 #' 
-boot_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,...){
+bootGloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,...){
   metadata_df<-.testDistMeta(dist_mat,metadata_df,sample_id)
   if(!c(group_vars) %in% names(metadata_df)) stop("group_vars does not define a variable in metadata_df")
   combinedData<-cbind(dist_mat,metadata_df)
@@ -28,28 +28,28 @@ boot_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group
   bootfun<-function(df,i){#x are ids
     d<-df[,1:nsamples]
     m<-df[,(nsamples+1):ncol(df)]
-    get_metrics(d[i,i], m[i,], metrics=metrics,sample_id=sample_id, 
+    getMetrics(d[i,i], m[i,], metrics=metrics,sample_id=sample_id, 
                 group_vars=group_vars,checkData=FALSE, permuteTest=FALSE)$statistic
   }
   return(boot::boot(data=combinedData,statistic=bootfun,R=R,...))
     
 }
 
-#' @rdname get_metrics
+#' @rdname getMetrics
 #' @order 2
 #' @param ci_type Single character value. The type of confidence interval to
 #'   compute. Passed to argument `type` in \code{\link[boot]{boot.ci}}
 #' @param ci_conf Scalar value between 0 and 1. The confidence level requested.
 #'   Passed to argument `conf` in \code{\link[boot]{boot.ci}}.
-#' @details `bootCI_gloscope` is a wrapper function to
+#' @details `bootCI` is a wrapper function to
 #'   \code{\link[boot]{boot.ci}}. `boot.ci` can be called directly on the output
-#'   of `boot_gloscope`. The main advantage of `bootCI_gloscope` is to calculate
+#'   of `bootGloscope`. The main advantage of `bootCI` is to calculate
 #'   bootstrap CI over multiple choices of metrics, variables, and/or distance
-#'   matrices. Unlike `boot.ci`, `bootCI_gloscope` does not allow different
+#'   matrices. Unlike `boot.ci`, `bootCI` does not allow different
 #'   choices of confidence interval types or levels, so `ci_type` and `ci_level`
 #'   must be of length 1. For this kind of multiplicity, call `boot.ci` directly
-#'   on the output of `boot_gloscope`.
-#' @return `bootCI_gloscope` creates a data frame containing the statistic for
+#'   on the output of `bootGloscope`.
+#' @return `bootCI` creates a data frame containing the statistic for
 #'   each combination of metric and grouping variable with columns with the
 #'   upper and lower bounds of the requested confidence intervals
 #' \itemize{
@@ -62,13 +62,13 @@ boot_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group
 #' @seealso \code{\link[boot]{boot.ci}}
 #' @examples
 #' # calculate many bootstraps -- for speed up we set R ridiculously low
-#' manyboot<-bootCI_gloscope(list("Distance 1"=dist_result,"Another distance"=dist_result),
+#' manyboot<-bootCI(list("Distance 1"=dist_result,"Another distance"=dist_result),
 #'   sample_metadata,"sample_id",
 #'   metrics=c("anosim","silhouette"),group_vars=c("phenotype","grouping"),R=20)
 #' 
 #' @importFrom boot boot.ci
 #' @export
-bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,ci_type=c("perc","norm","basic", "stud",  "bca"),ci_conf=0.95,...){
+bootCI<-function(dist_mat, metadata_df, metrics="anosim",sample_id, group_vars,R=1000,ci_type=c("perc","norm","basic", "stud",  "bca"),ci_conf=0.95,...){
   ci_type=match.arg(ci_type)
   if(length(ci_conf)!=1) stop("only single value of ci_conf is allowed")
   if(!inherits(dist_mat,"list")){
@@ -83,7 +83,7 @@ bootCI_gloscope<-function(dist_mat, metadata_df, metrics="anosim",sample_id, gro
     distName<-as.character(distName)
     g<-as.character(g)
     m<-as.character(m)
-    out<-boot_gloscope(dist_mat[[distName]],metadata_df,sample_id, metrics=m,group_vars=g,...)
+    out<-bootGloscope(dist_mat[[distName]],metadata_df,sample_id, metrics=m,group_vars=g,...)
     out.ci<-boot.ci(out,type=ci_type,conf=ci_conf)
     ci_type<-match.arg(ci_type,names(out.ci)) #make sure have the full name
     nCols<-ncol(out.ci[[ci_type]])
