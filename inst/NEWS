@@ -1,4 +1,4 @@
-Version 1.7.3 (2025-09-20)
+Version 1.99.0 (2025-09-20)
 =====================================
 
 - Changed name of function `gloscope_proportion` to `gloscopeProp` for consistent naming conventions
