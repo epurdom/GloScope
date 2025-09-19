@@ -7,7 +7,7 @@
 #'   must match the number of element in `cell_type_ids`
 #' @param cell_type_ids a vector of use defined cell type
 #' @param ep an integer of error term added to 0 proportion. Default ep = 0.
-#' @param dist_mat distance metric to calculate the distance. One of
+#' @param dist_metric distance metric to calculate the distance. One of
 #'   c("KL","JS")
 #' @return clusprop_dist a symmetric matrix of divergences 
 #' @examples
@@ -16,14 +16,14 @@
 #' sample_id <- SingleCellExperiment::colData(example_SCE_small)$sample_id 
 #' cluster_id <- SingleCellExperiment::colData(example_SCE_small)$cluster_id 
 #' dist_result <- gloscope_proportion(sample_id, cluster_id, ep = 0.5, 
-#'                                    dist_mat = "KL")
+#'                                    dist_metric = "KL")
 #' dist_result
 #' @importFrom utils combn
 #' @rdname gloscope_proportion
 #' @export
 
 gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
-                                ep = 0, dist_mat = c("KL", "JS")){
+                                ep = 0, dist_metric = c("KL", "JS")){
   if(length(cell_sample_ids)!=length(cell_type_ids)){
     stop("Lengths of cell id and cell type are not equal!")
   }
@@ -48,7 +48,7 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
   divergence_list <- lapply(patient_pair_list,
                             function(w){ .calc_prop(prop1 = clusprop[w[1],], 
                                                   prop2 = clusprop[w[2],], 
-                                                  dist_mat = dist_mat)})
+                                                  dist_metric = dist_metric)})
   
   # Convert pair-wise distances to a symmetric distance matrix
   divergence_vec <- unlist(divergence_list)
@@ -71,17 +71,17 @@ gloscope_proportion <- function(cell_sample_ids, cell_type_ids,
 #'
 #' @param prop1 sample1's cluster proportion
 #' @param prop2 sample2's cluster proportion
-#' @param dist_mat distance metric to calculate the distance. One of
+#' @param dist_metric distance metric to calculate the distance. One of
 #'   c("KL","JS")
 #' @return A single value contains the  KL divergence value calculated for the 
 #'    2 samples' cluster proportion.
 #'
 #' @noRd
-.calc_prop <- function(prop1, prop2, dist_mat){
-  if(dist_mat == "KL"){
+.calc_prop <- function(prop1, prop2, dist_metric){
+  if(dist_metric == "KL"){
     KLdist <-  sum(prop1*(log(prop1) - log(prop2))) +
       sum(prop2*(log(prop2) - log(prop1)))
-  }else if(dist_mat == "JS"){
+  }else if(dist_metric == "JS"){
     KLdist <-  1/2* sum(prop1*(log(prop1) - log(1/2*prop1 + 1/2*prop2))) +
       1/2* sum(prop2*(log(prop2) - log(1/2*prop1 + 1/2*prop2)))
   }

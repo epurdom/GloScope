@@ -27,7 +27,7 @@ test_that("gloscope warnings for small cell counts", {
 
 test_that("gloscope works with KNN",{
   expect_silent(temp_knn<-gloscope(subsample_data_subset,subsample_metadata$sample_id,
-      dens = "KNN", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)))
+      dens = "KNN", dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)))
   #test dimensions
   expect_equal(dim(temp_knn),c(4,4))
   #test distances the same as in the past
@@ -45,7 +45,7 @@ test_that("gloscope works with KNN",{
 test_that("gloscope works with GMM",{
   expect_silent(temp_gmm<-gloscope(subsample_data_subset,subsample_metadata$sample_id,
       dens = "GMM", GMM_params = list(modelNames=all_models,verbose=FALSE,plot=FALSE),
-      num_components = seq_len(9), dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+      num_components = seq_len(9), dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
   #test dimensions
   expect_equal(dim(temp_gmm),c(4,4))
   #test distances the same as in the past
@@ -62,9 +62,9 @@ test_that("gloscope works with GMM",{
 
 test_that("different random seeds give different GMM results",{
   expect_false(all(gloscope(subsample_data_subset,subsample_metadata$sample_id,
-                                   dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)) ==
+                                   dens = "GMM", dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=2)) ==
                  gloscope(subsample_data_subset,subsample_metadata$sample_id,
-                          dens = "GMM", dist_mat = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
+                          dens = "GMM", dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1))))
 })
 
 
@@ -201,10 +201,10 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
 test_that("Divergences using cell type works properly",{
   sample_ids <- subsample_metadata$sample_id
   celltype <- subsample_metadata$cluster_id
-  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscope_proportion(sample_ids,celltype, dist_mat= "KL"))
+  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscope_proportion(sample_ids,celltype, dist_metric= "KL"))
   expect_match(zero_prop_warnings,"There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.",all = FALSE)
 
-  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscope_proportion(sample_ids,celltype, ep = 0.5, dist_mat= "KL"))
+  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscope_proportion(sample_ids,celltype, ep = 0.5, dist_metric= "KL"))
   expect_match(set_ep_warnings,"There are elements haing 0 proportion! ep has been set to be 0.5.",all = FALSE)
   
   expect_equal(isSymmetric(fix_div_matrix),TRUE)

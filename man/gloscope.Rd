@@ -8,7 +8,7 @@ gloscope(
   embedding_matrix,
   cell_sample_ids,
   dens = c("GMM", "KNN"),
-  dist_mat = c("KL", "JS"),
+  dist_metric = c("KL", "JS"),
   r = 10000,
   num_components = seq(6, 24, by = 2),
   k = 50,
@@ -28,7 +28,7 @@ must match the number of rows in `embedding_matrix`}
 
 \item{dens}{the density estimation. One of c("GMM","KNN")}
 
-\item{dist_mat}{distance metric to calculate the distance. One of
+\item{dist_metric}{distance metric to calculate the distance. One of
 c("KL","JS")}
 
 \item{r}{number of Monte Carlo simulations to generate}

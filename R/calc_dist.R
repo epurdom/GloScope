@@ -12,7 +12,7 @@
 #'   mod_list)
 #' @param s2 The name or index of the second sample in a pair
 #' @param df_list A named list with each sample's reduced dimension embedding
-#' @param dist_mat The distance metric to use (KL or JS)
+#' @param dist_metric The distance metric to use (KL or JS)
 #' @param dens The density estimation method (GMM or KNN)
 #' @param r Number of Monte Carlo simulations to generate
 #' @param k Number of k nearest neighbours for KNN density estimation, default k
@@ -28,11 +28,11 @@
 #'   represenations
 #' @noRd
 .calc_dist <- function(mod_list, s1, s2, df_list,
-                dist_mat = c("KL","JS"), dens = c("GMM","KNN"), r, k,
+                dist_metric = c("KL","JS"), dens = c("GMM","KNN"), r, k,
                 KNN_params, varapp = FALSE, epapp = FALSE, ep = NA){
     dens<-match.arg(dens)
-    dist_mat<-match.arg(dist_mat)
-    if(dist_mat == "KL"){
+    dist_metric<-match.arg(dist_metric)
+    if(dist_metric == "KL"){
         if(dens == "KNN"){
         if (typeof(KNN_params) == "list" & "k" %in% names(KNN_params)){
             stop("k cannot be specified in `KNN_params`. This is specified by `k` instead.")
@@ -47,7 +47,7 @@
                 .calc_kl(mod_list = mod_list, df_list = df_list, sample1 = s2, sample2 = s1,
                     dens = dens, r = r, varapp = varapp, epapp = epapp, ep = ep)
         }
-    }  else if(dist_mat == "JS"){
+    }  else if(dist_metric == "JS"){
         mydist <- .calc_JS(mod_list = mod_list, df_list = df_list, sample1 = s1, sample2 = s2,
             dens = dens, r = r, KNN_params = KNN_params)
     }

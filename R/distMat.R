@@ -8,7 +8,7 @@
 #' @param cell_sample_ids a vector of the samples IDs each cell comes from. Length
 #'   must match the number of rows in `embedding_matrix`
 #' @param dens the density estimation. One of c("GMM","KNN")
-#' @param dist_mat distance metric to calculate the distance. One of
+#' @param dist_metric distance metric to calculate the distance. One of
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
@@ -46,14 +46,14 @@
 #' @export
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
-                dens = c("GMM","KNN"), dist_mat = c("KL","JS"),
+                dens = c("GMM","KNN"), dist_metric = c("KL","JS"),
                 r = 10000, num_components = seq(6,24,by=2), k = 50,
                 GMM_params = list(modelNames = c("VVE"),verbose=FALSE,plot=FALSE),
                 KNN_params = NULL,
                 BPPARAM = BiocParallel::SerialParam(),
                 prefit_density = NULL, return_density = FALSE){
     dens<-match.arg(dens)
-    dist_mat<-match.arg(dist_mat)
+    dist_metric<-match.arg(dist_metric)
     # Input safety check
     if(length(cell_sample_ids)!=nrow(embedding_matrix)){
         stop("The number of cells in the embedding matrix does not match the number of sample labels.")
@@ -120,7 +120,7 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     # set below. See `R/.calc_dist.R` for their details.
     divergence_list <- BiocParallel::bplapply(patient_pair_list,
         function(w){ .calc_dist(mod_list = mod_list, s1 = w[1], s2 = w[2],
-            df_list = sample_matrix_list, dist_mat = dist_mat, dens = dens,
+            df_list = sample_matrix_list, dist_metric = dist_metric, dens = dens,
             r = r, k = k, KNN_params = KNN_params,
             varapp = FALSE, epapp = FALSE, ep = NA)},BPPARAM=BPPARAM)
     
