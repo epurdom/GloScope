@@ -27,33 +27,6 @@
     return(samples)
 }
 
-#' @title Helper function to obtain the KL distance using cell type proportion
-#'
-#' @description The helper function `.clus_KL` calculate the KL divergence from
-#'   two set of proportions.
-#'
-#' @param prop1 sample1's cluster proportion
-#' @param prop2 sample2's cluster proportion
-#' @param dist_mat distance metric to calculate the distance. One of
-#'   c("KL","JS")
-#' @return A single value contains the  KL divergence value calculated for the 
-#'    2 samples' cluster proportion.
-#'
-#' @noRd
-
-# Helper function to obtain KL divergence using cell type proportion
-.clus_KL <- function(prop1, prop2, dist_mat){
-    if(dist_mat == "KL"){
-        KLdist <-  sum(prop1*(log(prop1) - log(prop2))) +
-            sum(prop2*(log(prop2) - log(prop1)))
-    }else if(dist_mat == "JS"){
-        KLdist <-  1/2* sum(prop1*(log(prop1) - log(1/2*prop1 + 1/2*prop2))) +
-            1/2* sum(prop2*(log(prop2) - log(1/2*prop1 + 1/2*prop2)))
-    }
-    return(KLdist)
-}
-
-
 #' @title Helper function to query nearest neighbour distances
 #'
 #' @description This helper function `.knn_query` gets the distance from each
