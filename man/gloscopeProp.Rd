@@ -8,7 +8,7 @@ gloscopeProp(
   cell_sample_ids,
   cell_type_ids,
   ep = 0,
-  dist_metric = c("KL", "JS")
+  dist_metric = c("KL", "JS", "TV")
 )
 }
 \arguments{
@@ -17,10 +17,9 @@ must match the number of element in `cell_type_ids`}
 
 \item{cell_type_ids}{a vector of use defined cell type}
 
-\item{ep}{an integer of error term added to 0 proportion. Default ep = 0.}
+\item{ep}{an numeric value added to the summary counts. Default ep = 0 means nothing will be added.}
 
-\item{dist_metric}{distance metric to calculate the distance. One of
-c("KL","JS")}
+\item{dist_metric}{distance metric to calculate the distance.}
 }
 \value{
 clusprop_dist a symmetric matrix of divergences
@@ -28,6 +27,11 @@ clusprop_dist a symmetric matrix of divergences
 \description{
 This function calculates a matrix of pairwise divergences
   between input samples' cell type proportion.
+}
+\details{
+Options for `dist_metric` are as follows: "KL" calculates the
+  symmetric-KL divergence. "JS" calculates the Jenson-Shannon distance. "TV"
+  calculates the total variation distance.
 }
 \examples{
 # Bring in small example data of single cell embeddings

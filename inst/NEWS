@@ -1,8 +1,10 @@
 Version 1.99.0 (2025-09-20)
 =====================================
 
+- Changed name of argument to `gloscope` and `gloscope_proportion` from `dist_mat` to `dist_metric` to be more consistent in argument names
 - Changed name of function `gloscope_proportion` to `gloscopeProp` for consistent naming conventions
-- Changed name of argument to `gloscope` from `dist_mat` to `dist_metric` to be more consistent in argument names
+- `gloscopeProp` now will calculated the total variation distance between cell-type proportions (`dist_metric="TV"`)
+- `gloscopeProp` now will add the value `ep` to all counts, not just those that are zero.
 - Changed `plotMDS` to be more versatile. ARGUMENTS HAVE CHANGED. Instead of `group_id`, user can now give any combination of `color_by` and `shape_by` to indicate variables to use for the ggplot. The function has also removed unnecessary ggplot commands, leaving those to the user to chose.
 - Added function `plotHeatmap` as a wrapper to `pheatmap` function for plotting a heatmap of the GloScope divergence matrix
 - Added functions `getMetrics`, `bootstrap_gloscope`, `bootCI` to perform hypothesis testing and confidence intervals for testing differences between groups.

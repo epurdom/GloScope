@@ -201,16 +201,18 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
 test_that("Divergences using cell type works properly",{
   sample_ids <- subsample_metadata$sample_id
   celltype <- subsample_metadata$cluster_id
-  zero_prop_warnings <- capture_warnings(inf_div_matrix <- gloscopeProp(sample_ids,celltype, dist_metric= "KL"))
-  expect_match(zero_prop_warnings,"There are elements haing 0 proportion! You may get invalid results. Please consider setting ep to be e.g 0.5.",all = FALSE)
-
-  set_ep_warnings <- capture_warnings(fix_div_matrix <- gloscopeProp(sample_ids,celltype, ep = 0.5, dist_metric= "KL"))
-  expect_match(set_ep_warnings,"There are elements haing 0 proportion! ep has been set to be 0.5.",all = FALSE)
+  expect_warning(gloscopeProp(sample_ids,celltype, dist_metric= "KL"), "There are cell-types in some samples having 0 counts! You may get invalid results with this distance type.")
+  expect_message(fix_div_matrix <-gloscopeProp(sample_ids,celltype, dist_metric= "KL",ep=0.5), "There are cell-types in some samples having 0 counts. An amount 0.5 has been added to all counts.")
   
   expect_equal(isSymmetric(fix_div_matrix),TRUE)
   short_sample_ids <- sample_ids[1:100]
   expect_error(gloscopeProp(short_sample_ids, celltype),
                regexp="Lengths of cell id and cell type are not equal!",fixed=TRUE)
+
+#check other distances work:
+  expect_message(gloscopeProp(sample_ids,celltype, dist_metric= "JS",ep=0.5), "There are cell-types in some samples having 0 counts. An amount 0.5 has been added to all counts.")
+  expect_silent(gloscopeProp(sample_ids,celltype, dist_metric= "TV",ep=0.5))
+  
 })
 
 test_that("gloscope warnings for user-specified models", {
