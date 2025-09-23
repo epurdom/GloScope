@@ -5,9 +5,10 @@
 #'
 #' @param cell_sample_ids a vector of the samples IDs each cell comes from. Length
 #'   must match the number of element in `cell_type_ids`
-#' @param cell_type_ids a vector of use defined cell type
-#' @param ep an numeric value added to the summary counts. Default ep = 0 means nothing will be added.
-#' @param dist_metric distance metric to calculate the distance.
+#' @param cell_type_ids a vector of user defined cell type
+#' @param ep an numeric value added to the summary counts. Default ep = 0 means
+#'   nothing will be added.
+#' @param dist_metric metric to calculate the divergence between samples.
 #' @return clusprop_dist a symmetric matrix of divergences 
 #' @details Options for `dist_metric` are as follows: "KL" calculates the
 #'   symmetric-KL divergence. "JS" calculates the Jenson-Shannon distance. "TV"

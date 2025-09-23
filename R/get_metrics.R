@@ -122,7 +122,7 @@ getMetrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","silh
     f<-factor(metadata_df[,varname])
     if(nlevels(f)<2) return(NA)
     else{
-      out<-vegan::adonis2(d~f,perm=permControl)
+      out<-vegan::adonis2(d~f,permutations=permControl)
       if(!permuteTest) return(out$F[1])
       else{ return(c(statistic=out$F[1],pval=out$`Pr(>F)`[1]))}
     }      
@@ -132,10 +132,10 @@ getMetrics <- function(dist_mat, metadata_df, metrics=c("anosim","adonis2","silh
     if(nlevels(factor(metadata_df[,varname]))<2) return(NA)
     else{
       meansil<-function(data,ind){
-        d<-data[,1:nsamples]
+        dd<-data[,1:nsamples]
         m<-data[,(nsamples+1):ncol(data)]
         fac<-factor(m[,varname])
-        sil<-cluster::silhouette(as.integer(factor(fac)), d)
+        sil<-cluster::silhouette(as.integer(factor(fac)), dd)
         return(mean(sil[,"sil_width"]))
       }
       if(!permuteTest){

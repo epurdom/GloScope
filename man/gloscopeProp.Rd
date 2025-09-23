@@ -15,11 +15,12 @@ gloscopeProp(
 \item{cell_sample_ids}{a vector of the samples IDs each cell comes from. Length
 must match the number of element in `cell_type_ids`}
 
-\item{cell_type_ids}{a vector of use defined cell type}
+\item{cell_type_ids}{a vector of user defined cell type}
 
-\item{ep}{an numeric value added to the summary counts. Default ep = 0 means nothing will be added.}
+\item{ep}{an numeric value added to the summary counts. Default ep = 0 means
+nothing will be added.}
 
-\item{dist_metric}{distance metric to calculate the distance.}
+\item{dist_metric}{metric to calculate the divergence between samples.}
 }
 \value{
 clusprop_dist a symmetric matrix of divergences
