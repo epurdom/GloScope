@@ -1,3 +1,8 @@
+Version 1.99.1 (2025-09-27)
+====================================
+
+- Changed default number of GMM components to 5,10,15,20
+
 Version 1.99.0 (2025-09-20)
 =====================================
 
@@ -14,17 +19,17 @@ Version 1.7.2 (2025-09-17)
 ===================================
 
 - Added functionality for custom GMM and kNN parameters in fitting
-- Add aditional test cases and update documentation
+- Added aditional test cases and update documentation
 
 Version 1.7.1 (2025-07-23)
 ====================================
 
-- Change default number of GMM components to 6,8,...,24
+- Changed default number of GMM components to 6,8,...,24
 
 Version 1.3.1 (2024-08-01)
 =====================================
 
-- Fix bug which caused the `gloscopeProp` function to not be properly exported.
+- Fixed bug which caused the `gloscopeProp` function to not be properly exported.
 
 Version 1.1.1 (2024-05-01)
 =====================================
