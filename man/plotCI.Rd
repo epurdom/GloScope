@@ -22,6 +22,9 @@ intervals will be plotted in an order determined internally.}
 Controls separation between confidence intervals with the same grouping
 value.}
 }
+\value{
+A plot of sample-pair divergences with confidence intervals
+}
 \description{
 This function creates a `ggplot` object that plots the
   confidence intervals created by `bootCI`

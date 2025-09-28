@@ -15,6 +15,8 @@
 #'   \code{\link[ggplot2]{position_dodge}} if `group_by` variable is given.
 #'   Controls separation between confidence intervals with the same grouping
 #'   value.
+#' @return A plot of sample-pair divergences with confidence intervals
+#'
 #' @examples
 #' data(example_SCE_small)
 #' sample_ids <- SingleCellExperiment::colData(example_SCE_small)$sample_id
