@@ -12,7 +12,7 @@
 #'   c("KL","JS")
 #' @param r number of Monte Carlo simulations to generate
 #' @param num_components a vector of integers for the number of components to
-#'   fit GMMs to, default is seq(6,24,by=2)
+#'   fit GMMs to, default is c(5,10,15,20)
 #' @param k number of nearest neighbours for KNN density estimation, default k =
 #'   50.
 #' @param GMM_params optional mclust parameters, default is to restrict the fit
@@ -47,7 +47,7 @@
 
 gloscope <- function(embedding_matrix, cell_sample_ids,
                 dens = c("GMM","KNN"), dist_metric = c("KL","JS"),
-                r = 10000, num_components = seq(6,24,by=2), k = 50,
+                r = 10000, num_components = c(5,10,15,20), k = 50,
                 GMM_params = list(modelNames = c("VVE"),verbose=FALSE,plot=FALSE),
                 KNN_params = NULL,
                 BPPARAM = BiocParallel::SerialParam(),

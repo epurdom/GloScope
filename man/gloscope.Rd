@@ -10,7 +10,7 @@ gloscope(
   dens = c("GMM", "KNN"),
   dist_metric = c("KL", "JS"),
   r = 10000,
-  num_components = seq(6, 24, by = 2),
+  num_components = c(5, 10, 15, 20),
   k = 50,
   GMM_params = list(modelNames = c("VVE"), verbose = FALSE, plot = FALSE),
   KNN_params = NULL,
@@ -34,7 +34,7 @@ c("KL","JS")}
 \item{r}{number of Monte Carlo simulations to generate}
 
 \item{num_components}{a vector of integers for the number of components to
-fit GMMs to, default is seq(6,24,by=2)}
+fit GMMs to, default is c(5,10,15,20)}
 
 \item{k}{number of nearest neighbours for KNN density estimation, default k =
 50.}
