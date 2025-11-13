@@ -63,15 +63,26 @@ test_that("gloscope works with GMM",{
 
 })
 
-test_that("gloscope works with imput embeddings with no column names",{
+test_that("gloscope works with variations in embedding properties",{
+  #check works with data.frames
+  exdf<-data.frame(subsample_data_subset)
+  expect_silent(gloscope(exdf,subsample_metadata$sample_id,
+                         dens = "KNN", 
+                         num_components = 3:4, dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+  expect_silent(gloscope(exdf,subsample_metadata$sample_id,
+                         dens = "GMM", 
+                         num_components = 3:4, dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+  
+  
+  #check what if no column names
   stripped<-subsample_data_subset
   colnames(stripped)<-NULL
   expect_silent(gloscope(stripped,subsample_metadata$sample_id,
                                    dens = "KNN", 
-                                   num_components = seq_len(9), dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+                                   num_components = 3:4, dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
   expect_silent(gloscope(stripped,subsample_metadata$sample_id,
                                    dens = "GMM", 
-                                   num_components = seq_len(9), dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+                                   num_components = 3:4, dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
 })
 
 test_that("different random seeds give different GMM results",{

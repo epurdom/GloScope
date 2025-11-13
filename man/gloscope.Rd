@@ -20,8 +20,8 @@ gloscope(
 )
 }
 \arguments{
-\item{embedding_matrix}{a matrix of latent embeddings with rows corresponding
-to cells and columns to dimensions}
+\item{embedding_matrix}{a matrix or data.frame of latent embeddings with rows
+corresponding to cells and columns to dimensions}
 
 \item{cell_sample_ids}{a vector of the samples IDs each cell comes from. Length
 must match the number of rows in `embedding_matrix`}
@@ -42,7 +42,8 @@ fit GMMs to, default is c(5,10,15,20)}
 \item{GMM_params}{optional mclust parameters, default is to restrict the fit
 model to only VVE}
 
-\item{KNN_params}{optional arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS), default is NULL}
+\item{KNN_params}{optional arguments for either `FNN:KL.dist` (KL) or
+`RANN::nn2` (JS), default is NULL}
 
 \item{BPPARAM}{BiocParallel parameters, default is running in serial. Set
 random seed with `RNGseed` argument}

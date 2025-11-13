@@ -3,8 +3,8 @@
 #' @description This function calculates a matrix of pairwise divergences
 #'   between input samples of single cell data.
 #'
-#' @param embedding_matrix a matrix of latent embeddings with rows corresponding
-#'   to cells and columns to dimensions
+#' @param embedding_matrix a matrix or data.frame of latent embeddings with rows
+#'   corresponding to cells and columns to dimensions
 #' @param cell_sample_ids a vector of the samples IDs each cell comes from. Length
 #'   must match the number of rows in `embedding_matrix`
 #' @param dens the density estimation. One of c("GMM","KNN")
@@ -17,7 +17,8 @@
 #'   50.
 #' @param GMM_params optional mclust parameters, default is to restrict the fit
 #'   model to only VVE
-#' @param KNN_params optional arguments for either `FNN:KL.dist` (KL) or `RANN::nn2` (JS), default is NULL
+#' @param KNN_params optional arguments for either `FNN:KL.dist` (KL) or
+#'   `RANN::nn2` (JS), default is NULL
 #' @param BPPARAM BiocParallel parameters, default is running in serial. Set
 #'   random seed with `RNGseed` argument
 #' @param prefit_density a named list of pre-fit `densityMclust` objects for
