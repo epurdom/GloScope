@@ -33,6 +33,17 @@
     if ("G" %in% names(GMM_params)){
         stop("G cannot be specified in `GMM_params`. This is specified by `num_components` instead.")
     }
+        # `mclust::densityMclust()` expects column names when invoked through
+        # `do.call()` (required for R >= 4.5, otherwise it errors while assigning
+        # dimnames).  Normalise the matrices once up front to avoid repeatedly
+        # copying large objects inside the parallel loop.
+        df_list <- lapply(df_list, function(mat){
+            if (is.null(colnames(mat))) {
+                colnames(mat) <- paste0("V", seq_len(ncol(mat)))
+            }
+            mat
+        })
+        
         mod_list <- BiocParallel::bplapply(df_list, function(z){
             GMM_params$data <- z
             GMM_params$G <- get_gmm_num_components_vec(nrow(z),num_components)
