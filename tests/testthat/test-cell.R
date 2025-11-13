@@ -40,6 +40,8 @@ test_that("gloscope works with KNN",{
   expect_equal(unname(sort(rownames(temp_knn))),sort(as.character(unique(subsample_metadata$sample_id))))
   # test symmetry
   expect_equal(isSymmetric(temp_knn),TRUE)
+  
+  
 })
 
 test_that("gloscope works with GMM",{
@@ -58,6 +60,18 @@ test_that("gloscope works with GMM",{
   expect_equal(unname(sort(rownames(temp_gmm))),sort(as.character(unique(subsample_metadata$sample_id))))
   # test symmetry
   expect_equal(isSymmetric(temp_gmm),TRUE)
+
+})
+
+test_that("gloscope works with imput embeddings with no column names",{
+  stripped<-subsample_data_subset
+  colnames(stripped)<-NULL
+  expect_silent(gloscope(stripped,subsample_metadata$sample_id,
+                                   dens = "KNN", 
+                                   num_components = seq_len(9), dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
+  expect_silent(gloscope(stripped,subsample_metadata$sample_id,
+                                   dens = "GMM", 
+                                   num_components = seq_len(9), dist_metric = "KL",BPPARAM = BiocParallel::SerialParam(RNGseed=1)))
 })
 
 test_that("different random seeds give different GMM results",{
@@ -86,10 +100,10 @@ test_that("JS divergences are properly implemented",{
 
   # Example 1
   set.seed(2)
-  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma=diag(2))
-  s2 <- mvnfast::rmvn(10000,mu=c(0.5,-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma=diag(2),kpnames=TRUE)
+  s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0.5,Dim2=-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2),kpnames=TRUE)
   df_list_1 <- list(s1,s2)
-
+  
   js_knn_1_expected <- 0.17
   mod_list_knn_1 <- .calc_dens(df_list_1, dens="KNN")
   js_knn_1 <- .calc_JS (mod_list_knn_1, df_list_1, 1, 2,
@@ -104,8 +118,8 @@ test_that("JS divergences are properly implemented",{
 
   # Example 2
   set.seed(2)
-  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(1,0,0,0.1),2,2))
-  s2 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(0.1,0,0,1),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma= matrix(c(1,0,0,0.1),2,2),kpnames=TRUE)
+  s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma= matrix(c(0.1,0,0,1),2,2),kpnames=TRUE)
   df_list_2 <- list(s1,s2)
 
   js_knn_2_expected <- 0.32
@@ -126,8 +140,8 @@ test_that("the sKL divergences are properly implemented",{
 
   # Example 1
   set.seed(2)
-  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma=diag(2))
-  s2 <- mvnfast::rmvn(10000,mu=c(0.5,-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma=diag(2),kpnames=TRUE)
+  s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0.5,Dim2=-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2),kpnames=TRUE)
   df_list_1 <- list(s1,s2)
 
   kl_knn_1_expected <- 1.45
@@ -136,6 +150,7 @@ test_that("the sKL divergences are properly implemented",{
     dens="KNN", KNN_params=list(k=50))
   expect_equal(round(kl_knn_1,2),kl_knn_1_expected)
 
+  #check with and without colnames
   kl_gmm_1_expected <- 1.84
   mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
     GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
@@ -144,8 +159,8 @@ test_that("the sKL divergences are properly implemented",{
 
   # Example 2
   set.seed(2)
-  s1 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(1,0,0,0.1),2,2))
-  s2 <- mvnfast::rmvn(10000,mu=c(0,0),sigma= matrix(c(0.1,0,0,1),2,2))
+  s1 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma= matrix(c(1,0,0,0.1),2,2),kpnames=TRUE)
+  s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma= matrix(c(0.1,0,0,1),2,2),kpnames=TRUE)
   df_list_2 <- list(s1,s2)
 
   kl_knn_2_expected <- 3.28
