@@ -26,34 +26,34 @@
 #' @importFrom mclust densityMclust
 #' @noRd
 .calc_dens <- function(df_list, dens = c("GMM","KNN"), k, num_components,
-                GMM_params, BPPARAM){
-    dens<-match.arg(dens)
-    if(dens == "GMM"){
-        # run (in parallel) GMM density fitting with `mclust::densityMclust`
+                       GMM_params, BPPARAM){
+  dens<-match.arg(dens)
+  if(dens == "GMM"){
+    # run (in parallel) GMM density fitting with `mclust::densityMclust`
     if ("G" %in% names(GMM_params)){
-        stop("G cannot be specified in `GMM_params`. This is specified by `num_components` instead.")
+      stop("G cannot be specified in `GMM_params`. This is specified by `num_components` instead.")
     }
-        # `mclust::densityMclust()` expects column names when invoked through
-        # `do.call()` (required for R >= 4.5, otherwise it errors while assigning
-        # dimnames).  Normalise the matrices once up front to avoid repeatedly
-        # copying large objects inside the parallel loop.
-        df_list <- lapply(df_list, function(mat){
-            if (is.null(colnames(mat))) {
-                colnames(mat) <- paste0("V", seq_len(ncol(mat)))
-            }
-            mat
-        })
-        
-        mod_list <- BiocParallel::bplapply(df_list, function(z){
-            GMM_params$data <- z
-            GMM_params$G <- get_gmm_num_components_vec(nrow(z),num_components)
-            fit_model <- do.call(mclust::densityMclust,GMM_params)
-            return(fit_model)
-        }, BPPARAM=BPPARAM)
-    }else if(dens == "KNN"){
-        # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
-        mod_list <- df_list
-    }
-
-    return(mod_list)
+    # `mclust::densityMclust()` expects column names when invoked through
+    # `do.call()` (required for R >= 4.5, otherwise it errors while assigning
+    # dimnames).  Normalise the matrices once up front to avoid repeatedly
+    # copying large objects inside the parallel loop.
+    df_list <- lapply(df_list, function(mat){
+      if (is.null(colnames(mat))) {
+        colnames(mat) <- paste0("V", seq_len(ncol(mat)))
+      }
+      mat
+    })
+    
+    mod_list <- BiocParallel::bplapply(df_list, function(z){
+      GMM_params$data <- z
+      GMM_params$G <- get_gmm_num_components_vec(nrow(z),num_components)
+      fit_model <- do.call(mclust::densityMclust,GMM_params)
+      return(fit_model)
+    }, BPPARAM=BPPARAM)
+  }else if(dens == "KNN"){
+    # The KNN algorithm takes the embedding coordinates as input and does not require density estimation
+    mod_list <- df_list
+  }
+  
+  return(mod_list)
 }
