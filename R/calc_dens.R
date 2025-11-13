@@ -10,7 +10,9 @@
 #'   specification this function simply returns the input embedding matrices
 #'   (see R/calc_dist.R).
 #'
-#' @param df_list A list containing each samples' dimension reduction embedding
+#' @param df_list A list containing each samples' dimension reduction embedding,
+#'   i.e. a list of matrices/data.frames. It is REQUIRED that each of these
+#'   matrices have column names.
 #' @param dens method used to estimate density, options are GMM (Gaussian
 #'   mixture model) and KNN (k-nearest Neighbor)
 #' @param k number of k nearest neighbour for KNN density estimation
@@ -35,14 +37,17 @@
     }
     # `mclust::densityMclust()` expects column names when invoked through
     # `do.call()` (required for R >= 4.5, otherwise it errors while assigning
-    # dimnames).  Normalise the matrices once up front to avoid repeatedly
+    # dimnames).  
+    hasNoNames<-sapply(df_list,function(x){is.null(colnames(x))})
+    if(any(hasNoNames)) stop("df_list must be list of matrices with columnnames for fitting the GMM density. The function gloscope has a check for this, so if you are getting this error you are calling `.calc_dens` directy. `.calc_dens` is not intended as a user-facing function.")
+    # Normalise the matrices once up front to avoid repeatedly
     # copying large objects inside the parallel loop.
-    df_list <- lapply(df_list, function(mat){
-      if (is.null(colnames(mat))) {
-        colnames(mat) <- paste0("V", seq_len(ncol(mat)))
-      }
-      mat
-    })
+    # df_list <- lapply(df_list, function(mat){
+    #   if (is.null(colnames(mat))) {
+    #     colnames(mat) <- paste0("V", seq_len(ncol(mat)))
+    #   }
+    #   mat
+    # })
     
     mod_list <- BiocParallel::bplapply(df_list, function(z){
       GMM_params$data <- z

@@ -64,6 +64,10 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
     unique_sample_ids <- unique(cell_sample_ids)
     names(unique_sample_ids) <- unique_sample_ids
 
+    if(is.null(colnames(embedding_matrix))){
+      # GMM fitting now requires column names for matrix
+      colnames(embedding_matrix)<-paste("Dim",seq_len(ncol(embedding_matrix)),sep="")
+    }
     # Results may be unreliable for samples with less than 500 cells
     # We raise a warning denoting samples for which this is the case
     MIN_CELLS <- 500
