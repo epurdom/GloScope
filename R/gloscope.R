@@ -108,8 +108,41 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
         k = k, num_components = num_components,
         GMM_params = GMM_params, BPPARAM = BPPARAM)
     } else {
+        # Validate that prefit_density contains densityMclust objects
+        for(i in seq_along(prefit_density)){
+            obj <- prefit_density[[i]]
+            obj_name <- names(prefit_density)[i]
+            if(is.null(obj_name)) obj_name <- paste0("[[", i, "]]")
+           
+            # Check if it's a densityMclust object
+            if(!inherits(obj, "densityMclust")){
+                # Provide specific guidance if it's a Mclust object
+                if(inherits(obj, "Mclust")){
+                    stop(
+                        sprintf(
+                            "prefit_density%s is a 'Mclust' object, but 'densityMclust' is required.\n",
+                            obj_name
+                        ),
+                        "  Use mclust::densityMclust() instead of mclust::Mclust().\n",
+                        "  Example: densityMclust(data, G = 12, modelNames = 'VVE', plot = FALSE)\n",
+                        "  See ?gloscope for more details."
+                    )
+                } else {
+                    stop(
+                        sprintf(
+                            "prefit_density%s must be a 'densityMclust' object.\n",
+                            obj_name
+                        ),
+                        "  Found object of class: ", class(obj)[1], "\n",
+                        "  Use mclust::densityMclust() to create the correct object type.\n",
+                        "  Example: densityMclust(data, G = 12, modelNames = 'VVE', plot = FALSE)"
+                    )
+                }
+            }
+        }
         mod_list <- prefit_density
     }
+
 
     sample_pairs <- utils::combn(unique_sample_ids, 2)
     # Convert patient pairs to a list for BiocParallel::bplapply
