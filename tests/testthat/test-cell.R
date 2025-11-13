@@ -99,8 +99,9 @@ test_that("GMM density fitting returns `densityMclust` objects",{
   # the following `lapply` creates the necessary input data structure for this fn.
   embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
   names(embeddings_list) <- unique(sample_ids)
-  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", num_components=seq_len(9),
+  expect_silent(gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM", num_components=seq_len(9),
     GMM_params = list(plot=FALSE,verbose=FALSE), BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  )
   # confirm that each element is in the output is a `densityMclust` object
   expect_true(all(unlist(lapply(gmm_density_list,function(x){class(x)[1]=="densityMclust"}))))
 })
@@ -115,16 +116,18 @@ test_that("JS divergences are properly implemented",{
   s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0.5,Dim2=-0.5),sigma= matrix(c(0.5,0.1,0.1,0.3),2,2),kpnames=TRUE)
   df_list_1 <- list(s1,s2)
   
+  #check KNN
   js_knn_1_expected <- 0.17
-  mod_list_knn_1 <- .calc_dens(df_list_1, dens="KNN")
-  js_knn_1 <- .calc_JS (mod_list_knn_1, df_list_1, 1, 2,
-    dens = "KNN", KNN_params = list(k=50))
+  expect_silent(mod_list_knn_1 <- .calc_dens(df_list_1, dens="KNN"))
+  expect_silent(js_knn_1 <- .calc_JS (mod_list_knn_1, df_list_1, 1, 2,
+    dens = "KNN", KNN_params = list(k=50)))
   expect_equal(round(js_knn_1,2),js_knn_1_expected)
 
+  #check GMM
   js_gmm_1_expected <- 0.18
-  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
-    GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
-  js_gmm_1 <- .calc_JS (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM", r = 10000)
+  expect_silent(mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
+    GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2)))
+  expect_silent(js_gmm_1 <- .calc_JS (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM", r = 10000))
   expect_equal(round(js_gmm_1,2),js_gmm_1_expected)
 
   # Example 2
@@ -133,11 +136,13 @@ test_that("JS divergences are properly implemented",{
   s2 <- mvnfast::rmvn(10000,mu=c(Dim1=0,Dim2=0),sigma= matrix(c(0.1,0,0,1),2,2),kpnames=TRUE)
   df_list_2 <- list(s1,s2)
 
+  #check KNN
   js_knn_2_expected <- 0.32
   mod_list_knn_2 <- .calc_dens(df_list_1, dens="KNN")
   js_knn_2 <- .calc_JS (mod_list_knn_2, df_list_2, 1, 2, dens = "KNN", KNN_params = list(k=50))
   expect_equal(round(js_knn_2,2),js_knn_2_expected)
 
+  #check GMM
   js_gmm_2_expected <- 0.33
   mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM", num_components = seq_len(9),
     GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
