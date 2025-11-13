@@ -124,7 +124,6 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
                             obj_name
                         ),
                         "  Use mclust::densityMclust() instead of mclust::Mclust().\n",
-                        "  Example: densityMclust(data, G = 12, modelNames = 'VVE', plot = FALSE)\n",
                         "  See ?gloscope for more details."
                     )
                 } else {
@@ -135,7 +134,6 @@ gloscope <- function(embedding_matrix, cell_sample_ids,
                         ),
                         "  Found object of class: ", class(obj)[1], "\n",
                         "  Use mclust::densityMclust() to create the correct object type.\n",
-                        "  Example: densityMclust(data, G = 12, modelNames = 'VVE', plot = FALSE)"
                     )
                 }
             }
