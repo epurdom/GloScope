@@ -131,15 +131,17 @@ test_that("the sKL divergences are properly implemented",{
   df_list_1 <- list(s1,s2)
 
   kl_knn_1_expected <- 1.45
-  mod_list_knn_1 <- .calc_dens(df_list_1, dens="KNN")
-  kl_knn_1 <- .calc_kl(mod_list_knn_1, df_list_1, 1, 2,
-    dens="KNN", KNN_params=list(k=50))
+  expect_silent(mod_list_knn_1 <- .calc_dens(df_list_1, dens="KNN"))
+  expect_silent(kl_knn_1 <- .calc_kl(mod_list_knn_1, df_list_1, 1, 2,
+    dens="KNN", KNN_params=list(k=50)))
   expect_equal(round(kl_knn_1,2),kl_knn_1_expected)
 
   kl_gmm_1_expected <- 1.84
-  mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
+  expect_silent(mod_list_gmm_1 <- .calc_dens(df_list_1, dens="GMM", num_components = seq_len(9),
     GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
-  kl_gmm_1 <- .calc_kl (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
+  )
+  expect_silent(kl_gmm_1 <- .calc_kl (mod_list_gmm_1, df_list_1, 1, 2, dens = "GMM")
+  )
   expect_equal(round(kl_gmm_1,2),kl_gmm_1_expected)
 
   # Example 2
@@ -149,14 +151,14 @@ test_that("the sKL divergences are properly implemented",{
   df_list_2 <- list(s1,s2)
 
   kl_knn_2_expected <- 3.28
-  mod_list_knn_2 <- .calc_dens(df_list_2, dens="KNN")
-  kl_knn_2 <- .calc_kl (mod_list_knn_2, df_list_2, 1, 2, dens = "KNN",KNN_params = list(k=50))
+  expect_silent(mod_list_knn_2 <- .calc_dens(df_list_2, dens="KNN"))
+  expect_silent(kl_knn_2 <- .calc_kl (mod_list_knn_2, df_list_2, 1, 2, dens = "KNN",KNN_params = list(k=50)))
   expect_equal(round(kl_knn_2,2),kl_knn_2_expected)
 
   kl_gmm_2_expected <- 4.05
-  mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM", num_components = seq_len(9),
-    GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
-  kl_gmm_2 <- .calc_kl (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM")
+  expect_silent(mod_list_gmm_2 <- .calc_dens(df_list_2, dens="GMM", num_components = seq_len(9),
+    GMM_params = list(plot=FALSE,verbose=FALSE),BPPARAM = BiocParallel::SerialParam(RNGseed = 2)))
+  expect_silent(kl_gmm_2 <- .calc_kl (mod_list_gmm_2, df_list_2, 1, 2, dens = "GMM"))
   expect_equal(round(kl_gmm_2,2),kl_gmm_2_expected)
 })
 
@@ -169,11 +171,11 @@ test_that("Divergences are properly computed with GloScope inputs and KNN",{
   patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
   w <- as.character(patient_pair_list[[6]]) # pick one unit
   w_div_kl_expected <- 1.52
-  w_div_kl <- .calc_kl(knn_density_list, embeddings_list, w[1], w[2],
-    dens = "KNN", KNN_params = list(k = 50))
+  expect_silent(w_div_kl <- .calc_kl(knn_density_list, embeddings_list, w[1], w[2],
+    dens = "KNN", KNN_params = list(k = 50)))
   w_div_js_expected <- 0.04
-  w_div_js <- .calc_JS(knn_density_list, embeddings_list, w[1], w[2], 
-    dens = "KNN", KNN_params = list(k = 50))
+  expect_silent(w_div_js <- .calc_JS(knn_density_list, embeddings_list, w[1], w[2], 
+    dens = "KNN", KNN_params = list(k = 50)))
   expect_equal(round(w_div_kl,2),w_div_kl_expected)
   expect_equal(round(w_div_js,2),w_div_js_expected)
 })
@@ -183,17 +185,17 @@ test_that("Divergences are properly computed with GloScope inputs and GMM",{
   sample_ids <- subsample_metadata$sample_id
   embeddings_list <- lapply(unique(sample_ids),function(x){subsample_data_subset[(sample_ids==x),]})
   names(embeddings_list) <- unique(sample_ids)
-  gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM",
-    GMM_params = list(plot=FALSE,verbose=FALSE),num_components = seq_len(9), BPPARAM = BiocParallel::SerialParam(RNGseed = 2))
+  expect_silent(gmm_density_list <- .calc_dens(embeddings_list, dens = "GMM",
+    GMM_params = list(plot=FALSE,verbose=FALSE),num_components = seq_len(9), BPPARAM = BiocParallel::SerialParam(RNGseed = 2)))
   sample_pairs <- utils::combn(unique(sample_ids), 2)
   patient_pair_list <- lapply(seq_len(ncol(sample_pairs)), function(i) sample_pairs[,i])
   w <- as.character(patient_pair_list[[2]]) # pick one unit
   w_div_kl_expected <- 5.06
   set.seed(2)
-  w_div_kl <- .calc_kl(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM")
+  expect_silent(w_div_kl <- .calc_kl(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM"))
   w_div_js_expected <- 0.50
   set.seed(2)
-  w_div_js <- .calc_JS(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM", r = 10000)
+  expect_silent(w_div_js <- .calc_JS(gmm_density_list, embeddings_list, w[1], w[2], dens = "GMM", r = 10000))
   expect_equal(round(w_div_kl,2),w_div_kl_expected)
   expect_equal(round(w_div_js,2),w_div_js_expected)
 })
