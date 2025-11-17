@@ -1,7 +1,7 @@
 Package: GloScope
 Type: Package
 Title: Population-level Representation on scRNA-Seq data
-Version: 2.1.1
+Version: 2.1.2
 Authors@R: c(
   person("Elizabeth", "Purdom", email = "epurdom@stat.berkeley.edu", role = c("aut","cre")),
   person("William", "Torous", email = "wtorous@berkeley.edu",
